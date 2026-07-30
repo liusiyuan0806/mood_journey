@@ -1,0 +1,46 @@
+<view class="page">
+  <view class="title">
+    {{date}}
+  </view>
+
+  <view class="count">
+    共 {{records.length}} 条记录
+  </view>
+
+  <block wx:if="{{records.length}}">
+
+  <view
+  wx:for="{{records}}"
+  wx:key="id"
+  class="record-item"
+  bindtap="editRecord"
+  data-id="{{item.id}}">
+    <view class="record-header">
+      <view>
+        <text class="emoji">{{item.emoji}}</text>
+        <text class="mood">{{item.mood}}</text>
+      </view>
+      <text class="time">{{item.time}}</text>
+    </view>
+    <view class="record-info">
+      🌤 {{item.weather}}
+      <text wx:if="{{item.location}}">
+        · 📍{{item.location}}
+      </text>
+    </view>
+    <view
+      wx:if="{{item.note}}"
+      class="record-note">
+      {{item.note}}
+    </view>
+  </view>
+  </block>
+  <view wx:else class="empty">
+    这一天还没有记录 🌿
+  </view>
+  <button
+  class="add-btn"
+  bindtap="addRecord">
+  ＋ 新增记录
+  </button>
+</view>

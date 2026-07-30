@@ -1,0 +1,46 @@
+<view class="page">
+  <view class="score card">
+    <view class="muted">情绪健康指数(EHI)</view>
+    <view class="score-line">
+      <text>{{score}}</text>
+      <text>/ 100 · {{level}}</text>
+    </view>
+    <view class="progress">
+      <view style="width: {{score+'%'}}"></view>
+    </view>
+    <view class="formula">
+      情绪健康指数 = (平均分/5)×100 − 标准差×3 − 连续低谷天数×1
+    </view>
+  </view>
+  <view class="tabs">
+    <text data-tab="week" bindtap="setTab" class="{{tab==='week'?'active':''}}">本周</text>
+    <text data-tab="month" bindtap="setTab" class="{{tab==='month'?'active':''}}">本月</text>
+    <text data-tab="all" bindtap="setTab" class="{{tab==='all'?'active':''}}">全部</text>
+  </view>
+  <view wx:if="{{records.length}}">
+    <view class="section-title">情绪走势</view>
+    <view class="chart card">
+      <view class="line-bars">
+        <view wx:for="{{line}}" wx:key="date" class="line-item">
+          <view class="bar-value" style="height:{{item.height}}"></view>
+          <text>{{item.date}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="section-title">天气关联</view>
+    <view class="chart card">
+      <view wx:for="{{weather}}" wx:key="name" class="weather-row">
+        <text>{{item.name}}</text>
+        <view>
+          <view class="weather-bar" style="width:{{item.value+'%'}}"></view>
+        </view>
+        <text>{{item.value}}分</text>
+      </view>
+    </view>
+    <view wx:if="{{warning}}" class="alert">连续 3 天情绪偏低。请给自己一点休息空间，也可以找信任的人聊聊。</view>
+  </view>
+  <view wx:else class="empty card">
+    <text>记录几次心情后，这里会为你呈现专属洞察。</text>
+    <button class="primary-btn" bindtap="goRecord">去记录心情</button>
+  </view>
+</view>

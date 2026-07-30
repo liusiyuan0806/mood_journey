@@ -1,0 +1,27 @@
+<view class="page">
+  <view class="user card" bindtap="edit">
+    <view class="avatar">
+      <image wx:if="{{profile && profile.avatar !== '🌿'}}" class="avatar-img" src="{{profile.avatar}}" mode="aspectFill" />
+      <text wx:else>🌿</text>
+    </view>
+    <view class="user-text">
+      <view class="name">
+        {{profile ? profile.nickname : '未登录'}}
+      </view>
+      <view class="muted">
+        {{profile ? (profile.signature || '点击编辑个人资料') : '登录后同步你的资料'}}
+      </view>
+    </view>
+    <text class="chevron">›</text>
+  </view><button wx:if="{{!profile}}" class="primary-btn" bindtap="login">一键登录</button><button wx:else class="logout" bindtap="logout">退出登录</button>
+  <view class="stats card">
+    <view><text>{{stats.total}}</text><text>累计记录天数</text></view>
+    <view><text>{{stats.streak}}</text><text>连续打卡天数</text></view>
+    <view><text>{{stats.avg}}</text><text>平均心情值</text></view>
+  </view>
+  <view class="menu card">
+    <view bindtap="report">生成本周情绪报告 <text>›</text></view>
+    <view bindtap="report">生成分享卡片 <text>›</text></view>
+    <view class="delete" bindtap="clear">清除所有数据 <text>›</text></view>
+  </view>
+</view>

@@ -1,0 +1,8 @@
+<view class="page">
+<view class="avatar" bindtap="avatar">
+<image wx:if="{{avatar !== '🌿'}}" src="{{avatar}}"/>
+<text wx:else>{{avatar}}</text>
+</view><view class="hint">点击更换头像</view>
+<view class="field">
+<text>昵称</text>
+<input value="{{nickname}}" data-field="nickname" bindinput="input" placeholder="输入昵称"/></view><view class="field"><text>个性签名</text><input value="{{signature}}" data-field="signature" bindinput="input" placeholder="写一句介绍自己"/></view><button class="primary-btn" bindtap="save">保存资料</button></view>

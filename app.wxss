@@ -1,0 +1,7 @@
+page { background:#FFF9F4; color:#34302F; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif; }
+.page { padding:28rpx 30rpx 48rpx; box-sizing:border-box; }
+.card { background:#FFF; border-radius:28rpx; box-shadow:0 10rpx 28rpx rgba(160,105,82,.08); }
+.section-title { font-size:36rpx; font-weight:700; margin:34rpx 0 20rpx; }
+.muted { color:#9B918E; font-size:25rpx; }
+.primary-btn { background:#F28B68; color:#fff; border-radius:48rpx; font-size:30rpx; line-height:88rpx; }
+.primary-btn::after { border:none; }

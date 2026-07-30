@@ -1,0 +1,2 @@
+const { getProfile, saveProfile } = require('../../utils/store');
+Page({data:{avatar:'🌿',nickname:'',signature:''},onLoad(){const p=getProfile();if(p)this.setData(p)},avatar(){wx.chooseMedia({count:1,mediaType:['image'],success:r=>this.setData({avatar:r.tempFiles[0].tempFilePath})})},input(e){this.setData({[e.currentTarget.dataset.field]:e.detail.value})},save(){if(!this.data.nickname.trim())return wx.showToast({title:'请填写昵称',icon:'none'});saveProfile(this.data);wx.showToast({title:'已保存'});setTimeout(()=>wx.navigateBack(),500)}});

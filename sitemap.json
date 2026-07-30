@@ -1,0 +1,4 @@
+{ "desc": "mood journal", "rules": [{
+  "action": "allow",
+  "page": "*"
+}] }

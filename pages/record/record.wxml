@@ -1,0 +1,63 @@
+<view class="page">
+
+  <view class="section">
+    <view class="label">
+      记录日期
+    </view>
+    <picker mode="date" value="{{date}}" bindchange="changeDate">
+      <view class="picker-box">
+        {{date}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="section">
+    <view class="label">
+      记录时间
+    </view>
+    <picker mode="time" value="{{time}}" bindchange="changeTime">
+      <view class="picker-box">
+        {{time}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="section-title">选择此刻的心情</view>
+  <view class="moods">
+    <view wx:for="{{moods}}" wx:key="name" class="mood {{selected===item.name?'chosen':''}}" data-name="{{item.name}}" bindtap="select">
+      <text>{{item.emoji}}</text>
+      <text>{{item.name}}</text>
+    </view>
+  </view>
+  <view class="section-title">写下更多 <text class="muted">{{note.length}}/300</text>
+  </view>
+  <textarea maxlength="300" value="{{note}}" bindinput="input" placeholder="发生了什么？此刻你有什么感受？" />
+  <view class="section-title">场景</view>
+  <view class="selectors">
+    <picker range="{{weatherOptions}}" bindchange="pickWeather">
+      <view>天气：{{weather}}
+        <text>›</text>
+      </view>
+    </picker>
+    <picker range="{{locationOptions}}" bindchange="pickLocation">
+      <view>地点：{{location}}
+        <text>›</text>
+      </view>
+    </picker>
+  </view>
+  <view class="section-title">情绪诱因
+    <text class="muted">最多3项</text>
+  </view>
+  <view class="triggers">
+    <text wx:for="{{triggerOptions}}" wx:key="*this" data-value="{{item}}" bindtap="trigger">{{item}}
+    </text>
+  </view>
+  <view class="section-title">图片
+    <text class="muted">最多9张</text>
+  </view>
+  <view class="photos">
+    <image wx:for="{{images}}" wx:key="*this" src="{{item}}" mode="aspectFill" data-index="{{index}}" bindtap="removeImage" />
+    <view wx:if="{{images.length<9}}" class="add" bindtap="images">＋</view>
+  </view>
+  <button class="primary-btn save" bindtap="save">保存今天的心情</button>
+</view>

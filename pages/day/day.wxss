@@ -1,0 +1,42 @@
+.page{
+  padding:30rpx;
+  background:#F7F9F5;
+  min-height:100vh;
+}
+.title{
+  font-size:42rpx;
+  font-weight:bold;
+  color:#47564C;
+}
+.count{
+  margin-top:12rpx;
+  color:#9AA39B;
+}
+.record-item{
+  margin-top:24rpx;
+  padding:24rpx;
+  border-radius:24rpx;
+  background:white;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.time{
+  color:#B08D62;
+}
+.emoji{
+  font-size:40rpx;
+}
+.mood{
+  margin-left:12rpx;
+  font-size:30rpx;
+}
+.right{
+  display:flex;
+  align-items:center;
+}
+.empty{
+  margin-top:60rpx;
+  text-align:center;
+  color:#999;
+}

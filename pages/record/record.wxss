@@ -1,0 +1,100 @@
+.moods {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14rpx
+}
+
+.mood {
+  background: #fff;
+  border-radius: 18rpx;
+  height: 106rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 23rpx;
+  border: 3rpx solid transparent
+}
+
+.mood text:first-child {
+  font-size: 38rpx
+}
+
+.mood.chosen {
+  border-color: #F28B68;
+  background: #FFF3EC
+}
+
+textarea {
+  width: 100%;
+  height: 190rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 22rpx;
+  box-sizing: border-box;
+  font-size: 28rpx
+}
+
+.selectors {
+  display: flex;
+  gap: 18rpx
+}
+
+.selectors picker {
+  flex: 1
+}
+
+.selectors view {
+  background: #fff;
+  border-radius: 18rpx;
+  padding: 25rpx;
+  font-size: 27rpx
+}
+
+.selectors text {
+  float: right
+}
+
+.triggers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15rpx
+}
+
+.triggers text {
+  padding: 14rpx 22rpx;
+  background: #fff;
+  border-radius: 30rpx;
+  font-size: 25rpx
+}
+
+.triggers .on {
+  background: #FADCCF;
+  color: #B95439
+}
+
+.photos {
+  display: flex;
+  gap: 14rpx;
+  flex-wrap: wrap
+}
+
+.photos image,
+.add {
+  width: 145rpx;
+  height: 145rpx;
+  border-radius: 14rpx
+}
+
+.add {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60rpx;
+  color: #C0B5B1
+}
+
+.save {
+  margin: 50rpx 0 20rpx
+}

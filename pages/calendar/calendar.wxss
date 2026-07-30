@@ -1,0 +1,104 @@
+.overview{
+  padding:28rpx
+}
+.big{
+  font-size:54rpx;
+  font-weight:800;
+  color:#F28B68
+}
+.summary{
+  margin-top:14rpx;
+  font-size:24rpx
+}
+.bar{
+  height:10rpx;
+  background:#F4EAE5;
+  border-radius:10rpx;
+  margin-top:6rpx
+}
+.bar view{
+  height:100%;
+  background:#F5B270;
+  border-radius:10rpx
+}
+.switch{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:32rpx;
+  font-weight:700;
+  margin:35rpx 10rpx 22rpx
+}
+.switch text:first-child,.switch text:last-child{
+  font-size:55rpx;
+  color:#F28B68
+}
+.week,.calendar{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  text-align:center
+}
+.week{
+  color:#9B918E;
+  font-size:24rpx;
+  margin-bottom:12rpx
+}
+.calendar{
+  row-gap:12rpx
+}
+.day{
+  height:76rpx;
+  display:flex;
+  justify-content:center
+}
+.date{
+  width:60rpx;
+  height:60rpx;
+  line-height:60rpx;
+  border-radius:50%;
+  font-size:26rpx
+}
+.mask{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.3);
+  z-index:10
+}
+.sheet{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  box-sizing:border-box;
+  background:#fff;
+  border-radius:32rpx 32rpx 0 0;
+  padding:40rpx
+}
+.sheet-mood{
+  font-size:40rpx;
+  font-weight:bold
+}
+.note{
+  margin:24rpx 0;
+  font-size:28rpx
+}
+.actions{
+  display:flex;
+  gap:18rpx
+}
+.actions button{
+  flex:1
+}
+.danger{
+  color:#D85454
+}
+.add-btn{
+  margin-top:40rpx;
+  height:80rpx;
+  border-radius:40rpx;
+  background:#9FD3B4;
+  color:#fff;
+  font-size:30rpx;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}

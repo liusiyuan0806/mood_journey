@@ -1,0 +1,196 @@
+<view class="page">
+
+  <!-- 顶部 -->
+  <view class="top">
+
+    <view class="avatar">
+      <image wx:if="{{profile && profile.avatar}}" class="avatar-img" src="{{profile.avatar}}" mode="aspectFill" />
+      <text wx:else>🌿</text>
+    </view>
+
+
+    <view class="user-info">
+
+      <view class="hello">
+        {{greeting}}，{{profile ? profile.nickname : '未登录'}}
+      </view>
+
+      <view class="clock">
+        {{clock}}
+      </view>
+
+    </view>
+
+  </view>
+
+
+
+  <!-- 天气 -->
+  <view class="weather card">
+
+    <view>
+      <view class="weather-city">
+        {{weather.city}}
+      </view>
+
+      <view class="muted">
+        愿你今天轻松自在
+      </view>
+    </view>
+
+
+    <view class="weather-info">
+      <text>{{weather.icon}}</text>
+      <text>{{weather.temp}}°</text>
+    </view>
+
+
+  </view>
+
+
+
+
+  <!-- 今日轨迹 -->
+
+  <view class="today-card">
+
+
+    <view class="today-header">
+
+      <text class="today-title">
+        ☀️ 今日心情轨迹
+      </text>
+
+      <text class="today-count">
+        已记录 {{todayRecords.length}} 次
+      </text>
+
+
+    </view>
+
+
+
+    <view wx:if="{{todayRecords.length==0}}" class="empty">
+
+      🌿 今天还没有记录心情哦
+
+    </view>
+
+
+
+    <block wx:else>
+
+
+      <view wx:for="{{todayRecords}}" wx:key="id" class="record-item">
+
+
+        <!-- 左边圆点 -->
+
+        <view class="record-dot">
+        </view>
+
+
+
+        <view class="record-body">
+
+
+          <view class="record-time">
+            {{item.time}}
+          </view>
+
+
+
+          <view class="emotion-row">
+
+
+            <text class="record-emoji">
+              {{item.emoji}}
+            </text>
+
+
+            <text class="record-mood">
+              {{item.mood}}
+            </text>
+
+
+          </view>
+
+
+
+          <view wx:if="{{item.note}}" class="record-note">
+
+            {{item.note}}
+
+          </view>
+
+
+
+        </view>
+
+
+      </view>
+
+
+    </block>
+
+
+  </view>
+
+
+
+
+
+  <!-- 选择心情 -->
+
+
+  <view class="section-title">
+
+    此刻的你，是什么心情？
+
+  </view>
+
+
+
+  <view class="moods">
+
+
+    <view wx:for="{{moods}}" wx:key="name" class="mood" bindtap="recordMood" data-name="{{item.name}}">
+
+
+      <text class="emoji">
+        {{item.emoji}}
+      </text>
+
+
+      <text class="mood-text">
+        {{item.name}}
+      </text>
+
+
+
+    </view>
+
+
+  </view>
+
+
+
+
+  <!-- 一句话 -->
+
+  <view class="quote card">
+
+    “{{quote}}”
+
+  </view>
+
+
+
+  <button class="primary-btn" bindtap="more">
+
+    写下更多
+
+  </button>
+
+
+</view>

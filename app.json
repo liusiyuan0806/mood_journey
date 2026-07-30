@@ -1,0 +1,41 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/calendar/calendar",
+    "pages/insights/insights",
+    "pages/profile/profile",
+    "pages/record/record",
+    "pages/edit-profile/edit-profile",
+    "pages/day/day"
+  ],
+  "window": {
+    "navigationBarTitleText": "情绪手账",
+    "navigationBarBackgroundColor": "#FFF9F4",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFF9F4"
+  },
+  "tabBar": {
+    "color": "#8C8C8C",
+    "selectedColor": "#F28B68",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "今日心情"
+      },
+      {
+        "pagePath": "pages/calendar/calendar",
+        "text": "情绪日历"
+      },
+      {
+        "pagePath": "pages/insights/insights",
+        "text": "晴雨表"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}
