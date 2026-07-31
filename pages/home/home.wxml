@@ -157,12 +157,12 @@
     <view wx:for="{{moods}}" wx:key="name" class="mood" bindtap="recordMood" data-name="{{item.name}}">
 
 
-      <text class="emoji">
+      <text class="emoji" >
         {{item.emoji}}
       </text>
 
 
-      <text class="mood-text">
+      <text class="mood-text" >
         {{item.name}}
       </text>
 

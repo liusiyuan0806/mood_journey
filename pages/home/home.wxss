@@ -56,30 +56,31 @@
 }
 
 .mood {
-  height: 130rpx;
   background: #fff;
   border-radius: 18rpx;
+  height: 106rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8rpx;
-  box-sizing: border-box;
-  font-size: 23rpx;
+  font-size: 29rpx;
   border: 3rpx solid transparent;
+  box-sizing:border-box;
+  gap:2rpx;
+  transform:translateY(-5rpx)
 }
-
 /* 首页 emoji 与记录页一致 */
 .mood .emoji {
   font-size: 38rpx;
-  line-height: 1;
-  margin: 0;
+  line-height:1;
+  margin-bottom:-20rpx;
 }
 
-/* 首页文字与记录页一致 */
-.mood text:last-child {
-  font-size: 23rpx;
-  line-height: 1.2;
+/* 
+首页文字与记录页一致 */
+.mood-text {
+  font-size: 25rpx;
+  line-height: 1;
   color: #665348;
   white-space: nowrap;
 }
@@ -188,33 +189,11 @@
 }
 
 
-/* 心情文字 */
-.mood-name{
-
-  font-size:34rpx;
-
-  font-weight:700;
-
-  color:#6B5142;
-
-  margin-left:18rpx;
-
-}
 
 
 
-/* 备注 */
-.note{
 
-  margin-top:12rpx;
 
-  font-size:28rpx;
-
-  color:#958174;
-
-  line-height:1.6;
-
-}
 /* ===== 今日心情轨迹新版布局 ===== */
 
 
