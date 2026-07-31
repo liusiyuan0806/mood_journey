@@ -87,7 +87,7 @@
 
 /* 今日心情轨迹 — 时间轴样式，融入页面背景 */
 .today-card {
-  margin: 36rpx 0 0;
+  margin: 20rpx 0 0;
   padding: 0;
   background: transparent;
   box-shadow: none;
@@ -112,9 +112,11 @@
   font-size: 24rpx;
   color: #E8856A;
   background: #FFF1E6;
-  padding: 6rpx 18rpx;
+  padding: 3rpx 18rpx;
   border-radius: 20rpx;
   font-weight: 500;
+  justify-content: center;
+  align-items: center;
 }
 
 /* 时间轴记录项 */
