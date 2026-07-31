@@ -10,14 +10,15 @@
   ],
   "window": {
     "navigationBarTitleText": "情绪手账",
-    "navigationBarBackgroundColor": "#FFF9F4",
+    "navigationBarBackgroundColor": "#FFF8F2",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#FFF9F4"
+    "backgroundColor": "#FFF8F2"
   },
   "tabBar": {
-    "color": "#8C8C8C",
-    "selectedColor": "#F28B68",
+    "color": "#B5A69C",
+    "selectedColor": "#E8856A",
     "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/home",

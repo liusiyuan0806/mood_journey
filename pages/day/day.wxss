@@ -1,42 +1,119 @@
-.page{
-  padding:30rpx;
-  background:#F7F9F5;
-  min-height:100vh;
+/* ===== 单日详情 · 温暖色调 ===== */
+
+.page {
+  padding: 30rpx;
+  background: #FFF8F2;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
-.title{
-  font-size:42rpx;
-  font-weight:bold;
-  color:#47564C;
+
+.title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  letter-spacing: 0.5rpx;
 }
-.count{
-  margin-top:12rpx;
-  color:#9AA39B;
+
+.count {
+  margin-top: 10rpx;
+  color: #B5A69C;
+  font-size: 25rpx;
 }
-.record-item{
-  margin-top:24rpx;
-  padding:24rpx;
-  border-radius:24rpx;
-  background:white;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+
+/* 记录卡片 */
+.record-item {
+  margin-top: 24rpx;
+  padding: 28rpx 26rpx;
+  border-radius: 24rpx;
+  background: #FFFFFF;
+  box-shadow: 0 6rpx 20rpx rgba(200, 130, 90, 0.08);
+  border: 1rpx solid rgba(232, 133, 106, 0.06);
+  transition: all 0.2s ease;
 }
-.time{
-  color:#B08D62;
+
+.record-item:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(200, 130, 90, 0.1);
 }
-.emoji{
-  font-size:40rpx;
+
+.record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
 }
-.mood{
-  margin-left:12rpx;
-  font-size:30rpx;
+
+.record-header > view:first-child {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
 }
-.right{
-  display:flex;
-  align-items:center;
+
+.emoji {
+  font-size: 42rpx;
+  line-height: 1;
 }
-.empty{
-  margin-top:60rpx;
-  text-align:center;
-  color:#999;
+
+.mood {
+  margin-left: 0;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #5D4A40;
+}
+
+.time {
+  color: #F0B27A;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.record-info {
+  font-size: 24rpx;
+  color: #8B776B;
+  margin-bottom: 10rpx;
+}
+
+.record-note {
+  font-size: 26rpx;
+  color: #6B5A50;
+  line-height: 1.7;
+  padding-top: 14rpx;
+  border-top: 1rpx solid #F5EBE3;
+  margin-top: 6rpx;
+}
+
+/* 空状态 */
+.empty {
+  margin-top: 80rpx;
+  text-align: center;
+  color: #B5A69C;
+  font-size: 26rpx;
+  padding: 60rpx 0;
+}
+
+/* 新增按钮 */
+.add-btn {
+  margin-top: 36rpx;
+  width: 100%;
+  height: 88rpx;
+  border-radius: 44rpx;
+  background: linear-gradient(135deg, #F09070 0%, #E8856A 100%);
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8rpx 20rpx rgba(232, 133, 106, 0.25);
+  letter-spacing: 2rpx;
+  border: none;
+}
+
+.add-btn::after {
+  border: none;
+}
+
+.add-btn:active {
+  opacity: 0.85;
+  transform: scale(0.98);
 }
