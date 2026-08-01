@@ -220,9 +220,20 @@
     <view class="fb-body">{{feedbackText}}</view>
   </view>
 
-  <!-- 一句话（保持原有） -->
+  <!-- 每日一句卡片（带收藏 + 换一句） -->
   <view class="quote card">
-    "{{quote}}"
+    <view class="quote-header">
+      <text class="quote-title">每日一句</text>
+      <view class="quote-actions">
+        <view class="quote-btn {{quoteFavorited ? 'active' : ''}}" bindtap="toggleFavoriteQuote" hover-class="quote-btn-hover" hover-stay-time="100">
+          <text class="quote-btn-icon">{{quoteFavorited ? '★' : '☆'}}</text>
+        </view>
+        <view class="quote-btn" bindtap="refreshQuote" hover-class="quote-btn-hover" hover-stay-time="100">
+          <text class="quote-btn-icon refresh">↻</text>
+        </view>
+      </view>
+    </view>
+    <view class="quote-body">{{quote}}</view>
   </view>
 
 </view>

@@ -953,16 +953,14 @@
   font-weight: 400;
 }
 
-/* ===== 一句话卡片（保持原有）===== */
+/* ===== 一句话卡片 ===== */
 .quote {
-  padding: 30rpx 28rpx;
+  padding: 26rpx 28rpx 32rpx;
   color: #7A665C;
   font-size: 27rpx;
   line-height: 1.7;
   margin: 32rpx 0 28rpx;
-  text-align: center;
   background: linear-gradient(135deg, #FFFBF7 0%, #FFF1E6 100%);
-  font-style: italic;
   letter-spacing: 1rpx;
   position: relative;
   z-index: 1;
@@ -970,20 +968,97 @@
 }
 .bg-rainy .quote {
   background: rgba(255, 255, 255, 0.35);
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.85);
 }
 .bg-night .quote {
   background: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.75);
 }
 .quote::before {
   content: '"';
   position: absolute;
-  top: 10rpx;
+  top: 50rpx;
   left: 24rpx;
   font-size: 60rpx;
-  color: rgba(232, 133, 106, 0.15);
+  color: rgba(232, 133, 106, 0.18);
   font-family: Georgia, serif;
+  pointer-events: none;
+}
+
+/* 标题栏（每日一句 + 右上角按钮组） */
+.quote-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18rpx;
+  position: relative;
+  z-index: 2;
+}
+.quote-title {
+  font-size: 29rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  font-style: normal;
+  letter-spacing: 1rpx;
+}
+.bg-rainy .quote-title,
+.bg-night .quote-title {
+  color: rgba(255, 255, 255, 0.92);
+}
+.quote-actions {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+.quote-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  transition: all 0.2s;
+  font-size: 36rpx;
+  line-height: 1;
+}
+.bg-rainy .quote-btn,
+.bg-night .quote-btn {
+  background: rgba(255, 255, 255, 0.2);
+}
+.quote-btn-hover {
+  transform: scale(0.88);
+  background: #F0B27A !important;
+}
+.quote-btn.active {
+  background: #FFE4D2;
+  color: #E8856A;
+}
+.bg-rainy .quote-btn.active,
+.bg-night .quote-btn.active {
+  background: rgba(255, 228, 210, 0.85);
+  color: #B85F44;
+}
+.quote-btn-icon {
+  font-size: 32rpx;
+  color: #B5A69C;
+  font-weight: 400;
+  line-height: 1;
+}
+.quote-btn.active .quote-btn-icon {
+  color: #E8856A;
+  font-size: 36rpx;
+}
+.quote-btn-icon.refresh {
+  font-size: 38rpx;
+  font-weight: 600;
+}
+.quote-body {
+  text-align: center;
+  font-style: italic;
+  position: relative;
+  z-index: 2;
+  padding: 6rpx 40rpx 0;
 }
 
 /* ===== 按钮 ===== */

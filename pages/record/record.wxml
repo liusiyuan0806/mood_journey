@@ -1,24 +1,60 @@
 <view class="page">
 
-  <view class="section">
-    <view class="label">
-      记录日期
+  <!-- 今日天气快照 -->
+  <view class="weather-snapshot-card {{weatherSnapshot.bgClass}}" wx:if="{{weatherSnapshot}}">
+    <view class="weather-snapshot-header">
+      <text class="weather-snapshot-title">今日天气快照</text>
+      <text class="weather-snapshot-time">{{weatherSnapshot.isNight?'🌙 夜晚':'☀️ 白天'}}</text>
     </view>
-    <picker mode="date" value="{{date}}" bindchange="changeDate">
-      <view class="picker-box">
-        {{date}}
+    <view class="weather-snapshot-main">
+      <view class="weather-snapshot-icon">{{weatherSnapshot.weatherIcon}}</view>
+      <view class="weather-snapshot-temp">
+        <text class="temp-value">{{weatherSnapshot.temp}}°</text>
+        <text class="temp-feel">体感 {{weatherSnapshot.feelsLike}}°</text>
       </view>
+      <view class="weather-snapshot-text">{{weatherSnapshot.weatherText}}</view>
+    </view>
+    <view class="weather-snapshot-details">
+      <view class="detail-item">
+        <text class="detail-label">湿度</text>
+        <text class="detail-value">{{weatherSnapshot.humidity}}%</text>
+      </view>
+      <view class="detail-item">
+        <text class="detail-label">风力</text>
+        <text class="detail-value">{{weatherSnapshot.wind}}</text>
+      </view>
+      <view class="detail-item">
+        <text class="detail-label">气压</text>
+        <text class="detail-value">{{weatherSnapshot.pressure}}hPa</text>
+      </view>
+      <view class="detail-item">
+        <text class="detail-label">空气</text>
+        <text class="detail-value aqi-{{weatherSnapshot.aqiClass}}">{{weatherSnapshot.aqiLevel}}</text>
+      </view>
+    </view>
+    <view class="weather-warning" wx:if="{{weatherSnapshot.hasWarning}}">
+      <text class="warning-icon">⚠️</text>
+      <text class="warning-text">{{weatherSnapshot.warningText}}</text>
+    </view>
+    <view class="weather-correct">
+      <text class="correct-label">天气不准？</text>
+      <picker range="{{weatherOptions}}" bindchange="pickWeatherFromTag">
+        <view class="correct-picker">点击修正 ›</view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="label">记录日期</view>
+    <picker mode="date" value="{{date}}" bindchange="changeDate">
+      <view class="picker-box">{{date}}</view>
     </picker>
   </view>
 
   <view class="section">
-    <view class="label">
-      记录时间
-    </view>
+    <view class="label">记录时间</view>
     <picker mode="time" value="{{time}}" bindchange="changeTime">
-      <view class="picker-box">
-        {{time}}
-      </view>
+      <view class="picker-box">{{time}}</view>
     </picker>
   </view>
 
@@ -29,35 +65,100 @@
       <text>{{item.name}}</text>
     </view>
   </view>
-  <view class="section-title">写下更多 <text class="muted">{{note.length}}/300</text>
-  </view>
+
+  <view class="section-title">写下更多 <text class="muted">{{note.length}}/300</text></view>
   <textarea maxlength="300" value="{{note}}" bindinput="input" placeholder="发生了什么？此刻你有什么感受？" />
+
+  <!-- 天气对我影响 -->
+  <view class="section-title">天气对我影响</view>
+  <view class="impact-options">
+    <view wx:for="{{weatherImpactOptions}}" wx:key="*this" class="impact-item {{weatherImpact===item?'on':''}}" data-value="{{item}}" bindtap="pickWeatherImpact">
+      {{item}}
+    </view>
+  </view>
+
+  <!-- 身体感受 -->
+  <view class="section-title">身体感受 <text class="muted">最多3个</text></view>
+  <view class="body-feelings">
+    <view wx:for="{{bodyFeelingOptions}}" wx:key="*this" class="body-item {{bodyFeelingMap[item]?'on':''}}" data-value="{{item}}" bindtap="toggleBodyFeeling">
+      {{item}}
+    </view>
+  </view>
+
+  <!-- 情绪诱因（三部分） -->
+  <view class="section-title">情绪诱因 <text class="muted">选择影响心情的因素（已选择{{triggerItems.length}}/3）</text></view>
+
+  <!-- 诱因分类选择 -->
+  <view class="trigger-categories">
+    <view wx:for="{{triggerGroups}}" wx:for-item="group" wx:for-index="key" wx:key="label" class="trigger-cat {{triggerCategory===key?'on':''}}" data-category="{{key}}" bindtap="selectTriggerCategory">
+      <text class="cat-icon" style="color:{{group.color}}">{{group.icon}}</text>
+      <text class="cat-label">{{group.label}}</text>
+    </view>
+  </view>
+
+  <!-- 诱因项目 -->
+  <view class="trigger-items" wx:if="{{triggerCategory}}">
+    <view wx:for="{{triggerGroups[triggerCategory].options}}" wx:key="*this" class="trigger-item {{triggerItemMap[item]?'on':''}}" data-value="{{item}}" bindtap="toggleTriggerItem">
+      {{item}}
+    </view>
+  </view>
+
+  <!-- 场景标签 -->
   <view class="section-title">场景</view>
-  <view class="selectors">
-    <picker range="{{weatherOptions}}" bindchange="pickWeather">
-      <view>天气：{{weather}}
-        <text>›</text>
+  <view class="scene-section">
+    <view class="scene-label">天气</view>
+    <view class="scene-tags">
+      <view wx:for="{{weatherOptions}}" wx:key="*this" class="scene-tag {{weather===item?'on':''}}" data-value="{{item}}" bindtap="pickWeatherFromTag">
+        {{item}}
       </view>
-    </picker>
-    <picker range="{{locationOptions}}" bindchange="pickLocation">
-      <view>地点：{{location}}
-        <text>›</text>
+    </view>
+
+    <view class="scene-label">地点</view>
+    <view class="scene-tags">
+      <view wx:for="{{locationOptions}}" wx:key="*this" class="scene-tag {{location===item?'on':''}}" data-value="{{item}}" bindtap="pickLocationFromTag">
+        {{item}}
       </view>
-    </picker>
+    </view>
+
+    <!-- 定位 -->
+    <view class="location-area" wx:if="{{currentAddress}}">
+      <text class="location-text">已定位：{{currentAddress}}</text>
+    </view>
+    <view class="location-btn" bindtap="chooseLocation">
+      <text class="location-btn-icon">📍</text>
+      <text>选择当前位置</text>
+    </view>
   </view>
-  <view class="section-title">情绪诱因
-    <text class="muted">最多3项</text>
+
+  <!-- 多媒体 -->
+  <view class="section-title">多媒体 <text class="muted">添加图片或语音</text></view>
+  <view class="media-section">
+    <!-- 图片 -->
+    <view class="photos">
+      <image wx:for="{{images}}" wx:key="*this" src="{{item}}" mode="aspectFill" data-index="{{index}}" bindtap="removeImage" />
+      <view wx:if="{{images.length<9}}" class="add" bindtap="images">
+        <text>+</text>
+        <text class="add-text">添加图片\n({{images.length}}/9)</text>
+      </view>
+    </view>
+
+    <!-- 录音 -->
+    <view class="audio-section">
+      <view wx:if="{{!audioPath}}" class="record-btn {{isRecording?'recording':''}}" bindtap="{{isRecording?'stopRecord':'startRecord'}}">
+        <text class="record-icon">{{isRecording?'⏹️':'🎙️'}}</text>
+        <text class="record-text">{{isRecording?'点击停止录音 ('+recordDuration+'s)':'点击开始录音'}}</text>
+      </view>
+      <view wx:if="{{audioPath}}" class="audio-player">
+        <view class="audio-info" bindtap="playAudio">
+          <text class="audio-icon">{{isPlaying?'⏸️':'▶️'}}</text>
+          <text class="audio-duration">{{audioDuration}}秒</text>
+        </view>
+        <view class="audio-delete" bindtap="deleteAudio">
+          <text>删除</text>
+        </view>
+      </view>
+    </view>
   </view>
-  <view class="triggers">
-    <text wx:for="{{triggerOptions}}" wx:key="*this" data-value="{{item}}" bindtap="trigger">{{item}}
-    </text>
-  </view>
-  <view class="section-title">图片
-    <text class="muted">最多9张</text>
-  </view>
-  <view class="photos">
-    <image wx:for="{{images}}" wx:key="*this" src="{{item}}" mode="aspectFill" data-index="{{index}}" bindtap="removeImage" />
-    <view wx:if="{{images.length<9}}" class="add" bindtap="images">＋</view>
-  </view>
+
   <button class="primary-btn save" bindtap="save">保存今天的心情</button>
 </view>
