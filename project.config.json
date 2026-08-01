@@ -1,5 +1,6 @@
 {
   "miniprogramRoot": "./",
+  "cloudfunctionRoot": "cloudfunctions/",
   "projectname": "mood-journal",
   "description": "情绪手账微信小程序",
   "appid": "wxf40313e03d0f8901",

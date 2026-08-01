@@ -14,6 +14,15 @@
     "navigationBarTextStyle": "black",
     "backgroundColor": "#FFF8F2"
   },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于获取所在城市天气，为你生成更贴切的关怀文案"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation"
+  ],
   "tabBar": {
     "color": "#B5A69C",
     "selectedColor": "#E8856A",

@@ -1,196 +1,228 @@
-<view class="page">
+<view class="page {{weatherData ? 'bg-' + weatherData.backgroundClass : ''}}">
 
-  <!-- 顶部 -->
+  <!-- ===== 动态天气背景层 ===== -->
+  <view class="bg-layer" wx:if="{{weatherData}}">
+    <!-- 通用动态云朵（所有天气都有的基础云） -->
+    <view class="cloud cloud-1"></view>
+    <view class="cloud cloud-2"></view>
+    <view class="cloud cloud-3"></view>
+    <view class="cloud cloud-4"></view>
+    <!-- 晴天光斑 -->
+    <block wx:if="{{weatherData.backgroundClass === 'sunny'}}">
+      <view class="sun-spot spot-1"></view>
+      <view class="sun-spot spot-2"></view>
+      <view class="sun-spot spot-3"></view>
+      <view class="sun-spot spot-4"></view>
+      <view class="sun-spot spot-5"></view>
+    </block>
+    <!-- 雨天滴落 -->
+    <block wx:if="{{weatherData.backgroundClass === 'rainy' || weatherData.weatherCategory === 'thunderstorm'}}">
+      <view class="rain-drop drop-1"></view>
+      <view class="rain-drop drop-2"></view>
+      <view class="rain-drop drop-3"></view>
+      <view class="rain-drop drop-4"></view>
+      <view class="rain-drop drop-5"></view>
+      <view class="rain-drop drop-6"></view>
+      <view class="rain-drop drop-7"></view>
+      <view class="rain-drop drop-8"></view>
+      <view class="rain-drop drop-9"></view>
+      <view class="rain-drop drop-10"></view>
+      <!-- 玻璃雨滴 -->
+      <view class="glass-drop gd-1"></view>
+      <view class="glass-drop gd-2"></view>
+      <view class="glass-drop gd-3"></view>
+    </block>
+    <!-- 雪天飘落 -->
+    <block wx:if="{{weatherData.backgroundClass === 'snowy'}}">
+      <view class="snow-flake sf-1">❄</view>
+      <view class="snow-flake sf-2">❅</view>
+      <view class="snow-flake sf-3">❆</view>
+      <view class="snow-flake sf-4">❄</view>
+      <view class="snow-flake sf-5">❅</view>
+      <view class="snow-flake sf-6">❆</view>
+      <view class="snow-flake sf-7">❄</view>
+      <view class="snow-flake sf-8">❅</view>
+    </block>
+    <!-- 夜晚星点 -->
+    <block wx:if="{{weatherData.backgroundClass === 'night'}}">
+      <view class="star star-1"></view>
+      <view class="star star-2"></view>
+      <view class="star star-3"></view>
+      <view class="star star-4"></view>
+      <view class="star star-5"></view>
+      <view class="star star-6"></view>
+      <view class="star star-7"></view>
+      <view class="star star-8"></view>
+      <view class="star star-9"></view>
+      <view class="star star-10"></view>
+      <view class="star star-11"></view>
+      <view class="star star-12"></view>
+    </block>
+  </view>
+
+  <!-- ===== 顶部用户区（保持原有）===== -->
   <view class="top">
-
     <view class="avatar">
       <image wx:if="{{profile && profile.avatar}}" class="avatar-img" src="{{profile.avatar}}" mode="aspectFill" />
       <text wx:else>🌿</text>
     </view>
-
-
     <view class="user-info">
-
       <view class="hello">
         {{greeting}}，{{profile ? profile.nickname : '未登录'}}
       </view>
-
       <view class="clock">
         {{clock}}
       </view>
-
     </view>
-
   </view>
 
+  <!-- ================================================================ -->
+  <!-- 第一层：沉浸式天气情绪卡 -->
+  <!-- ================================================================ -->
+  <view class="weather-immersive card-glass" wx:if="{{weatherData}}">
 
+    <!-- 数据来源小标签 -->
+    <view class="wi-source" wx:if="{{isRealWeather}}">
+      <text class="wi-source-dot"></text>实时天气
+    </view>
+    <view class="wi-source wi-source-sim" wx:else>
+      模拟数据
+    </view>
 
-  <!-- 天气 -->
-  <view class="weather card">
-
-    <view>
-      <view class="weather-city">
-        {{weather.city}}
+    <!-- 左侧：天气主信息 -->
+    <view class="wi-left">
+      <view class="wi-city-row" bindtap="pickLocation">
+        <text class="wi-city">{{weatherData.city}}</text>
+        <text class="wi-divider">·</text>
+        <text class="wi-type">{{weatherData.weatherText}}</text>
+        <text class="wi-pick">📍 切换</text>
       </view>
+      <view class="wi-temp-row">
+        <text class="wi-icon">{{weatherData.weatherIcon}}</text>
+        <text class="wi-temp">{{weatherData.temp}}°</text>
+        <text class="wi-feels">体感 {{weatherData.feelsLike}}°</text>
+      </view>
+      <view class="wi-care">{{weatherData.careText}}</view>
+    </view>
 
-      <view class="muted">
-        愿你今天轻松自在
+    <!-- 底部：详细信息条 -->
+    <view class="wi-details">
+      <view class="wi-detail-item">
+        <text class="wi-d-label">降雨</text>
+        <text class="wi-d-value">{{weatherData.rainProb}}%</text>
+      </view>
+      <view class="wi-detail-item">
+        <text class="wi-d-label">湿度</text>
+        <text class="wi-d-value">{{weatherData.humidity}}%</text>
+      </view>
+      <view class="wi-detail-item">
+        <text class="wi-d-label">风</text>
+        <text class="wi-d-value">{{weatherData.wind}}</text>
+      </view>
+      <view class="wi-detail-item">
+        <text class="wi-d-label">空气</text>
+        <text class="wi-d-value wi-aqi {{weatherData.aqiLevel === '优' ? 'aqi-good' : ''}}">{{weatherData.aqiLevel}} {{weatherData.aqi}}</text>
       </view>
     </view>
 
-
-    <view class="weather-info">
-      <text>{{weather.icon}}</text>
-      <text>{{weather.temp}}°</text>
-    </view>
-
-
-  </view>
-
-
-
-
-  <!-- 今日轨迹 -->
-
-  <view class="today-card">
-
-
-    <view class="today-header">
-
-      <text class="today-title">
-        ☀️ 今日心情轨迹
+    <!-- 日出日落 -->
+    <view class="wi-sun-row">
+      <text class="wi-sun">
+        <text class="wi-sun-icon">{{weatherData.isNight ? '🌙' : '☀️'}}</text>
+        {{weatherData.isNight ? '夜间' : '日出 ' + weatherData.sunrise}}
       </text>
-
-      <text class="today-count">
-        已记录 {{todayRecords.length}} 次
+      <text class="wi-sun">
+        {{weatherData.isNight ? '已入夜' : '日落 ' + weatherData.sunset}}
       </text>
-
-
     </view>
-
-
-
-    <view wx:if="{{todayRecords.length==0}}" class="empty">
-
-      🌿 今天还没有记录心情哦
-
-    </view>
-
-
-
-    <block wx:else>
-
-
-      <view wx:for="{{todayRecords}}" wx:key="id" class="record-item">
-
-
-        <!-- 左边圆点 -->
-
-        <view class="record-dot">
-        </view>
-
-
-
-        <view class="record-body">
-
-
-          <view class="record-time">
-            {{item.time}}
-          </view>
-
-
-
-          <view class="emotion-row">
-
-
-            <text class="record-emoji">
-              {{item.emoji}}
-            </text>
-
-
-            <text class="record-mood">
-              {{item.mood}}
-            </text>
-
-
-          </view>
-
-
-
-          <view wx:if="{{item.note}}" class="record-note">
-
-            {{item.note}}
-
-          </view>
-
-
-
-        </view>
-
-
-      </view>
-
-
-    </block>
-
-
   </view>
 
+  <!-- ================================================================ -->
+  <!-- 第二层：一问一答式记录 -->
+  <!-- ================================================================ -->
 
-
-
-
-  <!-- 选择心情 -->
-
-
-  <view class="section-title">
-
+  <!-- 情境化提问 -->
+  <view class="section-title context-question" wx:if="{{weatherData}}">
+    {{contextQuestion}}
+  </view>
+  <view class="section-title" wx:else>
     此刻的你，是什么心情？
-
   </view>
 
-
-
+  <!-- 心情选择网格（选择后直接跳转记录页） -->
   <view class="moods">
-
-
-    <view wx:for="{{moods}}" wx:key="name" class="mood" bindtap="recordMood" data-name="{{item.name}}">
-
-
-      <text class="emoji" >
-        {{item.emoji}}
-      </text>
-
-
-      <text class="mood-text" >
-        {{item.name}}
-      </text>
-
-
-
+    <view wx:for="{{moods}}" wx:key="name" class="mood" bindtap="selectMood" data-name="{{item.name}}">
+      <text class="emoji" >{{item.emoji}}</text>
+      <text class="mood-text" >{{item.name}}</text>
     </view>
-
-
   </view>
 
-
-
-
-  <!-- 一句话 -->
-
-  <view class="quote card">
-
-    “{{quote}}”
-
+  <!-- 天气影响追问（选择心情后出现） -->
+  <view class="weather-impact-panel" wx:if="{{showWeatherImpact}}">
+    <view class="wi-question">
+      <text class="wi-q-icon">☁️</text>
+      <text class="wi-q-text">今天的天气对你有影响吗？</text>
+    </view>
+    <view class="wi-options">
+      <view 
+        wx:for="{{weatherImpactOptions}}" 
+        wx:key="value" 
+        class="wi-opt"
+        data-value="{{item.value}}"
+        bindtap="answerWeatherImpact"
+      >{{item.label}}</view>
+    </view>
+    <view class="wi-skip" bindtap="skipWeatherImpact">
+      跳过 ›
+    </view>
   </view>
 
-
-
+  <!-- 写下更多按钮（放在心情轨迹前面） -->
   <button class="primary-btn" bindtap="more">
-
     写下更多
-
   </button>
 
+  <!-- 今日心情轨迹（保持原有） -->
+  <view class="today-card">
+    <view class="today-header">
+      <text class="today-title">☀️ 今日心情轨迹</text>
+      <text class="today-count">已记录 {{todayRecords.length}} 次</text>
+    </view>
+
+    <view wx:if="{{todayRecords.length==0}}" class="empty">
+      🌿 今天还没有记录心情哦
+    </view>
+
+    <block wx:else>
+      <view wx:for="{{todayRecords}}" wx:key="id" class="record-item">
+        <view class="record-dot"></view>
+        <view class="record-body">
+          <view class="record-time">{{item.time}}</view>
+          <view class="emotion-row">
+            <text class="record-emoji">{{item.emoji}}</text>
+            <text class="record-mood">{{item.mood}}</text>
+          </view>
+          <view wx:if="{{item.note}}" class="record-note">{{item.note}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- ================================================================ -->
+  <!-- 第三层：即时反馈 -->
+  <!-- ================================================================ -->
+  <view class="feedback-card card-glass" wx:if="{{showFeedback}}">
+    <view class="fb-header">
+      <text class="fb-icon">💬</text>
+      <text class="fb-title">来自记录的回响</text>
+      <text class="fb-close" bindtap="dismissFeedback">✕</text>
+    </view>
+    <view class="fb-body">{{feedbackText}}</view>
+  </view>
+
+  <!-- 一句话（保持原有） -->
+  <view class="quote card">
+    "{{quote}}"
+  </view>
 
 </view>
