@@ -469,6 +469,41 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+/* 穿衣建议（阳光/多云主题默认） */
+.wi-dress {
+  display: flex;
+  align-items: flex-start;
+  gap: 8rpx;
+  margin-top: 16rpx;
+  padding: 16rpx 18rpx;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16rpx;
+  backdrop-filter: blur(8rpx);
+  -webkit-backdrop-filter: blur(8rpx);
+}
+.bg-rainy .wi-dress {
+  background: rgba(255, 255, 255, 0.18);
+}
+.bg-night .wi-dress {
+  background: rgba(255, 255, 255, 0.12);
+}
+.wi-dress-icon {
+  font-size: 26rpx;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+.wi-dress-text {
+  flex: 1;
+  font-size: 24rpx;
+  color: #6b5a4a;
+  line-height: 1.7;
+  letter-spacing: 0.5rpx;
+}
+.bg-rainy .wi-dress-text,
+.bg-night .wi-dress-text {
+  color: rgba(255, 255, 255, 0.82);
+}
+
 /* 右侧图标 */
 .wi-icon {
   font-size: 60rpx;
