@@ -1,46 +1,221 @@
 <view class="page">
-  <view class="title">
-    {{date}}
-  </view>
 
-  <view class="count">
-    共 {{records.length}} 条记录
-  </view>
+  <!-- ========== Date Header Card ========== -->
+  <view class="date-header" style="background: linear-gradient(135deg, {{headerColor}} 0%, #FFF8F2 100%);">
 
-  <block wx:if="{{records.length}}">
-
-  <view
-  wx:for="{{records}}"
-  wx:key="id"
-  class="record-item"
-  bindtap="editRecord"
-  data-id="{{item.id}}">
-    <view class="record-header">
-      <view>
-        <text class="emoji">{{item.emoji}}</text>
-        <text class="mood">{{item.mood}}</text>
+    <!-- Navigation -->
+    <view class="date-nav">
+      <view class="nav-btn" bindtap="goPrev">
+        <text class="nav-arrow">‹</text>
+        <view class="nav-preview" wx:if="{{prevDay.emoji}}">
+          <text class="nav-emoji">{{prevDay.emoji}}</text>
+          <text class="nav-score">{{prevDay.score}}</text>
+        </view>
       </view>
-      <text class="time">{{item.time}}</text>
+
+      <view class="date-center">
+        <text class="date-main">{{dateInfo.m}}月{{dateInfo.d}}日</text>
+        <text class="date-sub">星期{{dateInfo.weekday}}{{isToday ? ' · 今天' : ''}}</text>
+      </view>
+
+      <view class="nav-btn {{isFuture ? 'nav-btn-disabled' : ''}}" bindtap="goNext">
+        <view class="nav-preview" wx:if="{{nextDay.emoji}}">
+          <text class="nav-emoji">{{nextDay.emoji}}</text>
+          <text class="nav-score">{{nextDay.score}}</text>
+        </view>
+        <text class="nav-arrow">›</text>
+      </view>
     </view>
-    <view class="record-info">
-      🌤 {{item.weather}}
-      <text wx:if="{{item.location}}">
-        · 📍{{item.location}}
-      </text>
+
+    <!-- Stats row -->
+    <view class="date-stats" wx:if="{{records.length}}">
+      <view class="ds-item">
+        <text class="ds-value">{{avgScore}}</text>
+        <text class="ds-label">心情均分</text>
+      </view>
+      <view class="ds-divider"></view>
+      <view class="ds-item">
+        <text class="ds-value">{{records.length}}</text>
+        <text class="ds-label">条记录</text>
+      </view>
+      <view class="ds-divider"></view>
+      <view class="ds-item">
+        <text class="ds-value ds-value-text">{{scoreLabel}}</text>
+        <text class="ds-label">整体感受</text>
+      </view>
     </view>
-    <view
-      wx:if="{{item.note}}"
-      class="record-note">
-      {{item.note}}
+
+    <!-- Mood color strip -->
+    <view class="mood-strip" wx:if="{{moodColors.length}}">
+      <view class="mood-strip-seg" wx:for="{{moodColors}}" wx:key="index" style="background:{{item}}"></view>
     </view>
   </view>
+
+  <!-- ========== Timeline / Records ========== -->
+  <block wx:if="{{timeline.length}}">
+    <view class="timeline" wx:for="{{timeline}}" wx:key="period">
+
+      <!-- Period header -->
+      <view class="tl-head">
+        <text class="tl-icon">{{item.icon}}</text>
+        <text class="tl-period">{{item.period}}</text>
+        <view class="tl-spacer"></view>
+        <text class="tl-score">{{item.avgScore}}分</text>
+        <text class="tl-count">{{item.count}}条</text>
+      </view>
+
+      <!-- Record cards in this period -->
+      <view
+        class="record-card"
+        wx:for="{{item.records}}"
+        wx:for-item="rec"
+        wx:key="id"
+        bindtap="editRecord"
+        data-id="{{rec.id}}"
+      >
+        <!-- Card header -->
+        <view class="rc-header">
+          <view class="rc-mood">
+            <text class="rc-emoji">{{rec.moodInfo.emoji}}</text>
+            <text class="rc-mood-name">{{rec.moodInfo.name}}</text>
+            <text class="rc-score">{{rec.moodInfo.score}}分</text>
+          </view>
+          <view class="rc-right">
+            <text class="rc-impact" wx:if="{{rec.weatherImpactInfo}}" style="color:{{rec.weatherImpactInfo.color}};background:{{rec.weatherImpactInfo.bg}}">{{rec.weatherImpact}}</text>
+            <text class="rc-time">{{rec.time}}</text>
+          </view>
+        </view>
+
+        <!-- Weather snapshot -->
+        <view class="rc-weather" wx:if="{{rec.hasSnapshot}}">
+          <text class="rc-w-icon">{{rec.weatherDisplay.icon}}</text>
+          <text class="rc-w-text">{{rec.weatherDisplay.text}}</text>
+          <text class="rc-w-detail">{{rec.weatherDisplay.tempText}}</text>
+          <text class="rc-w-detail" wx:if="{{rec.weatherDisplay.humidityText}}">{{rec.weatherDisplay.humidityText}}</text>
+          <text class="rc-w-detail" wx:if="{{rec.weatherDisplay.windText}}">{{rec.weatherDisplay.windText}}</text>
+          <text class="rc-w-detail" wx:if="{{rec.weatherDisplay.aqiText}}">{{rec.weatherDisplay.aqiText}}</text>
+        </view>
+        <view class="rc-weather rc-weather-simple" wx:elif="{{rec.weatherText || rec.weather}}">
+          <text class="rc-w-icon">🌤️</text>
+          <text class="rc-w-text">{{rec.weatherText || rec.weather}}</text>
+        </view>
+
+        <!-- Location -->
+        <view class="rc-location" wx:if="{{rec.currentAddress || rec.location}}">
+          <text class="rc-loc-icon">📍</text>
+          <text class="rc-loc-text">{{rec.currentAddress || rec.location}}</text>
+        </view>
+
+        <!-- Body feelings -->
+        <view class="rc-feelings" wx:if="{{rec.bodyFeelings && rec.bodyFeelings.length > 0}}">
+          <text class="rc-tag-label">💪</text>
+          <text class="rc-feeling-tag" wx:for="{{rec.bodyFeelings}}" wx:key="*this">{{item}}</text>
+        </view>
+
+        <!-- Triggers -->
+        <view class="rc-triggers" wx:if="{{rec.triggerItems && rec.triggerItems.length > 0}}">
+          <text class="rc-tag-label">{{rec.triggerInfo ? rec.triggerInfo.icon : '🔍'}}</text>
+          <text
+            class="rc-trigger-tag"
+            wx:for="{{rec.triggerItems}}"
+            wx:key="*this"
+            style="{{rec.triggerInfo ? 'color:' + rec.triggerInfo.color + ';background:' + rec.triggerInfo.bg : ''}}"
+          >{{item}}</text>
+        </view>
+
+        <!-- Images -->
+        <view class="rc-images" wx:if="{{rec.images && rec.images.length > 0}}">
+          <view
+            class="rc-img-wrap"
+            wx:for="{{rec.images}}"
+            wx:for-item="img"
+            wx:key="index"
+            catchtap="previewImage"
+            data-current="{{img}}"
+            data-urls="{{rec.images}}"
+          >
+            <image class="rc-img" src="{{img}}" mode="aspectFill"></image>
+          </view>
+        </view>
+
+        <!-- Note -->
+        <view class="rc-note" wx:if="{{rec.note}}">{{rec.note}}</view>
+
+        <!-- Audio -->
+        <view class="rc-audio" wx:if="{{rec.audioPath}}" catchtap="playAudio" data-path="{{rec.audioPath}}">
+          <text class="rc-audio-icon">🎙️</text>
+          <view class="rc-audio-bar">
+            <view class="rc-audio-dots">
+              <view class="rc-audio-dot"></view>
+              <view class="rc-audio-dot"></view>
+              <view class="rc-audio-dot"></view>
+              <view class="rc-audio-dot"></view>
+              <view class="rc-audio-dot"></view>
+            </view>
+            <text class="rc-audio-duration">{{rec.audioDurationDisplay}}</text>
+          </view>
+          <text class="rc-audio-play">▶</text>
+        </view>
+      </view>
+    </view>
   </block>
-  <view wx:else class="empty">
-    这一天还没有记录 🌿
+
+  <!-- ========== Daily Insights ========== -->
+  <view class="insights-card" wx:if="{{insights && records.length > 0}}">
+    <view class="insights-title">
+      <text class="insights-title-icon">📊</text>
+      <text>当日洞察</text>
+    </view>
+
+    <!-- Mood range -->
+    <view class="insight-row" wx:if="{{moodRange}}">
+      <text class="insight-label">心情波动</text>
+      <view class="insight-content">
+        <text class="irm-emoji">{{moodRange.highestEmoji}}</text>
+        <text class="irm-name">{{moodRange.highestName}}</text>
+        <text class="irm-arrow">→</text>
+        <text class="irm-emoji">{{moodRange.lowestEmoji}}</text>
+        <text class="irm-name">{{moodRange.lowestName}}</text>
+        <text class="irm-range">幅度{{moodRange.range}}</text>
+      </view>
+    </view>
+
+    <!-- Dominant trigger -->
+    <view class="insight-row" wx:if="{{insights.dominantTrigger}}">
+      <text class="insight-label">主导诱因</text>
+      <view class="insight-content">
+        <text class="ir-trigger-icon">{{insights.dominantTrigger.icon}}</text>
+        <text class="ir-trigger-label" style="color:{{insights.dominantTrigger.color}}">{{insights.dominantTrigger.label}}</text>
+        <text class="ir-trigger-count">{{insights.dominantTrigger.count}}条记录</text>
+      </view>
+    </view>
+
+    <!-- Weather-mood correlation -->
+    <view class="insight-row" wx:if="{{insights.weatherMood}}">
+      <text class="insight-label">天气关联</text>
+      <view class="insight-content">
+        <text class="ir-wm-text">{{insights.weatherMood.weather}}时心情更好</text>
+        <text class="ir-wm-avg">{{insights.weatherMood.avg}}分</text>
+        <text class="ir-wm-vs">vs {{insights.weatherMood.worstWeather}} {{insights.weatherMood.worstAvg}}分</text>
+      </view>
+    </view>
+
+    <!-- Fallback -->
+    <view class="insight-row insight-row-simple" wx:if="{{!moodRange && !insights.dominantTrigger && !insights.weatherMood}}">
+      <text class="insight-empty">今天的数据比较简单，继续记录可以解锁更多洞察 ✨</text>
+    </view>
   </view>
-  <button
-  class="add-btn"
-  bindtap="addRecord">
-  ＋ 新增记录
+
+  <!-- ========== Empty State ========== -->
+  <view class="empty-wrap" wx:if="{{!records.length}}">
+    <view class="empty-icon">{{isFuture ? '🌱' : '📝'}}</view>
+    <view class="empty-title">{{isFuture ? '这一天还没到呢' : '这一天还没有记录'}}</view>
+    <view class="empty-desc">{{isFuture ? '等到了再记录吧' : '点击下方按钮，补记这一天的心情'}}</view>
+  </view>
+
+  <!-- ========== Add Button ========== -->
+  <button class="add-btn" bindtap="addRecord" wx:if="{{!isFuture}}">
+    {{records.length ? '＋ 补充记录' : '＋ 记录心情'}}
   </button>
+
 </view>

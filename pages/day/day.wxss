@@ -1,99 +1,453 @@
-/* ===== 单日详情 · 温暖色调 ===== */
+/* ===== 单日详情 · 增强版 ===== */
 
 .page {
-  padding: 30rpx;
+  padding: 24rpx 28rpx 60rpx;
   background: #FFF8F2;
   min-height: 100vh;
   box-sizing: border-box;
 }
 
-.title {
-  font-size: 40rpx;
+/* ===================================================== */
+/* Date Header Card                                      */
+/* ===================================================== */
+.date-header {
+  border-radius: 28rpx;
+  padding: 28rpx 24rpx 24rpx;
+  box-shadow: 0 8rpx 28rpx rgba(200, 130, 90, 0.1);
+}
+
+.date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 12rpx;
+  border-radius: 16rpx;
+}
+.nav-btn:active { background: rgba(255,255,255,0.4); }
+.nav-btn-disabled { opacity: 0.3; }
+
+.nav-arrow {
+  font-size: 44rpx;
+  color: #E8856A;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.nav-preview {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+.nav-emoji { font-size: 28rpx; line-height: 1; }
+.nav-score { font-size: 20rpx; color: #8B776B; font-weight: 600; }
+
+.date-center {
+  text-align: center;
+  flex: 1;
+}
+.date-main {
+  display: block;
+  font-size: 36rpx;
   font-weight: 700;
   color: #4A3A32;
-  letter-spacing: 0.5rpx;
+  letter-spacing: 1rpx;
+}
+.date-sub {
+  display: block;
+  font-size: 22rpx;
+  color: #8B776B;
+  margin-top: 4rpx;
 }
 
-.count {
-  margin-top: 10rpx;
-  color: #B5A69C;
-  font-size: 25rpx;
-}
-
-/* 记录卡片 */
-.record-item {
+/* Stats row */
+.date-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-top: 24rpx;
-  padding: 28rpx 26rpx;
-  border-radius: 24rpx;
+  padding: 20rpx 0;
+  background: rgba(255,255,255,0.5);
+  border-radius: 20rpx;
+}
+.ds-item { flex: 1; text-align: center; }
+.ds-value {
+  display: block;
+  font-size: 38rpx;
+  font-weight: 800;
+  color: #4A3A32;
+  letter-spacing: -1rpx;
+}
+.ds-value-text { font-size: 30rpx; }
+.ds-label {
+  display: block;
+  font-size: 20rpx;
+  color: #B5A69C;
+  margin-top: 4rpx;
+}
+.ds-divider {
+  width: 1rpx;
+  height: 44rpx;
+  background: rgba(180, 160, 145, 0.3);
+}
+
+/* Mood color strip */
+.mood-strip {
+  display: flex;
+  gap: 4rpx;
+  margin-top: 16rpx;
+  height: 8rpx;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+.mood-strip-seg {
+  flex: 1;
+  border-radius: 4rpx;
+  min-width: 20rpx;
+}
+
+/* ===================================================== */
+/* Timeline                                              */
+/* ===================================================== */
+.timeline {
+  margin-top: 28rpx;
+}
+
+.tl-head {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 0 8rpx 12rpx;
+}
+.tl-icon { font-size: 28rpx; line-height: 1; }
+.tl-period {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #6B5A50;
+}
+.tl-spacer { flex: 1; }
+.tl-score {
+  font-size: 22rpx;
+  color: #E8856A;
+  font-weight: 600;
+}
+.tl-count {
+  font-size: 20rpx;
+  color: #B5A69C;
+}
+
+/* ===================================================== */
+/* Record Card                                           */
+/* ===================================================== */
+.record-card {
   background: #FFFFFF;
-  box-shadow: 0 6rpx 20rpx rgba(200, 130, 90, 0.08);
-  border: 1rpx solid rgba(232, 133, 106, 0.06);
+  border-radius: 24rpx;
+  padding: 24rpx 22rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(200, 130, 90, 0.06);
+  border: 1rpx solid rgba(232, 133, 106, 0.05);
   transition: all 0.2s ease;
 }
-
-.record-item:active {
-  transform: scale(0.98);
-  box-shadow: 0 4rpx 12rpx rgba(200, 130, 90, 0.1);
+.record-card:active {
+  transform: scale(0.985);
+  box-shadow: 0 2rpx 10rpx rgba(200, 130, 90, 0.1);
 }
 
-.record-header {
+/* Card header */
+.rc-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12rpx;
+  margin-bottom: 14rpx;
+}
+.rc-mood {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+.rc-emoji { font-size: 38rpx; line-height: 1; }
+.rc-mood-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #4A3A32;
+}
+.rc-score {
+  font-size: 22rpx;
+  color: #B5A69C;
+  font-weight: 500;
+}
+.rc-right {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+.rc-impact {
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+  font-weight: 600;
+}
+.rc-time {
+  font-size: 24rpx;
+  color: #F0B27A;
+  font-weight: 600;
 }
 
-.record-header > view:first-child {
+/* Weather snapshot */
+.rc-weather {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6rpx 12rpx;
+  padding: 14rpx 16rpx;
+  background: #FAF8F5;
+  border-radius: 16rpx;
+  margin-bottom: 12rpx;
+}
+.rc-weather-simple { padding: 10rpx 16rpx; }
+.rc-w-icon { font-size: 26rpx; line-height: 1; }
+.rc-w-text {
+  font-size: 24rpx;
+  color: #6B5A50;
+  font-weight: 600;
+}
+.rc-w-detail {
+  font-size: 21rpx;
+  color: #A8978E;
+}
+
+/* Location */
+.rc-location {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  margin-bottom: 10rpx;
+}
+.rc-loc-icon { font-size: 22rpx; }
+.rc-loc-text {
+  font-size: 23rpx;
+  color: #8B776B;
+}
+
+/* Body feelings */
+.rc-feelings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 8rpx;
+}
+.rc-tag-label { font-size: 24rpx; line-height: 1; }
+.rc-feeling-tag {
+  font-size: 21rpx;
+  color: #8B776B;
+  background: #F5EBE3;
+  padding: 5rpx 14rpx;
+  border-radius: 16rpx;
+}
+
+/* Triggers */
+.rc-triggers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 8rpx;
+}
+.rc-trigger-tag {
+  font-size: 21rpx;
+  color: #8B776B;
+  background: #F5EBE3;
+  padding: 5rpx 14rpx;
+  border-radius: 16rpx;
+}
+
+/* Images */
+.rc-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-bottom: 10rpx;
+}
+.rc-img-wrap {
+  width: 150rpx;
+  height: 150rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+.rc-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 16rpx;
+}
+
+/* Note */
+.rc-note {
+  font-size: 25rpx;
+  color: #6B5A50;
+  line-height: 1.8;
+  padding: 16rpx;
+  background: #FAF8F5;
+  border-radius: 14rpx;
+  border: 1rpx solid #F5EBE3;
+  margin-top: 6rpx;
+}
+
+/* Audio */
+.rc-audio {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 14rpx 18rpx;
+  background: #FFF1E6;
+  border-radius: 16rpx;
+  margin-top: 10rpx;
+}
+.rc-audio:active { opacity: 0.7; }
+.rc-audio-icon { font-size: 28rpx; }
+.rc-audio-bar {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 12rpx;
 }
-
-.emoji {
-  font-size: 42rpx;
-  line-height: 1;
+.rc-audio-dots {
+  display: flex;
+  gap: 4rpx;
+  align-items: center;
+  height: 28rpx;
+}
+.rc-audio-dot {
+  width: 6rpx;
+  border-radius: 3rpx;
+  background: #E8856A;
+}
+.rc-audio-dot:nth-child(1) { height: 12rpx; }
+.rc-audio-dot:nth-child(2) { height: 20rpx; }
+.rc-audio-dot:nth-child(3) { height: 28rpx; }
+.rc-audio-dot:nth-child(4) { height: 18rpx; }
+.rc-audio-dot:nth-child(5) { height: 14rpx; }
+.rc-audio-duration {
+  font-size: 22rpx;
+  color: #8B776B;
+  font-weight: 500;
+}
+.rc-audio-play {
+  font-size: 24rpx;
+  color: #E8856A;
+  font-weight: 700;
 }
 
-.mood {
-  margin-left: 0;
+/* ===================================================== */
+/* Daily Insights                                        */
+/* ===================================================== */
+.insights-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 24rpx 22rpx;
+  margin-top: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(200, 130, 90, 0.06);
+  border: 1rpx solid rgba(232, 133, 106, 0.05);
+}
+.insights-title {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  margin-bottom: 18rpx;
+}
+.insights-title-icon { font-size: 30rpx; }
+
+.insight-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 12rpx 0;
+  border-top: 1rpx solid #F5EBE3;
+}
+.insight-row:first-of-type { border-top: none; }
+.insight-label {
+  font-size: 22rpx;
+  color: #B5A69C;
+  width: 100rpx;
+  flex-shrink: 0;
+}
+.insight-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  flex-wrap: wrap;
+}
+
+/* Mood range */
+.irm-emoji { font-size: 28rpx; }
+.irm-name { font-size: 24rpx; color: #6B5A50; font-weight: 500; }
+.irm-arrow { font-size: 24rpx; color: #C8BFB2; }
+.irm-range {
+  font-size: 20rpx;
+  color: #E8856A;
+  background: rgba(232,133,106,0.1);
+  padding: 3rpx 12rpx;
+  border-radius: 12rpx;
+  margin-left: 4rpx;
+}
+
+/* Dominant trigger */
+.ir-trigger-icon { font-size: 26rpx; }
+.ir-trigger-label { font-size: 24rpx; font-weight: 600; }
+.ir-trigger-count { font-size: 20rpx; color: #B5A69C; }
+
+/* Weather-mood */
+.ir-wm-text { font-size: 24rpx; color: #6B5A50; }
+.ir-wm-avg {
+  font-size: 22rpx;
+  color: #52C41A;
+  font-weight: 700;
+}
+.ir-wm-vs { font-size: 20rpx; color: #B5A69C; }
+
+.insight-row-simple { justify-content: center; }
+.insight-empty {
+  font-size: 23rpx;
+  color: #B5A69C;
+  text-align: center;
+}
+
+/* ===================================================== */
+/* Empty State                                           */
+/* ===================================================== */
+.empty-wrap {
+  text-align: center;
+  padding: 80rpx 0 40rpx;
+}
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+.empty-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #5D4A40;
-}
-
-.time {
-  color: #F0B27A;
-  font-size: 26rpx;
-  font-weight: 600;
-}
-
-.record-info {
-  font-size: 24rpx;
   color: #8B776B;
   margin-bottom: 10rpx;
 }
-
-.record-note {
-  font-size: 26rpx;
-  color: #6B5A50;
-  line-height: 1.7;
-  padding-top: 14rpx;
-  border-top: 1rpx solid #F5EBE3;
-  margin-top: 6rpx;
-}
-
-/* 空状态 */
-.empty {
-  margin-top: 80rpx;
-  text-align: center;
+.empty-desc {
+  font-size: 24rpx;
   color: #B5A69C;
-  font-size: 26rpx;
-  padding: 60rpx 0;
 }
 
-/* 新增按钮 */
+/* ===================================================== */
+/* Add Button                                            */
+/* ===================================================== */
 .add-btn {
-  margin-top: 36rpx;
+  margin-top: 32rpx;
   width: 100%;
   height: 88rpx;
   border-radius: 44rpx;
@@ -108,11 +462,7 @@
   letter-spacing: 2rpx;
   border: none;
 }
-
-.add-btn::after {
-  border: none;
-}
-
+.add-btn::after { border: none; }
 .add-btn:active {
   opacity: 0.85;
   transform: scale(0.98);
