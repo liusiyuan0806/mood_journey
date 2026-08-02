@@ -1,5 +1,6 @@
 const { getProfile, saveProfile, getRecords, streak } = require('../../utils/store');
 const { byName } = require('../../utils/moods');
+const { randomQuote } = require('../../utils/quotes');
 
 function getRandomShareImage() {
   const idx = Math.floor(Math.random() * 13) + 1;
@@ -64,6 +65,8 @@ Page({
       const nickname = (profile && profile.nickname) || '未登录';
       const { total = 0, streak: days = 0, avg = '--' } = this.data.stats;
       const avatarUrl = profile && profile.avatar;
+      const dailyQuote = randomQuote();
+      console.log('[generateShareCard] dailyQuote=', dailyQuote);
 
       // 同时加载背景图 + 头像
       const tasks = [
@@ -93,13 +96,13 @@ Page({
           ctx.fillStyle = g;
           ctx.fillRect(0, 0, 750, 1334);
         }
-        this._drawContent(ctx, profile, nickname, total, days, avg, avatarImg);
+        this._drawContent(ctx, profile, nickname, total, days, avg, avatarImg, dailyQuote);
         this._exportCanvas(canvas);
       });
     });
   },
 
-  _drawContent(ctx, profile, nickname, total, days, avg, avatarImg) {
+  _drawContent(ctx, profile, nickname, total, days, avg, avatarImg, dailyQuote) {
     // 半透蒙版
     ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
     ctx.fillRect(0, 0, 750, 500);
@@ -165,13 +168,80 @@ Page({
     ctx.font = '60px sans-serif';
     ctx.fillText(emojis[Math.floor(Math.random() * emojis.length)], 375, cardY + 340);
 
+    // 每日一句 —— 用最稳的方式
+    if (dailyQuote) {
+      console.log('[share] 每日一句:', dailyQuote);
+      const quoteY = cardY + 400; // 960
+
+      try {
+        // 装饰线
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(180, quoteY);
+        ctx.lineTo(570, quoteY);
+        ctx.stroke();
+
+        // 装饰小圆点
+        ctx.fillStyle = '#1a1a1a';
+        ctx.beginPath();
+        ctx.arc(375, quoteY, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 标签
+        ctx.fillStyle = '#1a1a1a';
+        ctx.font = 'bold 26px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText('每日一句', 375, quoteY + 42);
+
+        // 主体句子 —— 简单按 14 字换行（不依赖 measureText，最稳）
+        const maxChars = 14;
+        const quoteLines = [];
+        let remaining = dailyQuote;
+        while (remaining.length > maxChars) {
+          // 优先在标点处断行
+          let cut = maxChars;
+          const lastPunc = Math.max(
+            remaining.lastIndexOf('，', maxChars - 1),
+            remaining.lastIndexOf('。', maxChars - 1),
+            remaining.lastIndexOf('；', maxChars - 1),
+            remaining.lastIndexOf('、', maxChars - 1)
+          );
+          if (lastPunc > 5) cut = lastPunc + 1;
+          quoteLines.push(remaining.substring(0, cut));
+          remaining = remaining.substring(cut);
+        }
+        if (remaining) quoteLines.push(remaining);
+        console.log('[share] 每日一句 换行:', quoteLines);
+
+        // 文字
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 36px sans-serif';
+        ctx.textAlign = 'center';
+        const lineH = 50;
+        const startY = quoteY + 95;
+        for (let i = 0; i < quoteLines.length; i++) {
+          ctx.fillText(quoteLines[i], 375, startY + i * lineH);
+        }
+      } catch (e) {
+        console.error('[share] 每日一句绘制失败:', e);
+        // 兜底：直接画一句不换行
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 30px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(dailyQuote, 375, quoteY + 100);
+      }
+    }
+
     // 底部
     const now = new Date();
     const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
-    ctx.fillStyle = '#7f8c8d';
-    ctx.font = '24px sans-serif';
-    ctx.fillText(dateStr, 375, 1240);
-    ctx.fillText('Mood Journey · 心情日记', 375, 1280);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = 'bold 24px sans-serif';
+    ctx.fillText(dateStr, 375, 1220);
+    ctx.fillStyle = '#4A3A32';
+    ctx.fillText('Mood Journey · 心情日记', 375, 1265);
   },
 
   _exportCanvas(canvas) {
@@ -245,6 +315,24 @@ Page({
     ctx.lineTo(x, y + r);
     ctx.arcTo(x, y, x + r, y, r);
     ctx.closePath();
+  },
+
+  // 文字换行：根据 maxWidth 把长文本拆成多行
+  _wrapText(ctx, text, maxWidth) {
+    const lines = [];
+    let currentLine = '';
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      const testLine = currentLine + ch;
+      if (ctx.measureText(testLine).width > maxWidth && currentLine) {
+        lines.push(currentLine);
+        currentLine = ch;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    if (currentLine) lines.push(currentLine);
+    return lines.length ? lines : [text];
   },
 
   closeShareModal() { this.setData({ showShareModal: false }); },
