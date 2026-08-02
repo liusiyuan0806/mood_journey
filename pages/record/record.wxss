@@ -1,38 +1,64 @@
-/* ===== 记录心情 · 温暖色调 ===== */
+/* ===== 记录心情 · 样式优化 ===== */
 
-/* 表单区块 */
-.section {
-  margin-bottom: 24rpx;
+/* 页面底部留白给 sticky 保存按钮 */
+.page {
+  padding-bottom: 180rpx;
 }
 
-.label {
-  font-size: 26rpx;
-  color: #8B776B;
-  margin-bottom: 12rpx;
+/* ========== 记录进度条 ========== */
+.record-progress {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 28rpx;
+}
+
+.rp-track {
+  flex: 1;
+  height: 12rpx;
+  background: #F5E6DB;
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.rp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F0B27A, #E8856A);
+  border-radius: 6rpx;
+  transition: width 0.3s ease;
+}
+
+.rp-text {
+  font-size: 22rpx;
+  color: #B5A69C;
+  white-space: nowrap;
   font-weight: 500;
-}
-
-.picker-box {
-  background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 24rpx 28rpx;
-  font-size: 28rpx;
-  color: #4A3A32;
-  box-shadow: 0 4rpx 12rpx rgba(200, 130, 90, 0.06);
-  border: 1rpx solid rgba(232, 133, 106, 0.08);
 }
 
 /* ========== 天气快照卡片 ========== */
 .weather-snapshot-card {
-  border-radius: 24rpx;
-  padding: 32rpx;
-  margin-bottom: 32rpx;
+  border-radius: 28rpx;
+  padding: 36rpx 32rpx;
+  margin-bottom: 28rpx;
   color: #FFFFFF;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.18);
   background: linear-gradient(135deg, #5B6EE1 0%, #7B68D4 100%);
+  position: relative;
+  overflow: hidden;
 }
 
-/* 天气背景渐变 — WXSS 预定义，避免 style 绑定不生效 */
+/* 装饰光晕 */
+.weather-snapshot-card::before {
+  content: '';
+  position: absolute;
+  top: -60rpx;
+  right: -40rpx;
+  width: 200rpx;
+  height: 200rpx;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
 .weather-bg-sunny {
   background: linear-gradient(135deg, #5B6EE1 0%, #7B68D4 100%) !important;
 }
@@ -62,7 +88,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
+  position: relative;
 }
 
 .weather-snapshot-title {
@@ -74,17 +101,22 @@
 .weather-snapshot-time {
   font-size: 24rpx;
   opacity: 0.8;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
 }
 
 .weather-snapshot-main {
   display: flex;
   align-items: center;
-  gap: 20rpx;
-  margin-bottom: 24rpx;
+  gap: 24rpx;
+  margin-bottom: 28rpx;
+  position: relative;
 }
 
 .weather-snapshot-icon {
-  font-size: 64rpx;
+  font-size: 72rpx;
+  text-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 }
 
 .weather-snapshot-temp {
@@ -93,7 +125,7 @@
 }
 
 .temp-value {
-  font-size: 56rpx;
+  font-size: 60rpx;
   font-weight: 700;
   line-height: 1;
 }
@@ -101,29 +133,31 @@
 .temp-feel {
   font-size: 22rpx;
   opacity: 0.8;
-  margin-top: 4rpx;
+  margin-top: 6rpx;
 }
 
 .weather-snapshot-text {
   font-size: 28rpx;
   margin-left: auto;
   opacity: 0.9;
+  font-weight: 500;
 }
 
 .weather-snapshot-details {
   display: flex;
   justify-content: space-between;
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 16rpx;
-  padding: 20rpx 16rpx;
-  margin-bottom: 16rpx;
+  border-radius: 18rpx;
+  padding: 22rpx 16rpx;
+  margin-bottom: 18rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
 }
 
 .detail-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6rpx;
+  gap: 8rpx;
 }
 
 .detail-label {
@@ -147,19 +181,14 @@
   align-items: center;
   gap: 10rpx;
   background: rgba(255, 100, 100, 0.25);
-  border-radius: 12rpx;
-  padding: 14rpx 18rpx;
-  margin-bottom: 16rpx;
+  border-radius: 14rpx;
+  padding: 16rpx 20rpx;
+  margin-bottom: 18rpx;
+  border: 1rpx solid rgba(255, 100, 100, 0.2);
 }
 
-.warning-icon {
-  font-size: 28rpx;
-}
-
-.warning-text {
-  font-size: 24rpx;
-  font-weight: 500;
-}
+.warning-icon { font-size: 28rpx; }
+.warning-text { font-size: 24rpx; font-weight: 500; }
 
 .weather-correct {
   display: flex;
@@ -168,21 +197,113 @@
   justify-content: flex-end;
 }
 
-.correct-label {
-  font-size: 22rpx;
-  opacity: 0.7;
-}
+.correct-label { font-size: 22rpx; opacity: 0.7; }
 
 .correct-picker {
   font-size: 24rpx;
   font-weight: 500;
-  opacity: 0.9;
-  padding: 6rpx 14rpx;
+  opacity: 0.95;
+  padding: 8rpx 18rpx;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 20rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.15);
 }
 
-/* 心情选择网格 */
+/* ========== 日期时间合并卡片 ========== */
+.datetime-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 4rpx 28rpx;
+  margin-bottom: 8rpx;
+  box-shadow: 0 6rpx 20rpx rgba(200, 130, 90, 0.08);
+  border: 1rpx solid rgba(232, 133, 106, 0.06);
+}
+
+.dt-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 28rpx 0;
+}
+
+.dt-icon {
+  font-size: 40rpx;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFF1E6;
+  border-radius: 18rpx;
+}
+
+.dt-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.dt-label {
+  font-size: 22rpx;
+  color: #B5A69C;
+}
+
+.dt-value {
+  font-size: 30rpx;
+  color: #4A3A32;
+  font-weight: 600;
+}
+
+.dt-arrow {
+  font-size: 32rpx;
+  color: #D5C5B8;
+}
+
+.dt-sep {
+  height: 1rpx;
+  background: #F5E6DB;
+}
+
+/* ========== 区块标题行 ========== */
+.st-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin: 40rpx 0 20rpx;
+}
+
+.st-bar {
+  width: 6rpx;
+  height: 32rpx;
+  background: linear-gradient(180deg, #E8856A, #F0B27A);
+  border-radius: 3rpx;
+}
+
+.st-icon {
+  font-size: 30rpx;
+  line-height: 1;
+}
+
+.st-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  letter-spacing: 0.5rpx;
+}
+
+.st-count {
+  font-size: 22rpx;
+  color: #B5A69C;
+  margin-left: auto;
+  font-weight: 500;
+}
+
+.st-count-warn {
+  color: #E8856A;
+}
+
+/* ========== 心情选择网格 ========== */
 .moods {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -190,9 +311,10 @@
 }
 
 .mood {
+  position: relative;
   background: #FFFFFF;
-  border-radius: 20rpx;
-  height: 110rpx;
+  border-radius: 22rpx;
+  height: 120rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -201,53 +323,90 @@
   border: 2rpx solid transparent;
   box-sizing: border-box;
   gap: 8rpx;
-  box-shadow: 0 4rpx 12rpx rgba(200, 130, 90, 0.06);
+  box-shadow: 0 4rpx 14rpx rgba(200, 130, 90, 0.06);
   transition: all 0.2s ease;
 }
 
-.mood text:first-child {
-  font-size: 40rpx;
+.mood-emoji {
+  font-size: 42rpx;
   line-height: 1;
 }
 
-.mood text:last-child {
+.mood-name {
   font-size: 24rpx;
   color: #6B5A50;
 }
 
-.mood.chosen {
-  border-color: #E8856A;
-  background: linear-gradient(135deg, #FFF1E6, #FFE8DD);
-  box-shadow: 0 4rpx 16rpx rgba(232, 133, 106, 0.2);
-  transform: scale(1.02);
+.mood.chosen .mood-name {
+  font-weight: 700;
+  color: #4A3A32;
 }
 
-.mood.chosen text:last-child {
-  color: #D46A4D;
-  font-weight: 600;
+.mood.chosen {
+  transform: scale(1.05);
 }
 
 .mood:active {
   transform: scale(0.95);
 }
 
-/* 文本输入 */
-textarea {
-  width: 100%;
-  height: 200rpx;
+/* 选中勾选标记 */
+.mood-check {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 28rpx;
+  height: 28rpx;
+  background: #E8856A;
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 2rpx 8rpx rgba(232, 133, 106, 0.4);
+}
+
+/* ========== 笔记卡片 ========== */
+.note-card {
   background: #FFFFFF;
-  border-radius: 20rpx;
+  border-radius: 22rpx;
   padding: 24rpx;
   box-sizing: border-box;
+  box-shadow: 0 4rpx 14rpx rgba(200, 130, 90, 0.06);
+  border: 1rpx solid rgba(232, 133, 106, 0.06);
+}
+
+.note-input {
+  width: 100%;
+  height: 200rpx;
   font-size: 28rpx;
   color: #4A3A32;
   line-height: 1.7;
-  box-shadow: 0 4rpx 12rpx rgba(200, 130, 90, 0.06);
-  border: 1rpx solid rgba(232, 133, 106, 0.08);
 }
 
-textarea::placeholder {
+.note-input::placeholder {
   color: #C9B9AE;
+}
+
+.note-progress {
+  height: 6rpx;
+  background: #F5E6DB;
+  border-radius: 3rpx;
+  margin-top: 16rpx;
+  overflow: hidden;
+}
+
+.np-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F0B27A, #E8856A);
+  border-radius: 3rpx;
+  transition: width 0.2s ease;
+}
+
+.np-fill-warn {
+  background: linear-gradient(90deg, #E8856A, #D46A4D);
 }
 
 /* ========== 天气影响 ========== */
@@ -258,13 +417,17 @@ textarea::placeholder {
 }
 
 .impact-item {
-  padding: 14rpx 28rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 16rpx 28rpx;
   background: #FFFFFF;
-  border-radius: 30rpx;
+  border-radius: 36rpx;
   font-size: 26rpx;
   color: #6B5A50;
   border: 1rpx solid #F5E6DB;
   transition: all 0.2s ease;
+  box-shadow: 0 2rpx 8rpx rgba(200, 130, 90, 0.04);
 }
 
 .impact-item.on {
@@ -272,7 +435,11 @@ textarea::placeholder {
   color: #D46A4D;
   border-color: transparent;
   font-weight: 600;
-  box-shadow: 0 2rpx 8rpx rgba(232, 133, 106, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(232, 133, 106, 0.2);
+}
+
+.impact-item:active {
+  transform: scale(0.95);
 }
 
 /* ========== 身体感受 ========== */
@@ -283,13 +450,17 @@ textarea::placeholder {
 }
 
 .body-item {
-  padding: 14rpx 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 16rpx 24rpx;
   background: #FFFFFF;
-  border-radius: 30rpx;
+  border-radius: 36rpx;
   font-size: 25rpx;
   color: #6B5A50;
   border: 1rpx solid #F5E6DB;
   transition: all 0.2s ease;
+  box-shadow: 0 2rpx 8rpx rgba(200, 130, 90, 0.04);
 }
 
 .body-item.on {
@@ -297,7 +468,11 @@ textarea::placeholder {
   color: #1890FF;
   border-color: transparent;
   font-weight: 600;
-  box-shadow: 0 2rpx 8rpx rgba(24, 144, 255, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.2);
+}
+
+.body-item:active {
+  transform: scale(0.95);
 }
 
 /* ========== 情绪诱因 ========== */
@@ -312,23 +487,26 @@ textarea::placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8rpx;
-  padding: 20rpx 12rpx;
+  gap: 10rpx;
+  padding: 24rpx 12rpx;
   background: #FFFFFF;
-  border-radius: 16rpx;
+  border-radius: 20rpx;
   border: 2rpx solid transparent;
-  box-shadow: 0 4rpx 12rpx rgba(200, 130, 90, 0.06);
+  box-shadow: 0 4rpx 14rpx rgba(200, 130, 90, 0.06);
   transition: all 0.2s ease;
 }
 
 .trigger-cat.on {
   border-color: #E8856A;
   background: linear-gradient(135deg, #FFF1E6, #FFE8DD);
+  transform: scale(1.02);
 }
 
-.cat-icon {
-  font-size: 36rpx;
+.trigger-cat:active {
+  transform: scale(0.97);
 }
+
+.cat-icon { font-size: 40rpx; }
 
 .cat-label {
   font-size: 24rpx;
@@ -340,17 +518,21 @@ textarea::placeholder {
   display: flex;
   flex-wrap: wrap;
   gap: 14rpx;
-  margin-bottom: 24rpx;
+  margin-bottom: 8rpx;
 }
 
 .trigger-item {
-  padding: 14rpx 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 16rpx 24rpx;
   background: #FFFFFF;
-  border-radius: 30rpx;
+  border-radius: 36rpx;
   font-size: 25rpx;
   color: #6B5A50;
   border: 1rpx solid #F5E6DB;
   transition: all 0.2s ease;
+  box-shadow: 0 2rpx 8rpx rgba(200, 130, 90, 0.04);
 }
 
 .trigger-item.on {
@@ -358,47 +540,57 @@ textarea::placeholder {
   color: #D46A4D;
   border-color: transparent;
   font-weight: 600;
-  box-shadow: 0 2rpx 8rpx rgba(232, 133, 106, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(232, 133, 106, 0.2);
+}
+
+.trigger-item:active {
+  transform: scale(0.95);
+}
+
+/* ========== 标签内 Emoji ========== */
+.tag-emoji {
+  font-size: 28rpx;
+  line-height: 1;
 }
 
 /* ========== 场景标签 ========== */
 .scene-section {
   background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 24rpx;
-  box-shadow: 0 4rpx 12rpx rgba(200, 130, 90, 0.06);
-  border: 1rpx solid rgba(232, 133, 106, 0.08);
+  border-radius: 22rpx;
+  padding: 28rpx;
+  box-shadow: 0 4rpx 14rpx rgba(200, 130, 90, 0.06);
+  border: 1rpx solid rgba(232, 133, 106, 0.06);
 }
 
 .scene-label {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #8B776B;
   margin-bottom: 14rpx;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.5rpx;
+}
+
+.scene-label:not(:first-child) {
+  margin-top: 28rpx;
 }
 
 .scene-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 14rpx;
-  margin-bottom: 24rpx;
-}
-
-.scene-tags:last-child {
-  margin-bottom: 0;
 }
 
 .scene-tag {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
   padding: 16rpx 24rpx;
   background: #FAFAFA;
-  border-radius: 12rpx;
+  border-radius: 14rpx;
   font-size: 25rpx;
   color: #4A3A32;
   border: 2rpx solid transparent;
   transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
 }
 
 .scene-tag.on {
@@ -406,16 +598,26 @@ textarea::placeholder {
   border-color: #E8856A;
   color: #D46A4D;
   font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(232, 133, 106, 0.15);
+}
+
+.scene-tag:active {
+  transform: scale(0.95);
 }
 
 /* 定位区域 */
 .location-area {
+  margin-top: 20rpx;
   margin-bottom: 16rpx;
+  padding: 14rpx 18rpx;
+  background: #F6FFED;
+  border-radius: 14rpx;
+  border: 1rpx solid #D9F7BE;
 }
 
 .location-text {
   font-size: 24rpx;
-  color: #8B776B;
+  color: #52C41A;
 }
 
 .location-btn {
@@ -425,24 +627,47 @@ textarea::placeholder {
   gap: 10rpx;
   background: linear-gradient(135deg, #52C41A, #73D13D);
   color: #FFFFFF;
-  border-radius: 16rpx;
+  border-radius: 18rpx;
   padding: 24rpx;
   font-size: 28rpx;
   font-weight: 500;
-  box-shadow: 0 4rpx 16rpx rgba(82, 196, 26, 0.3);
+  box-shadow: 0 6rpx 20rpx rgba(82, 196, 26, 0.3);
+  margin-top: 20rpx;
+  transition: all 0.2s ease;
 }
 
-.location-btn-icon {
-  font-size: 32rpx;
+.location-btn:active {
+  transform: scale(0.98);
+  opacity: 0.9;
 }
+
+.location-btn-icon { font-size: 32rpx; }
 
 /* ========== 多媒体区域 ========== */
 .media-section {
   background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 24rpx;
-  box-shadow: 0 4rpx 12rpx rgba(200, 130, 90, 0.06);
-  border: 1rpx solid rgba(232, 133, 106, 0.08);
+  border-radius: 22rpx;
+  padding: 28rpx;
+  box-shadow: 0 4rpx 14rpx rgba(200, 130, 90, 0.06);
+  border: 1rpx solid rgba(232, 133, 106, 0.06);
+}
+
+.media-sub-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #4A3A32;
+  margin-bottom: 16rpx;
+}
+
+.media-sub-label:not(:first-child) {
+  margin-top: 28rpx;
+}
+
+.media-count {
+  font-size: 22rpx;
+  color: #B5A69C;
+  font-weight: 400;
+  margin-left: 8rpx;
 }
 
 /* 图片上传 */
@@ -450,18 +675,18 @@ textarea::placeholder {
   display: flex;
   gap: 14rpx;
   flex-wrap: wrap;
-  margin-bottom: 24rpx;
 }
 
 .photos image,
 .add {
   width: 150rpx;
   height: 150rpx;
-  border-radius: 16rpx;
+  border-radius: 18rpx;
 }
 
 .photos image {
   object-fit: cover;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.08);
 }
 
 .add {
@@ -476,6 +701,11 @@ textarea::placeholder {
   box-sizing: border-box;
   transition: all 0.2s ease;
   gap: 4rpx;
+}
+
+.add-plus {
+  font-size: 48rpx;
+  line-height: 1;
 }
 
 .add-text {
@@ -501,11 +731,11 @@ textarea::placeholder {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10rpx;
+  gap: 12rpx;
   background: linear-gradient(135deg, #FFF1E6, #FFE8DD);
   border: 2rpx dashed #E8856A;
-  border-radius: 16rpx;
-  padding: 32rpx;
+  border-radius: 18rpx;
+  padding: 36rpx;
   transition: all 0.2s ease;
 }
 
@@ -518,12 +748,10 @@ textarea::placeholder {
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  50% { opacity: 0.75; }
 }
 
-.record-icon {
-  font-size: 48rpx;
-}
+.record-icon { font-size: 48rpx; }
 
 .record-text {
   font-size: 26rpx;
@@ -540,8 +768,8 @@ textarea::placeholder {
   align-items: center;
   justify-content: space-between;
   background: #F6FFED;
-  border-radius: 16rpx;
-  padding: 20rpx 24rpx;
+  border-radius: 18rpx;
+  padding: 22rpx 24rpx;
   border: 1rpx solid #B7EB8F;
 }
 
@@ -551,9 +779,7 @@ textarea::placeholder {
   gap: 16rpx;
 }
 
-.audio-icon {
-  font-size: 36rpx;
-}
+.audio-icon { font-size: 36rpx; }
 
 .audio-duration {
   font-size: 26rpx;
@@ -562,22 +788,63 @@ textarea::placeholder {
 }
 
 .audio-delete {
-  padding: 8rpx 20rpx;
+  padding: 10rpx 22rpx;
   background: #FFF1F0;
   border-radius: 20rpx;
   font-size: 24rpx;
   color: #FF4D4F;
 }
 
-/* 保存按钮 */
-.save {
-  margin: 50rpx 0 20rpx;
+/* ========== 保存按钮栏 ========== */
+.save-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 30rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, #FFF8F2 60%, rgba(255, 248, 242, 0.8));
+  backdrop-filter: blur(20rpx);
+  z-index: 100;
 }
 
-/* 通用 */
+.save-bar .primary-btn {
+  margin: 0;
+  box-shadow: 0 8rpx 28rpx rgba(232, 133, 106, 0.35);
+}
+
+/* ========== 通用 ========== */
 .muted {
   color: #C9B9AE;
   font-size: 24rpx;
-  margin-left: 12rpx;
   font-weight: 400;
+}
+
+/* 原有 section 和 label 样式保留兼容 */
+.section {
+  margin-bottom: 24rpx;
+}
+
+.label {
+  font-size: 26rpx;
+  color: #8B776B;
+  margin-bottom: 12rpx;
+  font-weight: 500;
+}
+
+.picker-box {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 24rpx 28rpx;
+  font-size: 28rpx;
+  color: #4A3A32;
+  box-shadow: 0 4rpx 12rpx rgba(200, 130, 90, 0.06);
+  border: 1rpx solid rgba(232, 133, 106, 0.08);
+}
+
+textarea {
+  width: 100%;
+  height: 200rpx;
+  font-size: 28rpx;
+  color: #4A3A32;
+  line-height: 1.7;
 }
