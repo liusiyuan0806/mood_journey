@@ -21,7 +21,23 @@
   </view>
   <view class="menu card">
     <view bindtap="report">生成本周情绪报告 <text>›</text></view>
-    <view bindtap="report">生成分享卡片 <text>›</text></view>
+    <view bindtap="generateShareCard">生成分享卡片 <text>›</text></view>
     <view class="delete" bindtap="clear">清除所有数据 <text>›</text></view>
   </view>
+  <!-- 隐藏的画布，用于绘制分享卡 -->
+<canvas type="2d" id="shareCanvas" style="position:fixed; top:0; left:0; width:750rpx; height:1334rpx; opacity:0; pointer-events:none; z-index:-1;"></canvas>
+
+
+<!-- 分享卡预览弹窗 -->
+<view class="share-modal" wx:if="{{showShareModal}}" catchtap="closeShareModal">
+  <view class="share-modal-content" catchtap="">
+    <view class="share-modal-title">保存到相册分享吧</view>
+    <image class="share-modal-img" src="{{shareImagePath}}" mode="aspectFit"></image>
+    <view class="share-modal-actions">
+      <view class="share-btn share-btn-cancel" bindtap="closeShareModal">取消</view>
+      <view class="share-btn share-btn-save" bindtap="saveShareImage">保存到相册</view>
+    </view>
+  </view>
+</view>
+
 </view>
