@@ -1,4 +1,4 @@
-const { getRecords } = require('../../utils/store');
+const { getRecords, deleteRecord } = require('../../utils/store');
 const { byName } = require('../../utils/moods');
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
@@ -259,6 +259,23 @@ Page({
   editRecord(e) {
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({ url: '/pages/record/record?id=' + id });
+  },
+
+  deleteRecord(e) {
+    const id = e.currentTarget.dataset.id;
+    wx.showModal({
+      title: '删除这条记录',
+      content: '删除后无法恢复，确定继续吗？',
+      confirmText: '删除',
+      confirmColor: '#E8856A',
+      cancelText: '再想想',
+      success: (res) => {
+        if (!res.confirm) return;
+        deleteRecord(id);
+        wx.showToast({ title: '已删除', icon: 'success', duration: 1200 });
+        this.loadData(this.data.date);
+      }
+    });
   },
 
   addRecord() {

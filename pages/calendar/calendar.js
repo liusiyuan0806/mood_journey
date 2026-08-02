@@ -376,22 +376,12 @@ Page({
     this.setData({ showBrief: false, briefData: null });
   },
 
-  // 编辑当日心情
+  // 编辑当日心情 → 直接进入 day 页面（在该页查看 / 编辑 / 新增 / 删除）
   showDayEdit() {
     const date = this.data.actionDate;
-    const dayRecords = this.data.records
-      .filter(r => r.date === date)
-      .map(r => ({
-        ...r,
-        moodInfo: byName(r.mood) || { emoji: '🙂', name: r.mood, score: 3, color: '#EAE4D7' }
-      }));
-
-    this.setData({
-      showActions: false,
-      showDayEdit: true,
-      editDate: date,
-      editRecords: dayRecords
-    });
+    if (!date) return;
+    this.setData({ showActions: false, actionDate: '' });
+    wx.navigateTo({ url: '/pages/day/day?date=' + date });
   },
 
   closeDayEdit() {
