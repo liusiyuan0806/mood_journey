@@ -1159,3 +1159,251 @@
   z-index: 1;
   position: relative;
 }
+
+/* ===== 天气前瞻与微行动 ===== */
+
+/* 区块外包装 */
+.forecast-section {
+  position: relative; z-index: 1;
+  margin-bottom: 20rpx;
+}
+
+/* 区块标题 */
+.forecast-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-bottom: 16rpx;
+  padding-left: 8rpx;
+}
+.forecast-section-icon {
+  font-size: 36rpx; line-height: 1;
+}
+.forecast-section-title {
+  font-size: 30rpx; font-weight: 700;
+  color: #4A3A32;
+  letter-spacing: 1rpx;
+}
+.forecast-section-subtitle {
+  font-size: 20rpx; color: #E8856A;
+  background: linear-gradient(135deg, #FEE2D5, #FDE3DA);
+  padding: 4rpx 14rpx; border-radius: 20rpx;
+  font-weight: 600;
+  margin-left: 8rpx;
+}
+
+/* 主卡片 */
+.forecast-card {
+  background: linear-gradient(165deg, #EBF4FF 0%, #F8F9FB 40%, #FFF7F0 100%);
+  border-radius: 24rpx;
+  padding: 28rpx 26rpx 0;
+  border: 1rpx solid #E2DCD8;
+  box-shadow: 0 2rpx 20rpx rgba(140, 120, 100, .06);
+  overflow: hidden;
+}
+
+/* ── 明日天气概览条 ── */
+.fc-weather-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 20rpx;
+  background: rgba(255,255,255,.65);
+  border-radius: 18rpx;
+  margin-bottom: 18rpx;
+}
+.fc-weather-bar-left {
+  display: flex; align-items: center; gap: 10rpx;
+}
+.fc-weather-icon {
+  font-size: 44rpx; line-height: 1;
+}
+.fc-weather-label {
+  font-size: 24rpx; color: #9B8E82; font-weight: 500;
+}
+.fc-weather-bar-right {
+  display: flex; align-items: center; gap: 16rpx;
+}
+.fc-weather-desc {
+  font-size: 26rpx; color: #4A3A32; font-weight: 600;
+}
+.fc-weather-temp {
+  font-size: 26rpx; color: #E8856A; font-weight: 700;
+}
+.fc-weather-humidity {
+  font-size: 22rpx; color: #9B8E82;
+}
+
+/* ── 建议内容 ── */
+.fc-body {
+  padding-bottom: 6rpx;
+}
+.fc-body-title {
+  display: block;
+  font-size: 30rpx; font-weight: 700; color: #4A3A32;
+  margin-bottom: 8rpx; line-height: 1.4;
+}
+.fc-body-text {
+  display: block;
+  font-size: 26rpx; color: #5D4A40; line-height: 1.85;
+  margin-bottom: 14rpx;
+}
+.fc-tags {
+  display: flex; flex-wrap: wrap; gap: 10rpx;
+  margin-bottom: 6rpx;
+}
+.fc-tag {
+  font-size: 22rpx; color: #E8856A;
+  background: rgba(232,133,106,.1);
+  padding: 6rpx 16rpx; border-radius: 24rpx;
+}
+
+/* ── 操作区 ── */
+.fc-actions {
+  padding-top: 16rpx;
+  padding-bottom: 20rpx;
+}
+.fc-buttons-row {
+  margin-bottom: 10rpx;
+}
+.fc-btn {
+  font-size: 28rpx; font-weight: 600;
+  border-radius: 44rpx;
+  padding: 18rpx 0;
+  text-align: center;
+  border: none;
+  line-height: 1.3;
+  box-shadow: 0 4rpx 14rpx rgba(232, 133, 106, .25);
+}
+.fc-btn::after { border: none; }
+.fc-btn-primary {
+  background: linear-gradient(135deg, #F7B599, #E8856A);
+  color: #fff;
+}
+.fc-btn-hover {
+  opacity: .85;
+  transform: scale(.98);
+}
+
+.fc-sub-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4rpx;
+}
+.fc-sub-btn {
+  font-size: 24rpx; color: #8B7355;
+  padding: 10rpx 0;
+}
+.fc-sub-btn-muted {
+  color: #C8BFB2;
+  font-size: 22rpx;
+}
+
+/* ── 收藏入口 ── */
+.fc-stash {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin: 0 -26rpx;
+  padding: 20rpx 26rpx;
+  background: linear-gradient(90deg, rgba(240,168,138,.06), rgba(232,133,106,.02));
+  border-top: 1rpx solid #F0E8E0;
+}
+.fc-stash-icon {
+  font-size: 28rpx; line-height: 1;
+}
+.fc-stash-text {
+  flex: 1;
+  font-size: 24rpx; color: #8B7355;
+}
+.fc-stash-badge {
+  font-size: 22rpx; color: #fff;
+  background: linear-gradient(135deg, #F7B599, #E8856A);
+  min-width: 36rpx; height: 36rpx; line-height: 36rpx;
+  text-align: center; border-radius: 18rpx;
+  padding: 0 10rpx;
+  font-weight: 600;
+}
+.fc-stash-arrow {
+  font-size: 32rpx; color: #C8BFB2;
+  margin-left: 4rpx;
+}
+
+/* ===== 夜间/雨天适配 ===== */
+.bg-rainy .forecast-section-title,
+.bg-night .forecast-section-title {
+  color: rgba(255,255,255,.88);
+}
+.bg-rainy .forecast-section-subtitle,
+.bg-night .forecast-section-subtitle {
+  background: rgba(255,255,255,.18);
+  color: rgba(255,255,255,.75);
+}
+
+.bg-rainy .forecast-card {
+  background: rgba(255,255,255,.16);
+  border-color: rgba(255,255,255,.12);
+  backdrop-filter: blur(14rpx);
+  -webkit-backdrop-filter: blur(14rpx);
+  box-shadow: none;
+}
+
+.bg-rainy .fc-weather-bar,
+.bg-night .fc-weather-bar {
+  background: rgba(255,255,255,.18);
+}
+.bg-rainy .fc-weather-label,
+.bg-night .fc-weather-label { color: rgba(255,255,255,.55); }
+.bg-rainy .fc-weather-desc,
+.bg-night .fc-weather-desc { color: rgba(255,255,255,.85); }
+.bg-rainy .fc-weather-temp,
+.bg-night .fc-weather-temp { color: rgba(255,255,255,.85); }
+.bg-rainy .fc-weather-humidity,
+.bg-night .fc-weather-humidity { color: rgba(255,255,255,.45); }
+
+.bg-rainy .fc-body-title,
+.bg-night .fc-body-title { color: rgba(255,255,255,.88); }
+.bg-rainy .fc-body-text,
+.bg-night .fc-body-text { color: rgba(255,255,255,.78); }
+
+.bg-rainy .fc-tag,
+.bg-night .fc-tag {
+  color: rgba(255,255,255,.75);
+  background: rgba(255,255,255,.12);
+}
+
+.bg-rainy .fc-btn-primary,
+.bg-night .fc-btn-primary {
+  background: rgba(255,255,255,.25);
+  color: rgba(255,255,255,.9);
+  box-shadow: 0 4rpx 14rpx rgba(0,0,0,.15);
+}
+
+.bg-rainy .fc-sub-btn,
+.bg-night .fc-sub-btn { color: rgba(255,255,255,.7); }
+.bg-rainy .fc-sub-btn-muted,
+.bg-night .fc-sub-btn-muted { color: rgba(255,255,255,.4); }
+
+.bg-rainy .fc-stash,
+.bg-night .fc-stash {
+  border-top-color: rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+}
+.bg-rainy .fc-stash-text,
+.bg-night .fc-stash-text { color: rgba(255,255,255,.7); }
+.bg-rainy .fc-stash-badge,
+.bg-night .fc-stash-badge {
+  background: rgba(255,255,255,.25);
+  color: rgba(255,255,255,.9);
+}
+.bg-rainy .fc-stash-arrow,
+.bg-night .fc-stash-arrow { color: rgba(255,255,255,.4); }
+
+.bg-night .forecast-card {
+  background: rgba(255,255,255,.09);
+  border-color: rgba(255,255,255,.06);
+  backdrop-filter: blur(14rpx);
+  -webkit-backdrop-filter: blur(14rpx);
+  box-shadow: none;
+}

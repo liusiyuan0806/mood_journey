@@ -215,6 +215,54 @@
 </view>
 
 <!-- ================================================================ -->
+<!-- 天气前瞻与微行动 -->
+<!-- ================================================================ -->
+<view class="forecast-section" wx:if="{{showAdvice && weatherAdvice}}">
+
+  <!-- 区块标题 -->
+  <view class="forecast-section-header">
+    <text class="forecast-section-icon">🌤️</text>
+    <text class="forecast-section-title">天气前瞻 · 明日微行动</text>
+    <text class="forecast-section-subtitle" wx:if="{{weatherAdvice.level === 'care'}}">特别关照</text>
+  </view>
+
+  <!-- 主卡片 -->
+  <view class="forecast-card card">
+
+    <!-- 明日天气概览栏 -->
+    <view class="fc-weather-bar">
+      <view class="fc-weather-bar-left">
+        <text class="fc-weather-icon">{{weatherAdvice.forecast.weatherIcon}}</text>
+        <text class="fc-weather-label">明日天气</text>
+      </view>
+      <view class="fc-weather-bar-right">
+        <text class="fc-weather-desc">{{weatherAdvice.forecast.weatherText}}</text>
+        <text class="fc-weather-temp">{{weatherAdvice.forecast.tempRange}}℃</text>
+        <text class="fc-weather-humidity">湿度 {{weatherAdvice.forecast.humidity}}%</text>
+      </view>
+    </view>
+
+    <!-- 建议内容 -->
+    <view class="fc-body">
+      <text class="fc-body-title">{{weatherAdvice.title}}</text>
+      <text class="fc-body-text">{{weatherAdvice.body}}</text>
+      <view class="fc-tags" wx:if="{{weatherAdvice.tags.length > 0}}">
+        <text class="fc-tag" wx:for="{{weatherAdvice.tags}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 操作区 -->
+    <view class="fc-actions">
+      <!-- 操作按钮 -->
+      <view class="fc-buttons-row">
+        <text class="fc-sub-btn" bindtap="goRecordNow">📝 记录此刻心情</text>
+      </view>
+    </view>
+
+  </view>
+</view>
+
+<!-- ================================================================ -->
 <!-- 第三层：即时反馈 -->
 <!-- ================================================================ -->
 <view class="feedback-card card-glass" wx:if="{{showFeedback}}">

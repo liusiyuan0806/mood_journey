@@ -519,6 +519,188 @@ function mergeRealWeather(baseData, realData) {
   return merged;
 }
 
+// ==================== 天气前瞻预报 ====================
+
+// 天气类型池（用于预报，不同于当天天气）
+const FORECAST_POOL = ['晴', '阴', '雨', '多云', '雷阵雨', '大风'];
+
+// 天气文本→分类映射
+function mapCategory(text) {
+  const m = {
+    '晴': 'sunny', '阴': 'cloudy', '雨': 'rainy', '雪': 'snowy',
+    '多云': 'cloudy', '雷阵雨': 'thunderstorm', '雾': 'foggy', '大风': 'windy'
+  };
+  return m[text] || 'sunny';
+}
+
+// 天气文本→图标映射（供预报使用）
+const WEATHER_MAP = {
+  '晴': '☀️', '阴': '☁️', '雨': '🌧️', '雪': '❄️',
+  '多云': '⛅', '雷阵雨': '⛈️', '雾': '🌫️', '大风': '💨'
+};
+
+// 生成次日天气预报（模拟）
+function generateForecast(todayWeatherText) {
+  const todaySeed = (todayWeatherText || '').length + new Date().getDate();
+
+  // 排除与今天相同的天气，避免总是一样
+  const pool = FORECAST_POOL.filter(w => w !== todayWeatherText);
+  if (pool.length === 0) pool.push('晴'); // 保底
+
+  const seed = todaySeed + 7 + Math.floor(Math.random() * 100);
+  const idx = seed % pool.length;
+  const weatherText = pool[idx] || '晴';
+  const weatherCategory = mapCategory(weatherText);
+  const icon = WEATHER_MAP[weatherText] || '🌤️';
+  const isSummer = new Date().getMonth() >= 5 && new Date().getMonth() <= 8;
+  const baseTemp = isSummer ? 30 : 18 + (seed % 12);
+  const currentTemp = baseTemp + (seed % 6) - 2;
+  const humidity = 40 + (seed % 45);
+
+  return {
+    weatherText,
+    weatherCategory,
+    weatherIcon: icon,
+    currentTemp,
+    tempRange: `${currentTemp - 3 - (seed % 3)}~${currentTemp + 2 + (seed % 4)}`,
+    humidity,
+    isHot: currentTemp >= 32,
+    isRainy: weatherCategory === 'rainy' || weatherCategory === 'thunderstorm',
+    isOvercast: weatherCategory === 'cloudy',
+    isSunny: weatherCategory === 'sunny',
+  };
+}
+
+// ==================== 天气前瞻建议生成 ====================
+
+// 从历史记录中提取天气-心情关联模式
+function analyzeHistoryPatterns(records) {
+  const groups = {};
+  records.forEach(r => {
+    const key = r.weather || '晴';
+    if (!groups[key]) groups[key] = { scores: [], moods: [], notes: [] };
+    groups[key].scores.push(r.moodScore != null ? r.moodScore : 0);
+    groups[key].moods.push(r.mood || '平静');
+    groups[key].notes.push(r.note || '');
+  });
+
+  const patterns = {};
+  Object.keys(groups).forEach(key => {
+    const g = groups[key];
+    const avg = g.scores.reduce((s, v) => s + v, 0) / g.scores.length;
+    patterns[key] = {
+      count: g.scores.length,
+      avgScore: avg,
+      // 该天气下最常见的情绪
+      topMood: (() => {
+        const map = {};
+        g.moods.forEach(m => { map[m] = (map[m] || 0) + 1; });
+        return Object.entries(map).sort((a, b) => b[1] - a[1])[0];
+      })()
+    };
+  });
+  return patterns;
+}
+
+// 生成天气前瞻建议
+function generateWeatherAdvice(forecast, records, todayWeatherText) {
+  if (!forecast) return null;
+
+  const patterns = records && records.length > 0 ? analyzeHistoryPatterns(records) : {};
+  const advice = { title: '', body: '', tags: [], level: 'gentle' };
+
+  // 检测连续阴雨
+  const isConsecutiveRain = forecast.isRainy &&
+    (todayWeatherText === '雨' || todayWeatherText === '阴' || todayWeatherText === '雷阵雨');
+
+  // 明日高温 + 历史高温易烦躁
+  if (forecast.isHot) {
+    const hotKey = Object.keys(patterns).find(k =>
+      ['晴', '多云'].includes(k) && patterns[k].avgScore < 3.0 && patterns[k].count >= 3
+    );
+    if (hotKey) {
+      advice.title = '明天可能偏热';
+      advice.body = '你过去在闷热天气里更容易感到烦躁，记得预留一点独处和补水时间。';
+      advice.tags = ['提醒喝水', '留出独处'];
+      advice.level = 'care';
+    } else if (forecast.currentTemp >= 35) {
+      advice.title = '明天将是高温日';
+      advice.body = '试着比平时慢半拍。小口喝水，找个阴凉角落喘口气，烦躁来了就让它来。';
+      advice.tags = ['补水', '慢下来'];
+      advice.level = 'care';
+    } else {
+      advice.title = '明天偏热，注意舒适感';
+      advice.body = '给自己准备一件透气的外衣，或者提前冰一点喜欢的饮品。';
+      advice.tags = ['清凉准备', '透气着装'];
+    }
+  }
+
+  // 连续阴雨 + 历史上阴天易低落
+  if (isConsecutiveRain) {
+    const rainKey = Object.keys(patterns).find(k =>
+      ['雨', '阴'].includes(k) && patterns[k].avgScore < 3.2 && patterns[k].count >= 3
+    );
+    if (rainKey) {
+      advice.title = '未来两天光照较少';
+      advice.body = '可以提前准备一件让自己舒展的小事，比如散步、听歌或联系朋友。';
+      advice.tags = ['找件舒展的小事', '联系朋友'];
+      advice.level = 'care';
+    } else if (forecast.isRainy) {
+      advice.title = '明天可能有雨';
+      advice.body = '雨天适合靠近自己。带把伞，也带一份愿意慢下来的心情。';
+      advice.tags = ['带伞', '允许慢下来'];
+    }
+  } else if (forecast.isRainy && !isConsecutiveRain) {
+    const rainKey = Object.keys(patterns).find(k =>
+      ['雨'].includes(k) && patterns[k].avgScore < 3.2 && patterns[k].count >= 3
+    );
+    if (rainKey) {
+      advice.title = '明天有雨，提前关照自己';
+      advice.body = '你过去在雨天会有一点低落趋势。可以提前安排一些微小的舒适活动。';
+      advice.tags = ['微舒适活动', '室内安排'];
+      advice.level = 'care';
+    } else {
+      advice.title = '明天可能有小雨';
+      advice.body = '雨天的空气很干净。不妨把节奏放慢，多给自己一点安静时间。';
+      advice.tags = ['放慢节奏', '安静时光'];
+    }
+  }
+
+  // 晴朗 + 用户晴天状态好
+  if (forecast.isSunny) {
+    const sunnyKey = Object.keys(patterns).find(k =>
+      ['晴'].includes(k) && patterns[k].avgScore >= 3.5 && patterns[k].count >= 3
+    );
+    if (sunnyKey) {
+      advice.title = '明天阳光不错';
+      advice.body = '或许适合安排一次短暂出门，哪怕只是散个步，光照会让身体更舒展。';
+      advice.tags = ['短暂出门', '晒晒太阳'];
+    } else {
+      advice.title = '明天是个晴天';
+      advice.body = '光线充足的日子，做点让自己开心的小事吧。';
+      advice.tags = ['享受阳光', '好天气'];
+    }
+  }
+
+  // 阴天
+  if (forecast.isOvercast && !advice.title) {
+    advice.title = '明天多云偏阴';
+    advice.body = '阴天适合慢下来，点一盏小灯，泡杯热茶，心情不会因为光线跑掉。';
+    advice.tags = ['慢下来', '一盏灯'];
+  }
+
+  // 保底通用
+  if (!advice.title) {
+    advice.title = '明天的小预告';
+    advice.body = `预报${forecast.weatherText}。无论什么天气，你都可以选择温柔对待自己。`;
+    advice.tags = ['温柔对待自己'];
+  }
+
+  advice.forecast = forecast;
+
+  return advice;
+}
+
 // ==================== 导出 ====================
 module.exports = {
   generateWeather,
@@ -526,4 +708,6 @@ module.exports = {
   generateFeedback,
   mergeRealWeather,
   getDressingTip,
+  generateForecast,
+  generateWeatherAdvice,
 };
