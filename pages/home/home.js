@@ -15,7 +15,27 @@ const quotes = [
   '慢慢来，一切都会在合适的时候抵达。',
   '你已经做得很好了，别忘了拥抱自己。',
   '每一种情绪，都值得被温柔看见。',
-  '今天也请把一点耐心留给自己。'
+  '今天也请把一点耐心留给自己。',
+  '允许自己慢一点，宇宙也在等你。',
+  '你不需要一直坚强，允许自己脆弱一会儿。',
+  '哪怕今天什么都没做，也是一种休息。',
+  '难过的时候，抱抱自己吧。',
+  '你比想象中更接近自己想成为的样子。',
+  '所有走过的路，都算数。',
+  '今天的你，已经尽力了。',
+  '没关系，不是每一天都需要有意义。',
+  '温柔地对待自己，和对待世界一样。',
+  '把今天过好，就是对明天最好的交代。',
+  '不急，慢慢来。',
+  '愿你被这个世界，温柔以待。',
+  '你的感受，比你想象得更重要。',
+  '愿你眼里有光，心中有暖。',
+  '生活很苦，但你的甜是真的。',
+  '走慢一点也没关系，方向比速度更重要。',
+  '愿你活成自己最喜欢的样子。',
+  '允许自己做个普通人，本身就很勇敢。',
+  '今晚的月亮，会替我陪你。',
+  '你被安稳地爱着呢，应该有做任何事的勇气。'
 ];
 Page({
   data:{ 
@@ -27,6 +47,7 @@ Page({
     weather:
       { city:'定位中', icon:'☁️', temp:'--' },
     quote:quotes[0],
+    quoteFavorited:false, // 当前这句话是否已被收藏
 
     // ===== 三层升级新增数据 =====
     // 第一层：完整天气数据
@@ -47,7 +68,11 @@ Page({
   },
   onShow() {
     const profile = getProfile();
-    this.setData({ profile, quote: quotes[new Date().getDate() % quotes.length] });
+    this.setData({
+      profile,
+      quote: quotes[new Date().getDate() % quotes.length],
+      quoteFavorited: this._isQuoteFavorited(quotes[new Date().getDate() % quotes.length])
+    });
     this.updateClock();
     clearInterval(this.timer);
     this.timer = setInterval(() => this.updateClock(), 60000);
@@ -218,8 +243,59 @@ Page({
   },
 
   // 原有：更多记录（"写下更多"按钮）
-  more(){ 
-    wx.navigateTo({ url: '/pages/record/record' }); 
+  more(){
+    wx.navigateTo({ url: '/pages/record/record' });
+  },
+
+  // ===== 每日一句：换一句 / 收藏 / 取消收藏 =====
+
+  // 换一句（不重复当前）
+  refreshQuote() {
+    const current = this.data.quote;
+    let next = current;
+    // 最多重试 5 次避免死循环
+    for (let i = 0; i < 5 && next === current; i++) {
+      next = quotes[Math.floor(Math.random() * quotes.length)];
+    }
+    this.setData({
+      quote: next,
+      quoteFavorited: this._isQuoteFavorited(next)
+    });
+    // 轻震动反馈
+    if (wx.vibrateShort) wx.vibrateShort({ type: 'light' });
+  },
+
+  // 切换收藏
+  toggleFavoriteQuote() {
+    const quote = this.data.quote;
+    if (!quote) return;
+    const list = wx.getStorageSync('favorite_quotes') || [];
+    const idx = list.findIndex(item => item.text === quote);
+    let favorited;
+    if (idx >= 0) {
+      // 已收藏 → 取消
+      list.splice(idx, 1);
+      favorited = false;
+      wx.showToast({ title: '已取消收藏', icon: 'none', duration: 1200 });
+    } else {
+      // 未收藏 → 加入（按时间倒序）
+      list.unshift({
+        text: quote,
+        time: Date.now()
+      });
+      favorited = true;
+      wx.showToast({ title: '已收藏到「我的」', icon: 'success', duration: 1200 });
+    }
+    wx.setStorageSync('favorite_quotes', list);
+    this.setData({ quoteFavorited: favorited });
+    // 轻震动反馈
+    if (wx.vibrateShort) wx.vibrateShort({ type: 'light' });
+  },
+
+  // 工具：判断某句话是否已收藏
+  _isQuoteFavorited(text) {
+    const list = wx.getStorageSync('favorite_quotes') || [];
+    return list.some(item => item.text === text);
   },
 
   // 检查是否有新创建的记录需要补充天气影响数据

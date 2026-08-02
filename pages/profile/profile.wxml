@@ -20,6 +20,7 @@
     <view><text>{{stats.avg}}</text><text>平均心情值</text></view>
   </view>
   <view class="menu card">
+    <view bindtap="goFavorites">我收藏的句子  <text>›</text></view>
     <view bindtap="report">生成本周情绪报告 <text>›</text></view>
     <view bindtap="generateShareCard">生成分享卡片 <text>›</text></view>
     <view class="delete" bindtap="clear">清除所有数据 <text>›</text></view>

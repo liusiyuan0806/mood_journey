@@ -24,7 +24,8 @@ Page({
     profile: null,
     stats: {},
     shareImagePath: '',
-    showShareModal: false
+    showShareModal: false,
+    favoriteCount: 0
   },
   onShow() {
     this.refresh();
@@ -32,12 +33,26 @@ Page({
   refresh() {
     const profile = getProfile();
     const records = getRecords();
+    const favorites = wx.getStorageSync('favorite_quotes') || [];
     const avg = records.length
       ? (records.reduce((sum, r) => sum + byName(r.mood).score, 0) / records.length).toFixed(1)
       : '--';
     this.setData({
       profile,
-      stats: { total: records.length, streak: streak(records), avg }
+      stats: {
+        total: records.length,
+        streak: streak(records),
+        avg
+      },
+      favoriteCount: favorites.length
+    });
+  },
+  // 跳转到收藏页
+  goFavorites() {
+    wx.navigateTo({
+      url: '/pages/favorites/favorites'
+    });
+  },
     });
   },
   login() {

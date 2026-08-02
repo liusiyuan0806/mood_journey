@@ -6,7 +6,8 @@
     "pages/profile/profile",
     "pages/record/record",
     "pages/edit-profile/edit-profile",
-    "pages/day/day"
+    "pages/day/day",
+    "pages/favorites/favorites"
   ],
   "window": {
     "navigationBarTitleText": "情绪手账",

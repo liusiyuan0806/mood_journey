@@ -1,0 +1,43 @@
+<view class="page">
+  <view class="header">
+    <view class="header-row">
+      <text class="title">收藏的句子</text>
+      <text class="count">共 {{list.length}} 句</text>
+    </view>
+    <text class="subtitle">那些让你心动的话语</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{list.length === 0}}" class="empty card">
+    <text class="empty-icon">✨</text>
+    <text class="empty-title">还没有收藏的句子</text>
+    <text class="empty-desc">回到首页，遇到心动的句子点右上角的小星星</text>
+  </view>
+
+  <!-- 列表 -->
+  <view wx:else class="list">
+    <view
+      wx:for="{{list}}"
+      wx:key="time"
+      wx:for-index="idx"
+      class="item card"
+    >
+      <view class="item-text">"{{item.text}}"</view>
+      <view class="item-meta">
+        <text class="item-time">{{item.timeText}}</text>
+        <view class="item-actions">
+          <view class="item-btn" data-text="{{item.text}}" data-idx="{{idx}}" bindtap="copyQuote" hover-class="item-btn-hover">
+            <text>复制</text>
+          </view>
+          <view class="item-btn danger" data-idx="{{idx}}" bindtap="removeQuote" hover-class="item-btn-hover">
+            <text>移除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{list.length > 0}}" class="footer">
+      <view class="clear-btn" bindtap="clearAll" hover-class="clear-btn-hover">清空全部</view>
+    </view>
+  </view>
+</view>

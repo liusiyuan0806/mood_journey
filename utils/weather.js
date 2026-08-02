@@ -312,6 +312,14 @@ function generateWeather(date) {
     backgroundClass = 'rainy';
   }
 
+  // 气压（基于海拔和天气的拟真值）
+  const pressure = 1000 + randomInt(baseSeed + 1000, 10, 40);
+
+  // 天气预警（低概率）
+  const hasWarning = seededRandom(baseSeed + 1100) < 0.05; // 5%概率
+  const warningTypes = ['暴雨预警', '雷电预警', '大风预警', '高温预警', '寒潮预警'];
+  const warningText = hasWarning ? pickFromSeed(baseSeed + 1200, warningTypes) : '';
+
   return {
     city: '当前位置',
     temp,
@@ -332,6 +340,9 @@ function generateWeather(date) {
     careText,
     dressingTip,
     backgroundClass,
+    pressure,
+    hasWarning,
+    warningText,
   };
 }
 
@@ -379,7 +390,9 @@ function getContextQuestion(weatherData) {
 
 // ==================== 即时反馈生成 ====================
 function generateFeedback(newRecord, allRecords) {
-  const { mood, emoji, weatherCategory, weatherText, weatherImpact } = newRecord;
+  const { mood, emoji, weatherImpact } = newRecord;
+  const weatherText = newRecord.weatherText || newRecord.weather || newRecord.weatherSnapshot?.weatherText || '今天';
+  const weatherCategory = newRecord.weatherCategory || newRecord.weatherSnapshot?.weatherCategory || 'sunny';
   const now = new Date();
   const isNight = now.getHours() < 6 || now.getHours() >= 19;
 
@@ -474,6 +487,9 @@ function mergeRealWeather(baseData, realData) {
     sunset: realData.sunset || baseData.sunset,
     aqi: realData.aqi ?? baseData.aqi,
     aqiLevel: realData.aqiLevel || baseData.aqiLevel,
+    pressure: realData.pressure ?? baseData.pressure,
+    hasWarning: realData.hasWarning ?? baseData.hasWarning,
+    warningText: realData.warningText || baseData.warningText,
     isNight,
     isRealData: true, // 标记为真实数据
   };
