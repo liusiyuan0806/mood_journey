@@ -9,7 +9,9 @@ const {
   generateWeather,
   getContextQuestion,
   generateFeedback,
-  mergeRealWeather
+  mergeRealWeather,
+  generateForecast,
+  generateWeatherAdvice
 } = require('../../utils/weather');
 const quotes = [
   '慢慢来，一切都会在合适的时候抵达。',
@@ -65,6 +67,10 @@ Page({
     // 第三层：即时反馈（天气影响问答后显示）
     showFeedback: false,
     feedbackText: '',
+
+    // ===== 天气前瞻与微行动 =====
+    weatherAdvice: null,
+    showAdvice: true,
   },
   onShow() {
     const profile = getProfile();
@@ -78,6 +84,7 @@ Page({
     this.timer = setInterval(() => this.updateClock(), 60000);
     this.loadWeather();
     this.loadTodayRecords();
+    this.loadForecastAdvice();
 
     // 先检查是否需要显示天气影响追问（记录页保存后回来）
     this.checkPendingWeatherImpact();
@@ -95,6 +102,57 @@ Page({
       greeting,
       clock:`${now.getMonth()+1}月${now.getDate()}日 星期${days[now.getDay()]}  ${String(hour).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
     }); 
+  },
+
+  // ===== 天气前瞻与微行动建议 =====
+
+  loadForecastAdvice() {
+    try {
+      // 1. 获取今天的天气文案（可以是模拟数据，也可以是真实天气数据）
+      const weatherData = this.data.weatherData;
+      const todayWeatherText = weatherData
+        ? (weatherData.weatherText || weatherData.weatherSnapshot?.weatherText || '晴')
+        : '晴';
+
+      // 2. 生成明日预报（模拟）
+      const forecast = generateForecast(todayWeatherText);
+
+      // 3. 获取历史记录并生成建议
+      let records;
+      try { records = getRecords(); } catch (e) { records = []; }
+      const advice = generateWeatherAdvice(forecast, records, todayWeatherText);
+
+      // 4. 清除旧数据
+      try { wx.removeStorageSync('advice_dismissed_at'); } catch (e) {}
+
+      this.setData({
+        weatherAdvice: advice,
+        showAdvice: !!advice
+      });
+    } catch (err) {
+      console.error('[天气前瞻] 生成失败:', err);
+      const fallback = {
+        forecast: {
+          weatherText: '未知',
+          weatherIcon: '🌤️',
+          tempRange: '--',
+          humidity: 50
+        },
+        title: '明日天气前瞻',
+        body: '无论什么天气，你都可以选择温柔对待自己。',
+        tags: ['温柔对待自己'],
+        level: 'gentle'
+      };
+      this.setData({
+        weatherAdvice: fallback,
+        showAdvice: true
+      });
+    }
+  },
+
+  // 去记录此刻心情
+  goRecordNow() {
+    wx.navigateTo({ url: '/pages/record/record' });
   },
 
   // ===== 加载天气 =====
