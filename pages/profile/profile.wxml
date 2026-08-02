@@ -12,7 +12,7 @@
         {{profile ? (profile.signature || '点击编辑个人资料') : '登录后同步你的资料'}}
       </view>
     </view>
-    <text class="chevron">›</text>
+    <text class="chevron"></text>
   </view><button wx:if="{{!profile}}" class="primary-btn" bindtap="login">一键登录</button><button wx:else class="logout" bindtap="logout">退出登录</button>
   <view class="stats card">
     <view><text>{{stats.total}}</text><text>累计记录天数</text></view>
@@ -20,13 +20,16 @@
     <view><text>{{stats.avg}}</text><text>平均心情值</text></view>
   </view>
   <view class="menu card">
-    <view bindtap="goFavorites">我收藏的句子  <text>›</text></view>
-    <view bindtap="report">生成本周情绪报告 <text>›</text></view>
+    <view bindtap="goFavorites">我收藏的句子  <text></text></view>
+    <view bindtap="report">生成本周情绪报告 <text></text></view>
     <view bindtap="generateShareCard">生成分享卡片 <text>›</text></view>
     <view class="delete" bindtap="clear">清除所有数据 <text>›</text></view>
   </view>
   <!-- 隐藏的画布，用于绘制分享卡 -->
-<canvas type="2d" id="shareCanvas" style="position:fixed; top:0; left:0; width:750rpx; height:1334rpx; opacity:0; pointer-events:none; z-index:-1;"></canvas>
+<canvas type="2d" id="shareCanvas" 
+        style="position:fixed; top:0; left:100vw; width:750rpx; height:1334rpx; pointer-events:none;">
+
+</canvas>
 
 
 <!-- 分享卡预览弹窗 -->

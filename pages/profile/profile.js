@@ -2,13 +2,8 @@ const { getProfile, saveProfile, getRecords, streak } = require('../../utils/sto
 const { byName } = require('../../utils/moods');
 
 function getRandomShareImage() {
-  const imgs = [
-    '/image/share/card-1.png',
-    '/image/share/card-2.png',
-    '/image/share/card-3.png',
-    '/image/share/card-4.png',
-  ];
-  return imgs[Math.floor(Math.random() * imgs.length)];
+  const idx = Math.floor(Math.random() * 13) + 1;
+  return `/image/share/card-${idx}.png`;
 }
 
 Page({
@@ -46,180 +41,194 @@ Page({
 
   report() { this.generateShareCard(); },
 
-  async generateShareCard() {
-    console.log('==========  开始生成分享卡  ==========');
+  generateShareCard() {
     wx.showLoading({ title: '生成中...', mask: true });
-    const timer = setTimeout(() => wx.hideLoading(), 10000);
 
-    try {
-      // 1. 拿 canvas
-      const canvas = await this._getCanvas();
+    const query = this.createSelectorQuery();
+    query.select('#shareCanvas').fields({ node: true }).exec(res => {
+      if (!res || !res[0] || !res[0].node) {
+        wx.hideLoading();
+        wx.showToast({ title: '画布未就绪', icon: 'none' });
+        return;
+      }
+
+      const canvas = res[0].node;
       const ctx = canvas.getContext('2d');
       const dpr = wx.getSystemInfoSync().pixelRatio;
       canvas.width = 750 * dpr;
       canvas.height = 1334 * dpr;
       ctx.scale(dpr, dpr);
-      console.log('1) canvas 初始化完毕 dpr =', dpr);
 
-      // 2. 加载背景图 —— 用 getImageInfo 拿临时路径，再给 createImage
       const bgPath = getRandomShareImage();
-      console.log('2) 准备加载背景图:', bgPath);
-      let bgImg = null;
-      try {
-        bgImg = await this._loadCanvasImage(canvas, bgPath);
-        console.log('2) ✓ 背景图加载成功');
-      } catch (e) {
-        console.error('2) ✗ 背景图加载失败:', JSON.stringify(e));
-      }
-
-      // 3. 加载头像
-      let avatarImg = null;
-      if (this.data.profile && this.data.profile.avatar) {
-        try { avatarImg = await this._loadCanvasImage(canvas, this.data.profile.avatar); } catch (e) {}
-      }
-
-      // 4. 绘制
-      if (bgImg) {
-        console.log('4) 绘制用户提供的背景图');
-        ctx.drawImage(bgImg, 0, 0, 750, 1334);
-      } else {
-        console.warn('4) bgImg 为空，使用渐变兜底');
-        const g = ctx.createLinearGradient(0, 0, 750, 1334);
-        g.addColorStop(0, '#ffd6a5');
-        g.addColorStop(0.5, '#ffadad');
-        g.addColorStop(1, '#a0c4ff');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, 750, 1334);
-      }
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.fillRect(0, 0, 750, 1334);
-
-      // 5. 文字内容
-      ctx.fillStyle = '#2c3e50';
-      ctx.font = 'bold 64px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('我的心情日记', 375, 180);
-      ctx.fillStyle = '#7f8c8d';
-      ctx.font = '28px sans-serif';
-      ctx.fillText('记录生活的温度', 375, 230);
-
-      if (avatarImg) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(375, 340, 60, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(avatarImg, 315, 280, 120, 120);
-        ctx.restore();
-      } else {
-        ctx.fillStyle = '#ecf0f1';
-        ctx.beginPath();
-        ctx.arc(375, 340, 60, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      const nickname = (this.data.profile && this.data.profile.nickname) || '未登录';
-      ctx.fillStyle = '#2c3e50';
-      ctx.font = 'bold 36px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(nickname, 375, 450);
-
-      const cardY = 560;
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-      this._roundRect(ctx, 75, cardY, 600, 280, 24);
-      ctx.fill();
-
+      const profile = this.data.profile;
+      const nickname = (profile && profile.nickname) || '未登录';
       const { total = 0, streak: days = 0, avg = '--' } = this.data.stats;
-      ctx.fillStyle = '#2c3e50';
-      ctx.font = 'bold 64px sans-serif';
-      ctx.fillText(String(total), 195, cardY + 140);
-      ctx.fillText(String(days), 375, cardY + 140);
-      ctx.fillText(String(avg), 555, cardY + 140);
+      const avatarUrl = profile && profile.avatar;
 
-      ctx.fillStyle = '#7f8c8d';
-      ctx.font = '26px sans-serif';
-      ctx.fillText('总记录', 195, cardY + 200);
-      ctx.fillText('连续天数', 375, cardY + 200);
-      ctx.fillText('平均心情', 555, cardY + 200);
+      // 同时加载背景图 + 头像
+      const tasks = [
+        this._loadCanvasImage(canvas, bgPath).catch(err => {
+          console.warn('[canvas] 背景图加载失败:', err);
+          return null;
+        })
+      ];
+      if (avatarUrl) {
+        tasks.push(
+          this._loadCanvasImage(canvas, avatarUrl).catch(err => {
+            console.warn('[canvas] 头像加载失败:', err);
+            return null;
+          })
+        );
+      }
 
-      const emojis = ['😊', '😌', '🌸', '🍃', '✨', '🌿', '🌈'];
-      ctx.font = '60px sans-serif';
-      ctx.fillText(emojis[Math.floor(Math.random() * emojis.length)], 375, cardY + 340);
-
-      const now = new Date();
-      const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
-      ctx.fillStyle = '#7f8c8d';
-      ctx.font = '24px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(dateStr, 375, 1240);
-      ctx.fillText('Mood Journey · 心情日记', 375, 1280);
-
-      const result = await this._exportCanvas(canvas);
-      this.setData({ shareImagePath: result.tempFilePath, showShareModal: true });
-      console.log('==========  完成  ==========');
-    } catch (e) {
-      console.error('顶层异常:', JSON.stringify(e));
-      wx.showToast({ title: '生成失败', icon: 'none' });
-    } finally {
-      clearTimeout(timer);
-      wx.hideLoading();
-    }
+      Promise.all(tasks).then(([bgImg, avatarImg]) => {
+        // 背景
+        if (bgImg) {
+          ctx.drawImage(bgImg, 0, 0, 750, 1334);
+        } else {
+          const g = ctx.createLinearGradient(0, 0, 750, 1334);
+          g.addColorStop(0, '#ffd6a5');
+          g.addColorStop(0.5, '#ffadad');
+          g.addColorStop(1, '#a0c4ff');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, 750, 1334);
+        }
+        this._drawContent(ctx, profile, nickname, total, days, avg, avatarImg);
+        this._exportCanvas(canvas);
+      });
+    });
   },
 
-  // 关键方法：getImageInfo → createImage + 临时路径
+  _drawContent(ctx, profile, nickname, total, days, avg, avatarImg) {
+    // 半透蒙版
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+    ctx.fillRect(0, 0, 750, 500);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.fillRect(0, 500, 750, 500);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.fillRect(0, 1000, 750, 334);
+
+    // 标题
+    ctx.fillStyle = '#2c3e50';
+    ctx.font = 'bold 64px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('我的心情日记', 375, 180);
+    ctx.fillStyle = '#7f8c8d';
+    ctx.font = '28px sans-serif';
+    ctx.fillText('记录生活的温度', 375, 230);
+
+    // 头像
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(375, 340, 60, 0, Math.PI * 2);
+    ctx.clip();
+    if (avatarImg) {
+      ctx.drawImage(avatarImg, 315, 280, 120, 120);
+    } else {
+      ctx.fillStyle = '#ecf0f1';
+      ctx.fillRect(315, 280, 120, 120);
+    }
+    ctx.restore();
+    // 白边
+    ctx.beginPath();
+    ctx.arc(375, 340, 60, 0, Math.PI * 2);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+
+    // 昵称
+    ctx.fillStyle = '#2c3e50';
+    ctx.font = 'bold 36px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(nickname, 375, 450);
+
+    // 数据卡片
+    const cardY = 560;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    this._roundRect(ctx, 75, cardY, 600, 280, 24);
+    ctx.fill();
+
+    ctx.fillStyle = '#2c3e50';
+    ctx.font = 'bold 64px sans-serif';
+    ctx.fillText(String(total), 195, cardY + 140);
+    ctx.fillText(String(days), 375, cardY + 140);
+    ctx.fillText(String(avg), 555, cardY + 140);
+
+    ctx.fillStyle = '#7f8c8d';
+    ctx.font = '26px sans-serif';
+    ctx.fillText('总记录', 195, cardY + 200);
+    ctx.fillText('连续天数', 375, cardY + 200);
+    ctx.fillText('平均心情', 555, cardY + 200);
+
+    // 心情云
+    const emojis = ['😊', '😌', '🌸', '🍃', '✨', '🌿', '🌈'];
+    ctx.font = '60px sans-serif';
+    ctx.fillText(emojis[Math.floor(Math.random() * emojis.length)], 375, cardY + 340);
+
+    // 底部
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+    ctx.fillStyle = '#7f8c8d';
+    ctx.font = '24px sans-serif';
+    ctx.fillText(dateStr, 375, 1240);
+    ctx.fillText('Mood Journey · 心情日记', 375, 1280);
+  },
+
+  _exportCanvas(canvas) {
+    setTimeout(() => {
+      wx.canvasToTempFilePath({
+        canvas,
+        x: 0, y: 0, width: 750, height: 1334,
+        destWidth: 750 * 2, destHeight: 1334 * 2,
+        fileType: 'png',
+        success: res => {
+          wx.hideLoading();
+          this.setData({ shareImagePath: res.tempFilePath, showShareModal: true });
+        },
+        fail: err => {
+          wx.hideLoading();
+          console.error('[canvas] 导出失败:', err);
+          wx.showToast({ title: '导出失败', icon: 'none' });
+        }
+      });
+    }, 300);
+  },
+
   _loadCanvasImage(canvas, src) {
     return new Promise((resolve, reject) => {
+      if (!src) { reject(new Error('src 为空')); return; }
+      console.log('[canvas-img] 开始加载:', src);
+
       // 网络图片
       if (src.startsWith('http://') || src.startsWith('https://')) {
         const img = canvas.createImage();
-        img.onload = () => resolve(img);
-        img.onerror = (e) => reject(new Error('网络图片失败: ' + src));
+        img.onload = () => { console.log('[canvas-img] 网络图片成功:', src); resolve(img); };
+        img.onerror = e => reject(new Error('网络图片加载失败: ' + JSON.stringify(e)));
         img.src = src;
         return;
       }
 
-      // 本地图片：先 getImageInfo
-      console.log('[loadImage] 调 getImageInfo, src =', src);
+      // 本地图片
       wx.getImageInfo({
-        src: src,
+        src,
         success: info => {
-          console.log('[loadImage] getImageInfo 成功, 返回 path =', info.path);
-          const img = canvas.createImage();
-          img.onload = () => {
-            console.log('[loadImage] Image.onload 成功, w =', img.width, 'h =', img.height);
-            resolve(img);
-          };
-          img.onerror = (e) => {
-            console.error('[loadImage] Image.onerror:', JSON.stringify(e));
-            reject(new Error('Image 加载失败'));
-          };
-          img.src = info.path;  // 关键：传临时路径，不是原路径
+          console.log('[canvas-img] getImageInfo 成功:', src, '→', info.path);
+          const fs = wx.getFileSystemManager();
+          fs.readFile({
+            filePath: info.path,
+            encoding: 'base64',
+            success: readRes => {
+              const img = canvas.createImage();
+              img.onload = () => { console.log('[canvas-img] 本地图片加载成功:', src); resolve(img); };
+              img.onerror = e => reject(new Error('图片解析失败: ' + JSON.stringify(e)));
+              const ext = (info.type || src.split('.').pop() || 'png').toLowerCase();
+              const mime = ext === 'jpg' || ext === 'jpeg' ? 'jpeg' : 'png';
+              img.src = `data:image/${mime};base64,${readRes.data}`;
+            },
+            fail: err => { console.error('[canvas-img] fs.readFile 失败:', err); reject(err); }
+          });
         },
-        fail: err => {
-          console.error('[loadImage] getImageInfo 失败:', JSON.stringify(err));
-          reject(err);
-        }
-      });
-    });
-  },
-
-  _getCanvas() {
-    return new Promise((resolve, reject) => {
-      const q = this.createSelectorQuery();
-      q.select('#shareCanvas').fields({ node: true, size: true }).exec(res => {
-        if (!res || !res[0]) return reject(new Error('画布未找到'));
-        resolve(res[0].node);
-      });
-    });
-  },
-
-  _exportCanvas(canvas) {
-    return new Promise((resolve, reject) => {
-      wx.canvasToTempFilePath({
-        canvas, x: 0, y: 0, width: 750, height: 1334,
-        destWidth: 750 * 2, destHeight: 1334 * 2,
-        fileType: 'png',
-        success: resolve,
-        fail: reject
+        fail: err => { console.error('[canvas-img] getImageInfo 失败:', err, 'src=', src); reject(err); }
       });
     });
   },
