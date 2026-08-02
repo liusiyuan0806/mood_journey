@@ -26,107 +26,159 @@
   position: absolute;
   pointer-events: none;
   animation: cloudFloat linear infinite;
+  /* 椭圆主体：重模糊使边界完全融入背景 + 底部微投影增加飘浮感 */
+  filter: blur(6rpx);
+  border-radius: 50%;
 }
+/* 云瓣 - 极重模糊使其完全融入主体，只见浓淡不见边界 */
 .cloud::before,
 .cloud::after {
   content: '';
   position: absolute;
   border-radius: 50%;
   background: inherit;
+  filter: blur(14rpx);
+  opacity: 0.75;
 }
+
+/* 云朵1 - 中大型，顶部缓慢飘 */
 .cloud-1 {
-  width: 160rpx;
-  height: 56rpx;
-  top: 8%;
-  left: -25%;
-  border-radius: 56rpx;
-  animation-duration: 36s;
+  width: 250rpx;
+  height: 90rpx;
+  top: 6%;
+  left: -38%;
+  animation-duration: 55s;
+  animation-delay: 0s;
 }
 .cloud-1::before {
-  width: 64rpx; height: 64rpx;
-  top: -34rpx; left: 32rpx;
+  width: 130rpx; height: 130rpx;
+  top: -66rpx; left: 36rpx;
 }
 .cloud-1::after {
-  width: 48rpx; height: 48rpx;
-  top: -20rpx; left: 76rpx;
+  width: 96rpx; height: 96rpx;
+  top: -46rpx; left: 130rpx;
 }
+
+/* 云朵2 - 小朵轻飘，最快错开节奏 */
 .cloud-2 {
-  width: 120rpx;
-  height: 40rpx;
-  top: 22%;
-  left: -30%;
-  border-radius: 40rpx;
-  animation-duration: 28s;
-  animation-delay: 6s;
+  width: 100rpx;
+  height: 36rpx;
+  top: 18%;
+  left: -18%;
+  animation-duration: 22s;
+  animation-delay: 5s;
 }
 .cloud-2::before {
-  width: 50rpx; height: 50rpx;
-  top: -26rpx; left: 20rpx;
+  width: 60rpx; height: 60rpx;
+  top: -28rpx; left: 12rpx;
 }
 .cloud-2::after {
-  width: 36rpx; height: 36rpx;
-  top: -14rpx; left: 56rpx;
+  width: 44rpx; height: 44rpx;
+  top: -18rpx; left: 54rpx;
 }
+
+/* 云朵3 - 超大厚重，中层极慢飘，占主导 */
 .cloud-3 {
-  width: 200rpx;
-  height: 64rpx;
-  top: 52%;
-  left: -35%;
-  border-radius: 64rpx;
-  animation-duration: 44s;
-  animation-delay: 12s;
+  width: 320rpx;
+  height: 115rpx;
+  top: 44%;
+  left: -48%;
+  animation-duration: 68s;
+  animation-delay: 22s;
 }
 .cloud-3::before {
-  width: 80rpx; height: 80rpx;
-  top: -40rpx; left: 40rpx;
+  width: 160rpx; height: 160rpx;
+  top: -82rpx; left: 50rpx;
 }
 .cloud-3::after {
-  width: 56rpx; height: 56rpx;
-  top: -24rpx; left: 96rpx;
+  width: 120rpx; height: 120rpx;
+  top: -60rpx; left: 175rpx;
 }
+
+/* 云朵4 - 中等偏小，中速飘，补空隙 */
 .cloud-4 {
-  width: 140rpx;
-  height: 48rpx;
-  top: 68%;
+  width: 170rpx;
+  height: 60rpx;
+  top: 72%;
   left: -28%;
-  border-radius: 48rpx;
-  animation-duration: 32s;
-  animation-delay: 3s;
+  animation-duration: 35s;
+  animation-delay: 11s;
 }
 .cloud-4::before {
-  width: 56rpx; height: 56rpx;
-  top: -30rpx; left: 28rpx;
+  width: 92rpx; height: 92rpx;
+  top: -44rpx; left: 26rpx;
 }
 .cloud-4::after {
-  width: 42rpx; height: 42rpx;
-  top: -16rpx; left: 68rpx;
+  width: 66rpx; height: 66rpx;
+  top: -30rpx; left: 96rpx;
 }
 
+/* 飘动动画：水平平移 + 轻柔垂荡，模拟真实云朵漂浮 */
 @keyframes cloudFloat {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(calc(100vw + 200%)); }
+  0%   { transform: translateX(0) translateY(0); }
+  15%  { transform: translateX(15vw) translateY(-8rpx); }
+  35%  { transform: translateX(35vw) translateY(6rpx); }
+  55%  { transform: translateX(55vw) translateY(-10rpx); }
+  75%  { transform: translateX(75vw) translateY(4rpx); }
+  90%  { transform: translateX(90vw) translateY(-6rpx); }
+  100% { transform: translateX(calc(100vw + 200%)) translateY(0); }
 }
 
-/* 不同天气下的云朵颜色 */
+/* 不同天气下的云朵（多层径向渐变：中心亮→边淡→底更淡，模拟水汽散射） */
 .bg-sunny .cloud {
-  background: rgba(255, 255, 255, 0.55);
-  box-shadow: 0 4rpx 20rpx rgba(255, 255, 255, 0.15);
+  background: radial-gradient(
+    ellipse 90% 75% at 40% 35%,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0.65) 30%,
+    rgba(255, 255, 255, 0.35) 60%,
+    rgba(255, 255, 255, 0.08) 85%,
+    transparent 100%
+  );
+  box-shadow: 0 8rpx 24rpx rgba(255, 255, 255, 0.12);
 }
 .bg-cloudy .cloud {
-  background: rgba(200, 200, 210, 0.65);
-  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.06);
+  background: radial-gradient(
+    ellipse 90% 75% at 40% 35%,
+    rgba(230, 235, 242, 0.72) 0%,
+    rgba(210, 218, 228, 0.52) 30%,
+    rgba(190, 200, 212, 0.28) 60%,
+    rgba(180, 190, 204, 0.06) 85%,
+    transparent 100%
+  );
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.04);
 }
 .bg-rainy .cloud {
-  background: rgba(140, 155, 180, 0.45);
-  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.1);
+  background: radial-gradient(
+    ellipse 90% 75% at 40% 35%,
+    rgba(170, 185, 205, 0.55) 0%,
+    rgba(148, 165, 188, 0.38) 30%,
+    rgba(130, 148, 172, 0.2) 60%,
+    rgba(120, 140, 165, 0.04) 85%,
+    transparent 100%
+  );
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.06);
 }
 .bg-snowy .cloud {
-  background: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 2rpx 16rpx rgba(255, 255, 255, 0.1);
+  background: radial-gradient(
+    ellipse 90% 75% at 40% 35%,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.68) 30%,
+    rgba(255, 255, 255, 0.38) 60%,
+    rgba(255, 255, 255, 0.1) 85%,
+    transparent 100%
+  );
+  box-shadow: 0 8rpx 24rpx rgba(255, 255, 255, 0.14);
 }
 .bg-night .cloud {
-  background: rgba(180, 190, 210, 0.18);
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  background: radial-gradient(
+    ellipse 90% 75% at 40% 35%,
+    rgba(210, 218, 235, 0.32) 0%,
+    rgba(190, 200, 220, 0.2) 30%,
+    rgba(170, 182, 205, 0.1) 60%,
+    rgba(160, 175, 200, 0.02) 85%,
+    transparent 100%
+  );
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
 /* ---------- 晴天背景 ---------- */
@@ -467,6 +519,41 @@
 }
 .bg-night .wi-care {
   color: rgba(255, 255, 255, 0.8);
+}
+
+/* 穿衣建议（阳光/多云主题默认） */
+.wi-dress {
+  display: flex;
+  align-items: flex-start;
+  gap: 8rpx;
+  margin-top: 16rpx;
+  padding: 16rpx 18rpx;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16rpx;
+  backdrop-filter: blur(8rpx);
+  -webkit-backdrop-filter: blur(8rpx);
+}
+.bg-rainy .wi-dress {
+  background: rgba(255, 255, 255, 0.18);
+}
+.bg-night .wi-dress {
+  background: rgba(255, 255, 255, 0.12);
+}
+.wi-dress-icon {
+  font-size: 26rpx;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+.wi-dress-text {
+  flex: 1;
+  font-size: 24rpx;
+  color: #6b5a4a;
+  line-height: 1.7;
+  letter-spacing: 0.5rpx;
+}
+.bg-rainy .wi-dress-text,
+.bg-night .wi-dress-text {
+  color: rgba(255, 255, 255, 0.82);
 }
 
 /* 右侧图标 */

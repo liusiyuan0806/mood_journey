@@ -1,6 +1,6 @@
 /**
  * 天气数据工具模块
- * — 生成拟真天气数据、关怀文案、背景类型、即时反馈
+ * — 生成拟真天气数据、关怀文案、穿衣建议、背景类型、即时反馈
  * — 支持真实天气 API 数据合并（通过 mergeRealWeather）
  */
 
@@ -119,6 +119,96 @@ const CARE_TEXTS = {
   ],
 };
 
+// ==================== 穿衣建议库（语气温和） ====================
+const DRESS_TIPS = {
+  // 晴天
+  sunny: [
+    '阳光正好，穿一件轻薄透气的长袖就很舒服。',
+    '今天紫外线偏强，外出时记得戴一顶小帽或撑把伞。',
+    '晴天的你可以选浅色系的衣服，会更清爽一些。',
+    '光线很暖，穿宽松一点的衣服，心情也会跟着松一点。',
+  ],
+  // 多云 / 阴
+  cloudy: [
+    '云层挡住了紫外线，但也挡住了热气，穿一件薄外套刚刚好。',
+    '阴天温差容易变，一件方便穿脱的外套会是不错的选择。',
+    '今天不需要太厚，穿得舒服比穿得好看更重要。',
+    '长袖加一件薄衫，就足以应对这种温吞的天。',
+  ],
+  // 雨天
+  rainy: [
+    '记得带一把伞，淋湿了也没关系，但能避免的时候还是避免一下。',
+    '雨天可以选一双防水的鞋，脚步稳一些，心情也会稳一些。',
+    '外面在下雨，建议穿深色或带防水涂层的外套。',
+    '把伞放在容易拿到的地方，是对今天自己温柔的小事。',
+  ],
+  // 雷阵雨
+  thunderstorm: [
+    '雷雨天尽量减少外出，必要时穿一件防水外套再出门。',
+    '今天风大又有雨，避免穿过于宽松的衣服。',
+    '雷雨天安全第一，穿得简单一些，让自己行动更方便。',
+    '如果一定要外出，记得避开空旷地带，外套选厚实一点。',
+  ],
+  // 雪天
+  snowy: [
+    '下雪天，羽绒服和围巾是给自己的一份温暖。',
+    '路会有些滑，穿一双防滑的鞋，走慢一点也没关系。',
+    '雪天建议保暖内衣 + 毛衣 + 厚外套，层层包裹更安心。',
+    '手套和帽子别忘了，冷的是手，也是想被照顾的心。',
+  ],
+  // 高温加成
+  hot: [
+    '体感较热，建议穿棉麻等透气材质的浅色衣服。',
+    '今天适合背心或短袖，出门前涂一点防晒更安心。',
+    '热天不要穿太紧身的衣服，让皮肤能自由呼吸。',
+    '高温天记得多喝水，穿得轻薄一点就是对自己最好的照顾。',
+  ],
+  // 寒冷加成
+  cold: [
+    '今天挺冷的，建议厚外套 + 围巾，把自己裹得暖和些。',
+    '气温偏低，可以穿一件贴身的保暖内衣，会舒服很多。',
+    '冷天别忘了护好脖子和脚踝，那两处最容易着凉。',
+    '穿厚一点不是娇气，是懂得心疼自己。',
+  ],
+  // 夜晚加成
+  night: [
+    '夜里凉意重，外出的话记得披一件薄外套。',
+    '夜晚气温会低一些，回家路上别让自己冷到。',
+    '睡前把外套放在伸手可及的地方，半夜起来也会方便。',
+    '夜深了，把今天穿出门的衣服换成柔软舒适的家居服吧。',
+  ],
+  // 通用兜底
+  default: [
+    '今天穿让自己舒服的衣服就好，不必太在意别人的眼光。',
+    '选一件穿起来心情会好一点的那件。',
+    '合适的衣服能温柔地拥抱今天，记得对自己好一点。',
+  ],
+};
+
+// ==================== 生成穿衣建议 ====================
+/**
+ * 根据天气数据生成一条温和的穿衣建议
+ * @param {Object} weather - 天气数据对象（需要包含 weatherCategory / weatherText / temp / isNight）
+ * @param {number} [seed] - 随机种子，便于同一日输出稳定
+ * @returns {string} 穿衣建议文案
+ */
+function getDressingTip(weather, seed) {
+  if (!weather) return '';
+
+  const category = weather.weatherCategory || 'default';
+  const temp = typeof weather.temp === 'number' ? weather.temp : 20;
+  const isNight = !!weather.isNight;
+
+  // 优先按天气类别，再叠加温度与时段
+  const pool = [...(DRESS_TIPS[category] || DRESS_TIPS.default)];
+  if (temp > 30) pool.push(...DRESS_TIPS.hot);
+  if (temp < 8)  pool.push(...DRESS_TIPS.cold);
+  if (isNight)   pool.push(...DRESS_TIPS.night);
+
+  const useSeed = typeof seed === 'number' ? seed : (new Date().getDate() * 17 + 3);
+  return pickFromSeed(useSeed, pool);
+}
+
 // ==================== 生成天气数据 ====================
 function generateWeather(date) {
   const month = date.getMonth();     // 0-11
@@ -188,21 +278,30 @@ function generateWeather(date) {
     sunsetHour  = 17; sunsetMin  = randomInt(baseSeed + 800, 0, 30);
   } else if (month >= 5 && month <= 7) { // 夏季
     sunriseHour = 5; sunriseMin = randomInt(baseSeed + 700, 0, 30);
-    sunsetHour  = 19; sunsetMin = randomInt(baseSeed + 800, 0, 30);
+    sunsetHour  = 19; sunsetMin  = randomInt(baseSeed + 800, 0, 30);
   } else { // 春秋
     sunriseHour = 6; sunriseMin = randomInt(baseSeed + 700, 0, 40);
-    sunsetHour  = 18; sunsetMin = randomInt(baseSeed + 800, 0, 30);
+    sunsetHour  = 18; sunsetMin  = randomInt(baseSeed + 800, 0, 30);
   }
   const sunrise = `${String(sunriseHour).padStart(2, '0')}:${String(sunriseMin).padStart(2, '0')}`;
   const sunset  = `${String(sunsetHour).padStart(2, '0')}:${String(sunsetMin).padStart(2, '0')}`;
 
   // 关怀文案
-  let careCategory = weatherItem.category;
+  const careCategory = weatherItem.category;
   const careTexts = [...CARE_TEXTS[careCategory]];
   if (temp > 32) careTexts.push(...CARE_TEXTS.hot);
   if (temp < 5)  careTexts.push(...CARE_TEXTS.cold);
   if (isNight)   careTexts.push(...CARE_TEXTS.night);
   const careText = pickFromSeed(baseSeed + 900, careTexts);
+
+  // 穿衣建议（先准备一个中间对象，确保 getDressingTip 能读到所需字段）
+  const draft = {
+    weatherCategory: weatherItem.category,
+    weatherText: weatherItem.text,
+    temp,
+    isNight,
+  };
+  const dressingTip = getDressingTip(draft, baseSeed + 1000);
 
   // 背景类型
   let backgroundClass = weatherItem.category;
@@ -239,6 +338,7 @@ function generateWeather(date) {
     sunset,
     isNight,
     careText,
+    dressingTip,
     backgroundClass,
     pressure,
     hasWarning,
@@ -413,6 +513,9 @@ function mergeRealWeather(baseData, realData) {
     merged.careText = pickFromSeed(new Date().getDate() * 13, careTexts);
   }
 
+  // 重新生成穿衣建议（基于真实天气数据）
+  merged.dressingTip = getDressingTip(merged, new Date().getDate() * 19 + 5);
+
   return merged;
 }
 
@@ -422,4 +525,5 @@ module.exports = {
   getContextQuestion,
   generateFeedback,
   mergeRealWeather,
+  getDressingTip,
 };
