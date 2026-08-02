@@ -105,6 +105,7 @@ Page({
   },
 
   _drawContent(ctx, profile, nickname, total, days, avg, avatarImg, dailyQuote) {
+    console.log('[draw] ENTER _drawContent, dailyQuote=', dailyQuote);
     // 半透蒙版
     ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
     ctx.fillRect(0, 0, 750, 500);
@@ -169,81 +170,38 @@ Page({
     const emojis = ['😊', '😌', '🌸', '🍃', '✨', '🌿', '🌈'];
     ctx.font = '60px sans-serif';
     ctx.fillText(emojis[Math.floor(Math.random() * emojis.length)], 375, cardY + 340);
+    console.log('[draw] 心情云 OK');
 
-    // 每日一句 —— 用最稳的方式
+    // 每日一句 —— 极简版
     if (dailyQuote) {
-      console.log('[share] 每日一句:', dailyQuote);
-      const quoteY = cardY + 400; // 960
-
+      console.log('[draw] 进入每日一句, quote=', dailyQuote);
       try {
-        // 装饰线
-        ctx.strokeStyle = '#1a1a1a';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(180, quoteY);
-        ctx.lineTo(570, quoteY);
-        ctx.stroke();
-
-        // 装饰小圆点
-        ctx.fillStyle = '#1a1a1a';
-        ctx.beginPath();
-        ctx.arc(375, quoteY, 5, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 标签
-        ctx.fillStyle = '#1a1a1a';
-        ctx.font = 'bold 26px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'alphabetic';
-        ctx.fillText('每日一句', 375, quoteY + 42);
-
-        // 主体句子 —— 简单按 14 字换行（不依赖 measureText，最稳）
-        const maxChars = 14;
-        const quoteLines = [];
-        let remaining = dailyQuote;
-        while (remaining.length > maxChars) {
-          // 优先在标点处断行
-          let cut = maxChars;
-          const lastPunc = Math.max(
-            remaining.lastIndexOf('，', maxChars - 1),
-            remaining.lastIndexOf('。', maxChars - 1),
-            remaining.lastIndexOf('；', maxChars - 1),
-            remaining.lastIndexOf('、', maxChars - 1)
-          );
-          if (lastPunc > 5) cut = lastPunc + 1;
-          quoteLines.push(remaining.substring(0, cut));
-          remaining = remaining.substring(cut);
-        }
-        if (remaining) quoteLines.push(remaining);
-        console.log('[share] 每日一句 换行:', quoteLines);
-
-        // 文字
-        ctx.fillStyle = '#000000';
-        ctx.font = 'bold 36px sans-serif';
-        ctx.textAlign = 'center';
-        const lineH = 50;
-        const startY = quoteY + 95;
-        for (let i = 0; i < quoteLines.length; i++) {
-          ctx.fillText(quoteLines[i], 375, startY + i * lineH);
-        }
-      } catch (e) {
-        console.error('[share] 每日一句绘制失败:', e);
-        // 兜底：直接画一句不换行
         ctx.fillStyle = '#000000';
         ctx.font = 'bold 30px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(dailyQuote, 375, quoteY + 100);
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText('每日一句', 375, 1000);
+        console.log('[draw] 标签 OK');
+        // 简化：不换行，直接画整句
+        ctx.fillText(dailyQuote, 375, 1080);
+        console.log('[draw] 主体 OK, len=', dailyQuote.length);
+      } catch (e) {
+        console.error('[draw] 每日一句 ERROR:', e);
       }
+    } else {
+      console.warn('[draw] dailyQuote 为空，跳过');
     }
 
     // 底部
     const now = new Date();
     const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
-    ctx.fillStyle = '#1a1a1a';
+    ctx.fillStyle = '#000000';
     ctx.font = 'bold 24px sans-serif';
     ctx.fillText(dateStr, 375, 1220);
-    ctx.fillStyle = '#4A3A32';
+    console.log('[draw] 日期 OK');
     ctx.fillText('Mood Journey · 心情日记', 375, 1265);
+    console.log('[draw] footer OK');
+    console.log('[draw] EXIT _drawContent');
   },
 
   _exportCanvas(canvas) {
