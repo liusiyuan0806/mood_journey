@@ -131,7 +131,7 @@
         <text class="as-sub">选择操作</text>
       </view>
       <view class="as-buttons">
-        <button class="as-btn" bindtap="showBrief" hover-class="as-btn-hover">
+        <button class="as-btn" bindtap="showBrief" hover-class="as-btn-hover" style="position: relative; left: 0rpx; top: 0rpx; width: 550rpx; display: flex; box-sizing: border-box">
           <text class="as-btn-icon">🌤️</text>
           <view class="as-btn-text">
             <text class="as-btn-title">天气 - 心情简报</text>
@@ -180,7 +180,7 @@
 
       <!-- 评分条 -->
       <view class="brief-score-bar">
-        <view class="brief-score-fill" style="width:{{briefData.avgScore/5*100}}%"></view>
+        <view class="brief-score-fill" style="width:{{briefData.avgScore/5*100}}'%'"></view>
         <text class="brief-score-label">{{briefData.scoreLabel}}</text>
       </view>
 
