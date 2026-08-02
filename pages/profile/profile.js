@@ -32,6 +32,8 @@ Page({
   },
   logout() { saveProfile(null); this.refresh(); },
   edit() { wx.navigateTo({ url: '/pages/edit-profile/edit-profile' }); },
+  goFavorites() { wx.navigateTo({ url: '/pages/favorites/favorites' }); },
+  goWeatherMood() { wx.navigateTo({ url: '/pages/weather-mood/weather-mood' }); },
   clear() {
     wx.showModal({
       title: '清除数据', content: '所有心情记录将被永久清除。',

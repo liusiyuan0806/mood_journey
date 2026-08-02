@@ -1,0 +1,95 @@
+.wrap { padding: 24rpx 20rpx 60rpx; min-height: 100vh; background: linear-gradient(180deg, #FFF8F2 0%, #FFF5EE 100%); }
+
+/* 标题 */
+.header { text-align: center; margin: 24rpx 0 28rpx; }
+.title { font-size: 40rpx; font-weight: 700; color: #2c3e50; display: block; }
+.sub { font-size: 26rpx; color: #9B8E82; display: block; margin-top: 8rpx; }
+
+/* 筛选器 */
+.filter-bar { display: flex; justify-content: center; gap: 16rpx; margin-bottom: 28rpx; }
+.filter-chip {
+  padding: 12rpx 32rpx; border-radius: 40rpx;
+  background: #fff; color: #8B7355; font-size: 26rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,.04);
+  transition: all 0.2s;
+}
+.filter-chip.on {
+  background: #E8856A; color: #fff;
+  box-shadow: 0 4rpx 14rpx rgba(232,133,106,.3);
+}
+
+/* 空态 */
+.empty { text-align: center; padding: 120rpx 40rpx; }
+.empty-icon { font-size: 80rpx; display: block; margin-bottom: 20rpx; }
+.empty-text { font-size: 32rpx; color: #666; display: block; }
+.empty-hint { font-size: 26rpx; color: #aaa; display: block; margin-top: 10rpx; }
+
+/* ===== 卡片流 ===== */
+.card-list { display: flex; flex-direction: column; gap: 20rpx; }
+
+.weather-card {
+  border-radius: 24rpx; padding: 28rpx; overflow: hidden;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,.05);
+}
+.weather-card.card-dim { opacity: 0.72; border: 2rpx dashed #E0D6C8; }
+
+/* 卡片顶部 */
+.card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20rpx; }
+.card-weather { display: flex; align-items: center; gap: 16rpx; }
+.card-emoji { font-size: 52rpx; line-height: 1; }
+.card-name-row { display: flex; flex-direction: column; gap: 6rpx; }
+.card-label { font-size: 30rpx; font-weight: 700; color: #2c3e50; }
+.card-badge {
+  display: inline-flex; align-self: flex-start;
+  padding: 2rpx 16rpx; border-radius: 20rpx; font-size: 22rpx; font-weight: 600;
+}
+.card-avg { text-align: right; }
+.avg-label { font-size: 22rpx; color: #999; display: block; }
+.avg-num { font-size: 40rpx; font-weight: 700; display: block; }
+
+/* 空态卡片 */
+.card-locked { text-align: center; padding: 32rpx 20rpx; }
+.locked-icon { font-size: 40rpx; display: block; margin-bottom: 12rpx; }
+.locked-text { font-size: 26rpx; color: #B0A89A; line-height: 1.6; }
+
+/* 心情分布 */
+.mood-dist { margin-bottom: 18rpx; }
+.dist-header { margin-bottom: 14rpx; }
+.dist-title { font-size: 24rpx; color: #999; font-weight: 600; }
+
+/* 堆叠条 */
+.dist-bar { display: flex; height: 16rpx; border-radius: 8rpx; overflow: hidden; margin-bottom: 14rpx; }
+.dist-seg { height: 100%; min-width: 4rpx; }
+
+/* 图例 */
+.dist-legend { display: flex; flex-wrap: wrap; gap: 12rpx 20rpx; }
+.legend-item { display: flex; align-items: center; gap: 6rpx; }
+.legend-dot { width: 14rpx; height: 14rpx; border-radius: 4rpx; }
+.legend-name { font-size: 22rpx; color: #555; }
+.legend-pct { font-size: 20rpx; color: #bbb; margin-left: 2rpx; }
+
+/* 典型感受 */
+.card-feeling { display: flex; align-items: flex-start; gap: 10rpx; padding-top: 16rpx; border-top: 1rpx solid rgba(0,0,0,.06); }
+.feeling-label { font-size: 26rpx; flex-shrink: 0; }
+.feeling-text { font-size: 24rpx; color: #888; line-height: 1.6; }
+
+/* ===== 洞察卡片 ===== */
+.insights-section { margin-top: 36rpx; }
+.insights-header { display: flex; align-items: baseline; margin-bottom: 16rpx; gap: 12rpx; }
+.insights-title { font-size: 32rpx; font-weight: 700; color: #2c3e50; }
+.insights-sub { font-size: 22rpx; color: #c0b6a8; }
+
+.insight-card {
+  display: flex; align-items: flex-start; gap: 14rpx;
+  padding: 22rpx 24rpx; margin-bottom: 14rpx;
+  border-radius: 16rpx; background: #fff;
+  box-shadow: 0 1rpx 8rpx rgba(0,0,0,.03);
+}
+.insight-card.notable { border-left: 6rpx solid #E8856A; }
+.insight-card.low { border-left: 6rpx solid #D0C8B8; }
+
+.insight-dot { width: 12rpx; height: 12rpx; border-radius: 50%; margin-top: 8rpx; flex-shrink: 0; }
+.dot-high { background: #E8856A; }
+.dot-low { background: #D0C8B8; }
+
+.insight-text { font-size: 28rpx; color: #4a4a4a; line-height: 1.7; flex: 1; }

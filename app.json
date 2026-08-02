@@ -7,7 +7,8 @@
     "pages/record/record",
     "pages/edit-profile/edit-profile",
     "pages/day/day",
-    "pages/favorites/favorites"
+    "pages/favorites/favorites",
+    "pages/weather-mood/weather-mood"
   ],
   "window": {
     "navigationBarTitleText": "情绪手账",

@@ -1,0 +1,100 @@
+<view class="wrap">
+  <!-- 标题 -->
+  <view class="header">
+    <text class="title">天气心情地图</text>
+    <text class="sub">不同天气下，你的情绪如何变化？</text>
+  </view>
+
+  <!-- 筛选器 -->
+  <view class="filter-bar">
+    <view
+      wx:for="{{filters}}" wx:key="key"
+      class="filter-chip {{filter === item.key ? 'on' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="switchFilter"
+    >
+      <text>{{item.icon}} {{item.label}}</text>
+    </view>
+  </view>
+
+  <!-- 无数据 -->
+  <view class="empty" wx:if="{{weatherCards.length === 0}}">
+    <text class="empty-icon">☁️</text>
+    <text class="empty-text">该分类下还没有记录</text>
+    <text class="empty-hint">切换筛选条件，或先记录几天的情绪吧</text>
+  </view>
+
+  <!-- 卡片流 -->
+  <view class="card-list" wx:if="{{weatherCards.length > 0}}">
+    <view
+      wx:for="{{weatherCards}}" wx:key="key"
+      class="weather-card {{item.enoughData ? '' : 'card-dim'}}"
+      style="background: linear-gradient(135deg, {{item.bg}} 0%, #fff 100%);"
+    >
+
+      <!-- 卡片顶部：天气 emoji + 名称 + 次数 -->
+      <view class="card-top">
+        <view class="card-weather">
+          <text class="card-emoji">{{item.icon}}</text>
+          <view class="card-name-row">
+            <text class="card-label">{{item.label}}</text>
+            <view class="card-badge" style="background:{{item.color}}20; color:{{item.color}}">
+              <text>{{item.count}}次</text>
+            </view>
+          </view>
+        </view>
+        <view class="card-avg" wx:if="{{item.enoughData}}">
+          <text class="avg-label">均分</text>
+          <text class="avg-num" style="color:{{item.avgScore >= 3.5 ? '#52C41A' : item.avgScore >= 2.5 ? '#FAAD14' : '#F5222D'}}">{{item.avgScoreText}}</text>
+        </view>
+      </view>
+
+      <!-- 空态提示 -->
+      <view class="card-locked" wx:if="{{!item.enoughData}}">
+        <text class="locked-icon">🔒</text>
+        <text class="locked-text">再多记录几次，就能解锁这份天气的心情画像</text>
+      </view>
+
+      <!-- 心情分布条 -->
+      <view class="mood-dist" wx:if="{{item.enoughData}}">
+        <view class="dist-header">
+          <text class="dist-title">心情分布</text>
+        </view>
+        <!-- 堆叠条 -->
+        <view class="dist-bar">
+          <view
+            wx:for="{{item.moodDist}}" wx:key="name" wx:for-item="d"
+            class="dist-seg"
+            style="width:{{d.pct}}%; background:{{d.color}};"
+          ></view>
+        </view>
+        <!-- 图例 -->
+        <view class="dist-legend">
+          <view class="legend-item" wx:for="{{item.moodDist}}" wx:key="name" wx:for-item="d">
+            <view class="legend-dot" style="background:{{d.color}};"></view>
+            <text class="legend-name">{{d.emoji}}{{d.name}}</text>
+            <text class="legend-pct">{{d.pct}}%</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 典型感受 -->
+      <view class="card-feeling" wx:if="{{item.enoughData && item.feeling}}">
+        <text class="feeling-label">💬</text>
+        <text class="feeling-text">{{item.feeling}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 个性化洞察 -->
+  <view class="insights-section" wx:if="{{insights.length > 0}}">
+    <view class="insights-header">
+      <text class="insights-title">💡 个性化洞察</text>
+      <text class="insights-sub" wx:if="{{sampleAll < 5}}">（数据量较少，结论仅供参考）</text>
+    </view>
+    <view wx:for="{{insights}}" wx:key="*this" class="insight-card {{item.level === 'notable' ? 'notable' : 'low'}}">
+      <view class="insight-dot {{item.level === 'notable' ? 'dot-high' : 'dot-low'}}"></view>
+      <text class="insight-text">{{item.text}}</text>
+    </view>
+  </view>
+</view>
