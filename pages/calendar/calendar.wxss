@@ -1,214 +1,408 @@
-/* ===== 情绪日历 · 温暖色调 ===== */
+/* ===== 情绪日历 · 增强版 ===== */
 
-/* 月度概览卡片 */
+/* —— 月度概览卡片 —— */
 .overview {
   padding: 32rpx 30rpx;
   background: linear-gradient(135deg, #FFFFFF 0%, #FFF1E6 100%);
 }
 
+/* 连续打卡 */
+.ov-streak {
+  display: flex; align-items: baseline; gap: 10rpx; margin-bottom: 24rpx;
+}
 .big {
-  font-size: 56rpx;
-  font-weight: 800;
-  color: #E8856A;
-  letter-spacing: -1rpx;
+  font-size: 56rpx; font-weight: 800; color: #E8856A; letter-spacing: -1rpx;
+}
+.ov-streak-label {
+  font-size: 26rpx; color: #8B776B; font-weight: 500;
 }
 
-.overview > view:first-child {
-  display: flex;
-  align-items: baseline;
-  gap: 10rpx;
-  margin-bottom: 20rpx;
+/* 统计网格 */
+.ov-grid {
+  display: flex; align-items: center;
+  background: rgba(255,255,255,0.6); border-radius: 18rpx;
+  padding: 20rpx 0; margin-bottom: 20rpx;
+}
+.ov-grid-item { flex: 1; text-align: center; }
+.og-value {
+  display: block; font-size: 34rpx; font-weight: 800; color: #4A3A32;
+  letter-spacing: -0.5rpx;
+}
+.og-value-up { color: #52C41A; }
+.og-value-down { color: #FA541C; }
+.og-label {
+  display: block; font-size: 19rpx; color: #B5A69C; margin-top: 4rpx;
+}
+.og-divider {
+  width: 1rpx; height: 40rpx; background: rgba(180,160,145,0.25);
 }
 
-.overview > view:first-child text:last-child {
-  font-size: 26rpx;
-  color: #8B776B;
-  font-weight: 500;
+/* 心情最好 & 情绪低谷 */
+.ov-highlights {
+  display: flex; gap: 12rpx; margin-bottom: 20rpx;
+}
+.ov-hl {
+  flex: 1; display: flex; align-items: center; gap: 10rpx;
+  padding: 16rpx 14rpx; border-radius: 16rpx;
+  transition: transform 0.15s ease;
+}
+.ov-hl:active { transform: scale(0.97); }
+.ov-hl-best {
+  background: rgba(255,225,154,0.25);
+}
+.ov-hl-attention {
+  background: rgba(187,212,238,0.2);
+}
+.ov-hl-emoji { font-size: 34rpx; line-height: 1; flex-shrink: 0; }
+.ov-hl-info { flex: 1; display: flex; flex-direction: column; gap: 2rpx; min-width: 0; }
+.ov-hl-title {
+  font-size: 21rpx; color: #8B776B; font-weight: 600;
+}
+.ov-hl-sub {
+  font-size: 19rpx; color: #B5A69C;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ov-hl-score {
+  font-size: 30rpx; font-weight: 800; color: #4A3A32; flex-shrink: 0;
 }
 
+/* 心情分布 */
 .summary {
-  margin-top: 16rpx;
-  font-size: 24rpx;
-  color: #6B5A50;
+  margin-top: 16rpx; font-size: 24rpx; color: #6B5A50;
 }
-
 .bar {
-  height: 12rpx;
-  background: #F5E6DB;
-  border-radius: 12rpx;
-  margin-top: 8rpx;
-  overflow: hidden;
+  height: 12rpx; background: #F5E6DB; border-radius: 12rpx; margin-top: 8rpx; overflow: hidden;
 }
-
 .bar view {
-  height: 100%;
-  background: linear-gradient(90deg, #F0B27A, #E8856A);
-  border-radius: 12rpx;
+  height: 100%; background: linear-gradient(90deg, #F0B27A, #E8856A); border-radius: 12rpx;
   transition: width 0.3s ease;
 }
 
-/* 月份切换 */
-.switch {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #4A3A32;
-  margin: 36rpx 10rpx 24rpx;
+/* —— 月度心情色带 —— */
+.color-band-wrap {
+  margin: 24rpx 10rpx 0;
 }
-
-.switch text:first-child,
-.switch text:last-child {
-  font-size: 52rpx;
-  color: #E8856A;
-  width: 60rpx;
-  height: 60rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #FFF1E6;
-  border-radius: 50%;
-  line-height: 1;
+.cb-label {
+  font-size: 22rpx; color: #B5A69C; font-weight: 500; display: block; margin-bottom: 10rpx;
 }
-
-.switch text:first-child:active,
-.switch text:last-child:active {
-  background: #FFE0CC;
-  transform: scale(0.9);
+.color-band {
+  display: flex; gap: 3rpx; height: 28rpx; border-radius: 8rpx; overflow: hidden;
 }
-
-/* 星期表头 */
-.week {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  text-align: center;
-  color: #B5A69C;
-  font-size: 24rpx;
-  margin-bottom: 16rpx;
-  font-weight: 500;
-}
-
-/* 日历网格 */
-.calendar {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  text-align: center;
-  row-gap: 10rpx;
-}
-
-.day {
-  height: 80rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.date {
-  width: 64rpx;
-  height: 64rpx;
-  line-height: 64rpx;
-  border-radius: 50%;
-  font-size: 26rpx;
-  color: #5D4A40;
-  font-weight: 500;
+.cb-seg {
+  flex: 1; border-radius: 4rpx; min-width: 6rpx;
   transition: all 0.2s ease;
 }
-
-.date:active {
-  transform: scale(0.9);
+.cb-seg-empty {
+  opacity: 0.5;
 }
 
-.day.empty .date {
-  color: transparent;
+/* —— 月份切换 —— */
+.switch {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 32rpx; font-weight: 700; color: #4A3A32; margin: 36rpx 10rpx 20rpx;
+}
+.switch text:first-child,
+.switch text:last-child {
+  font-size: 52rpx; color: #E8856A; width: 60rpx; height: 60rpx;
+  display: flex; align-items: center; justify-content: center;
+  background: #FFF1E6; border-radius: 50%; line-height: 1;
+}
+.switch text:first-child:active,
+.switch text:last-child:active { background: #FFE0CC; transform: scale(0.9); }
+
+/* —— 热力图图例 —— */
+.legend {
+  display: flex; align-items: center; gap: 16rpx; margin: 0 10rpx 20rpx; padding-left: 4rpx;
+}
+.legend-label {
+  font-size: 22rpx; color: #B5A69C; font-weight: 500; white-space: nowrap;
+}
+.legend-bar {
+  display: flex; flex: 1; gap: 6rpx;
+}
+.legend-swatch {
+  flex: 1; height: 16rpx; border-radius: 8rpx; display: flex; align-items: center; justify-content: center;
+}
+.legend-swatch text {
+  font-size: 16rpx; color: #B5A69C;
 }
 
-/* 底部弹窗 */
+/* 图例说明 */
+.legend-hint {
+  display: block; font-size: 19rpx; color: #C8B8AC;
+  margin: 0 10rpx 16rpx; padding-left: 4rpx; line-height: 1.5;
+}
+
+/* —— 星期表头 —— */
+.week {
+  display: grid; grid-template-columns: repeat(7, 1fr); text-align: center;
+  color: #B5A69C; font-size: 24rpx; margin-bottom: 12rpx; font-weight: 500;
+}
+
+/* —— 日历网格（增强） —— */
+.calendar {
+  display: grid; grid-template-columns: repeat(7, 1fr); text-align: center;
+  row-gap: 8rpx; column-gap: 2rpx;
+}
+.day { height: 96rpx; display: flex; justify-content: center; align-items: center; }
+.date {
+  width: 76rpx; height: 80rpx; border-radius: 16rpx;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: all 0.2s ease; position: relative;
+}
+.date-num {
+  font-size: 24rpx; color: #5D4A40; font-weight: 600; line-height: 1;
+}
+.day.empty .date { color: transparent; background: transparent !important; }
+.date:active { transform: scale(0.88); }
+
+/* 有记录的日期 */
+.day.has-records .date {
+  box-shadow: inset 0 0 0 3rpx rgba(255,255,255,.5);
+}
+
+/* Today highlight */
+.date-today {
+  box-shadow: 0 0 0 3rpx #E8856A, inset 0 0 0 3rpx rgba(255,255,255,.5) !important;
+}
+
+/* 当天主要心情 emoji */
+.mood-emoji {
+  font-size: 20rpx; line-height: 1; margin-top: 3rpx;
+  text-shadow: 0 0 3rpx rgba(255,255,255,0.7);
+}
+
+/* Count badge */
+.count-badge {
+  position: absolute; top: 2rpx; right: 4rpx;
+  font-size: 16rpx; color: #fff; font-weight: 700;
+  background: rgba(232,133,106,0.7);
+  min-width: 22rpx; height: 22rpx; line-height: 22rpx;
+  border-radius: 11rpx; padding: 0 6rpx;
+}
+
+/* ===================================================== */
+/* 底部动作面板 */
+/* ===================================================== */
 .mask {
-  position: fixed;
-  inset: 0;
-  background: rgba(74, 58, 50, 0.35);
-  z-index: 10;
-  backdrop-filter: blur(2px);
+  position: fixed; inset: 0; background: rgba(74, 58, 50, 0.4);
+  z-index: 100; backdrop-filter: blur(4rpx);
 }
 
-.sheet {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
+.action-sheet {
+  position: absolute; bottom: 0; width: 100%; box-sizing: border-box;
+  background: #FFF8F2; border-radius: 36rpx 36rpx 0 0;
+  padding: 36rpx 30rpx 70rpx;
+  box-shadow: 0 -8rpx 30rpx rgba(0,0,0,.1);
+}
+.as-header {
+  text-align: center; margin-bottom: 28rpx;
+}
+.as-date {
+  display: block; font-size: 30rpx; font-weight: 700; color: #4A3A32;
+}
+.as-sub {
+  font-size: 22rpx; color: #B5A69C; margin-top: 6rpx; display: block;
+}
+
+.as-buttons { display: flex; flex-direction: column; gap: 16rpx; }
+.as-btn {
+  display: flex; align-items: center; gap: 20rpx;
+  padding: 28rpx 24rpx; border-radius: 20rpx; border: none;
+  background: #fff; box-shadow: 0 2rpx 12rpx rgba(0,0,0,.04);
+  transition: all 0.15s ease;
+  height: 150rpx;
   box-sizing: border-box;
-  background: #FFF8F2;
-  border-radius: 32rpx 32rpx 0 0;
-  padding: 40rpx 32rpx 60rpx;
-  box-shadow: 0 -8rpx 30rpx rgba(0, 0, 0, 0.1);
+}
+.as-btn::after { border: none; }
+.as-btn-hover { background: #FFF1E6; transform: scale(0.98); }
+
+.as-btn-icon { font-size: 44rpx; line-height: 1; width: 56rpx; text-align: center; }
+.as-btn-text { flex: 1; display: flex; flex-direction: column; gap: 6rpx; text-align: left; }
+.as-btn-title {
+  font-size: 28rpx; font-weight: 700; color: #4A3A32;
+}
+.as-btn-desc {
+  font-size: 22rpx; color: #B5A69C;
 }
 
-.sheet-mood {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #4A3A32;
-  margin-bottom: 8rpx;
+/* ===================================================== */
+/* 天气 - 心情简报弹窗（增强） */
+/* ===================================================== */
+.brief-sheet {
+  position: absolute; bottom: 0; width: 100%; max-height: 80vh;
+  box-sizing: border-box; background: #FFF8F2; border-radius: 36rpx 36rpx 0 0;
+  padding: 36rpx 30rpx 70rpx;
+  box-shadow: 0 -8rpx 30rpx rgba(0,0,0,.1);
+  overflow-y: auto;
+}
+.brief-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 24rpx;
+}
+.brief-title { font-size: 34rpx; font-weight: 700; color: #4A3A32; }
+.brief-date { font-size: 24rpx; color: #B5A69C; }
+
+/* 核心指标 */
+.brief-stats {
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; border-radius: 20rpx; padding: 24rpx 0; margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,.03);
+}
+.brief-stat { flex: 1; text-align: center; }
+.brief-stat-value { display: block; font-size: 36rpx; font-weight: 800; color: #E8856A; }
+.brief-stat-label { font-size: 20rpx; color: #B5A69C; margin-top: 4rpx; display: block; }
+.brief-divider { width: 1rpx; height: 48rpx; background: #F0E8E0; }
+
+/* 评分条 */
+.brief-score-bar {
+  height: 24rpx; background: #F0E8E0; border-radius: 12rpx; margin-bottom: 20rpx;
+  position: relative; overflow: hidden;
+}
+.brief-score-fill {
+  height: 100%; border-radius: 12rpx;
+  background: linear-gradient(90deg, #F0B27A, #E8702A);
+  transition: width 0.3s ease;
+}
+.brief-score-label {
+  position: absolute; right: 12rpx; top: 0; line-height: 24rpx;
+  font-size: 20rpx; color: #fff; font-weight: 600;
 }
 
-.sheet .muted {
-  font-size: 24rpx;
-  color: #B5A69C;
+/* 心情标签 */
+.brief-moods { display: flex; flex-wrap: wrap; gap: 10rpx; margin-bottom: 20rpx; }
+.brief-mood-tag {
+  font-size: 22rpx; color: #E8856A; background: rgba(232,133,106,.1);
+  padding: 6rpx 16rpx; border-radius: 20rpx;
 }
 
-.note {
-  margin: 24rpx 0 32rpx;
-  font-size: 28rpx;
-  color: #6B5A50;
-  line-height: 1.7;
-  padding: 20rpx;
-  background: #FFFFFF;
-  border-radius: 16rpx;
+/* 时段分布 - 卡片式 */
+.brief-period-cards {
+  display: flex; gap: 12rpx;
+}
+.bp-card {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4rpx;
+  padding: 18rpx 8rpx; border-radius: 14rpx;
+  background: #F5EBE3; opacity: 0.45;
+  transition: opacity 0.2s ease;
+}
+.bp-card-active {
+  opacity: 1; background: #FFF1E6;
+}
+.bp-card-emoji { font-size: 30rpx; line-height: 1; }
+.bp-card-name { font-size: 19rpx; color: #B5A69C; }
+.bp-card-count {
+  font-size: 22rpx; font-weight: 700; color: #4A3A32;
+}
+
+/* 各模块 */
+.brief-section { margin-bottom: 20rpx; }
+.brief-section-title { font-size: 24rpx; color: #8B776B; font-weight: 600; margin-bottom: 10rpx; display: block; }
+.brief-tags { display: flex; flex-wrap: wrap; gap: 10rpx; }
+.brief-tag {
+  font-size: 22rpx; color: #6B5A50; background: #FFF1E6;
+  padding: 6rpx 16rpx; border-radius: 20rpx;
+}
+
+/* 照片缩略图 */
+.brief-photos {
+  display: flex; flex-wrap: wrap; gap: 10rpx;
+}
+.brief-photo {
+  width: 120rpx; height: 120rpx; border-radius: 14rpx;
+}
+
+.brief-excerpt {
+  font-size: 26rpx; color: #5D4A40; line-height: 1.8;
+  background: #fff; padding: 20rpx; border-radius: 16rpx;
   border: 1rpx solid #F5EBE3;
 }
-
-.actions {
-  display: flex;
-  gap: 20rpx;
+.brief-empty {
+  font-size: 24rpx; color: #B5A69C; text-align: center; padding: 32rpx 0;
 }
 
-.actions button {
-  flex: 1;
-  font-size: 28rpx;
-  border-radius: 40rpx;
-  line-height: 80rpx;
+/* ===================================================== */
+/* 编辑当日心情面板 */
+/* ===================================================== */
+.edit-sheet {
+  position: absolute; bottom: 0; width: 100%; height: 75vh;
+  box-sizing: border-box; background: #FFF8F2; border-radius: 36rpx 36rpx 0 0;
+  padding: 36rpx 0 0;
+  box-shadow: 0 -8rpx 30rpx rgba(0,0,0,.1);
+  display: flex; flex-direction: column;
+}
+.edit-header {
+  display: flex; align-items: center; gap: 12rpx;
+  padding: 0 30rpx 20rpx; border-bottom: 1rpx solid #F0E8E0;
+}
+.edit-title { flex: 1; font-size: 30rpx; font-weight: 700; color: #4A3A32; }
+.edit-count {
+  font-size: 22rpx; color: #B5A69C; background: #fff;
+  padding: 4rpx 14rpx; border-radius: 20rpx;
+}
+.edit-close {
+  font-size: 36rpx; color: #C8BFB2; padding: 0 4rpx; line-height: 1;
 }
 
-.actions button:first-child {
-  background: #FFF1E6;
-  color: #E8856A;
+/* 记录列表 */
+.edit-list { flex: 1; padding: 16rpx 30rpx; overflow-y: auto; }
+
+/* 记录卡片 */
+.edit-card {
+  background: #fff; border-radius: 20rpx; padding: 24rpx;
+  margin-bottom: 16rpx; box-shadow: 0 2rpx 10rpx rgba(0,0,0,.03);
 }
 
-.actions button::after {
-  border: none;
+.ec-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 14rpx;
+}
+.ec-mood { display: flex; align-items: center; gap: 10rpx; }
+.ec-emoji { font-size: 36rpx; line-height: 1; }
+.ec-mood-name { font-size: 28rpx; font-weight: 700; color: #4A3A32; }
+.ec-weather { font-size: 22rpx; color: #B5A69C; }
+
+.ec-feelings { display: flex; flex-wrap: wrap; gap: 8rpx; margin-bottom: 8rpx; }
+.ec-triggers { display: flex; flex-wrap: wrap; gap: 8rpx; margin-bottom: 8rpx; }
+
+.ec-tag {
+  font-size: 20rpx; color: #8B776B; background: #F5EBE3;
+  padding: 4rpx 12rpx; border-radius: 16rpx;
+}
+.ec-tag-trigger {
+  color: #E8856A; background: rgba(232,133,106,.08);
 }
 
-.danger {
-  color: #D87060 !important;
-  background: #FFE8E3 !important;
+.ec-note {
+  font-size: 24rpx; color: #6B5A50; line-height: 1.7;
+  margin-top: 8rpx; padding: 14rpx; background: #FAF8F5;
+  border-radius: 12rpx;
 }
 
-/* 新增记录按钮 */
-.add-btn {
-  margin-top: 40rpx;
-  height: 84rpx;
-  border-radius: 42rpx;
-  background: linear-gradient(135deg, #F09070 0%, #E8856A 100%);
-  color: #fff;
-  font-size: 28rpx;
-  font-weight: 600;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 6rpx 16rpx rgba(232, 133, 106, 0.25);
+.ec-actions {
+  display: flex; gap: 16rpx; margin-top: 16rpx;
+}
+.ec-btn {
+  flex: 1; height: 64rpx; line-height: 64rpx; font-size: 24rpx; font-weight: 600;
+  border-radius: 32rpx; border: none; text-align: center; padding: 0;
+}
+.ec-btn::after { border: none; }
+.ec-btn-edit { background: #FFF1E6; color: #E8856A; }
+.ec-btn-del { background: #FFE8E3; color: #D87060; }
+
+.edit-empty {
+  text-align: center; font-size: 26rpx; color: #B5A69C; padding: 60rpx 0;
+}
+
+/* 新增按钮 */
+.edit-add {
+  display: flex; justify-content: center; align-items: center;
+  height: 88rpx; margin: 10rpx 30rpx 40rpx;
+  border-radius: 44rpx;
+  background: linear-gradient(135deg, #F0A88A, #E8856A);
+  color: #fff; font-size: 28rpx; font-weight: 600;
   letter-spacing: 2rpx;
+  box-shadow: 0 6rpx 18rpx rgba(232,133,106,.25);
 }
+.edit-add:active { opacity: .85; transform: scale(.98); }
 
-.add-btn:active {
-  opacity: 0.85;
-  transform: scale(0.98);
-}
+/* 兜底文字 */
+.muted { font-size: 24rpx; color: #B5A69C; text-align: center; padding: 20rpx 0; }

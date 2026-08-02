@@ -1,47 +1,318 @@
 <view class="page">
+  <!-- ========== 月度概览（增强） ========== -->
   <view class="overview card">
-    <view>
+    <!-- 连续打卡 -->
+    <view class="ov-streak">
       <text class="big">{{streak}}</text>
-      <text> 天连续打卡</text>
+      <text class="ov-streak-label"> 天连续打卡</text>
     </view>
-    <!-- 拆分为 block，让 wx:if 和 wx:else 成为相邻兄弟 -->
+
+    <!-- 统计网格 -->
+    <view class="ov-grid">
+      <view class="ov-grid-item">
+        <text class="og-value">{{recordDaysDisplay}}</text>
+        <text class="og-label">已记录天</text>
+      </view>
+      <view class="og-divider"></view>
+      <view class="ov-grid-item">
+        <text class="og-value">{{moodDiversity}}</text>
+        <text class="og-label">种心情</text>
+      </view>
+      <view class="og-divider"></view>
+      <view class="ov-grid-item">
+        <text class="og-value {{trendUp ? 'og-value-up' : ''}} {{trendDown ? 'og-value-down' : ''}}">{{trendDisplay}}</text>
+        <text class="og-label">vs 上月</text>
+      </view>
+      <view class="og-divider"></view>
+      <view class="ov-grid-item">
+        <text class="og-value">{{monthAvgScore || '—'}}</text>
+        <text class="og-label">月均分</text>
+      </view>
+    </view>
+
+    <!-- 心情最好 & 情绪低谷 -->
+    <view class="ov-highlights" wx:if="{{bestDay}}">
+      <view class="ov-hl ov-hl-best" bindtap="jumpToDay" data-date="{{bestDay.date}}">
+        <text class="ov-hl-emoji">{{bestDay.emoji}}</text>
+        <view class="ov-hl-info">
+          <text class="ov-hl-title">心情最好</text>
+          <text class="ov-hl-sub">{{month}}月{{bestDay.day}}日 · {{bestDay.moodName}}</text>
+        </view>
+        <text class="ov-hl-score">{{bestDay.score}}</text>
+      </view>
+      <view class="ov-hl ov-hl-attention" wx:if="{{attentionDay}}" bindtap="jumpToDay" data-date="{{attentionDay.date}}">
+        <text class="ov-hl-emoji">{{attentionDay.emoji}}</text>
+        <view class="ov-hl-info">
+          <text class="ov-hl-title">情绪低谷</text>
+          <text class="ov-hl-sub">{{month}}月{{attentionDay.day}}日 · {{attentionDay.moodName}}</text>
+        </view>
+        <text class="ov-hl-score">{{attentionDay.score}}</text>
+      </view>
+    </view>
+
+    <!-- 心情分布 -->
     <block wx:if="{{summary.length}}">
       <view class="summary" wx:for="{{summary}}" wx:key="name">
         <text>{{item.name}} {{item.count}}次</text>
-        <view class="bar">
-          <view style="width:{{item.width}}"></view>
-        </view>
+        <view class="bar"><view style="width:{{item.width}}"></view></view>
       </view>
     </block>
     <view wx:else class="muted">本月还没有记录</view>
   </view>
 
+  <!-- ========== 月度心情色带 ========== -->
+  <view class="color-band-wrap" wx:if="{{colorBand.length}}">
+    <text class="cb-label">本月心情色带</text>
+    <view class="color-band">
+      <view
+        wx:for="{{colorBand}}"
+        wx:key="day"
+        class="cb-seg {{item.hasRecords ? '' : 'cb-seg-empty'}}"
+        style="background:{{item.color}}"
+      ></view>
+    </view>
+  </view>
+
+  <!-- ========== 月份切换 & 图例 ========== -->
   <view class="switch">
     <text bindtap="prev">‹</text>
     <text>{{year}} 年 {{month}} 月</text>
     <text bindtap="next">›</text>
   </view>
 
+  <!-- 热力图图例 -->
+  <view class="legend">
+    <text class="legend-label">心情热度</text>
+    <view class="legend-bar">
+      <view class="legend-swatch" style="background:#EAE4DE"><text>空</text></view>
+      <view class="legend-swatch" style="background:hsl(22,18%,88%)"></view>
+      <view class="legend-swatch" style="background:hsl(22,42%,72%)"></view>
+      <view class="legend-swatch" style="background:hsl(22,66%,56%)"></view>
+      <view class="legend-swatch" style="background:hsl(22,85%,44%)"></view>
+    </view>
+  </view>
+  <text class="legend-hint">色深 = 心情越好 · emoji = 当天主要心情 · 角标数字 = 记录条数</text>
+
+  <!-- ========== 日历网格（增强） ========== -->
   <view class="week">
-    <text wx:for="日一二三四五六" wx:key="*this">{{item}}</text>
+    <text wx:for="{{['日','一','二','三','四','五','六']}}" wx:key="*this">{{item}}</text>
   </view>
 
   <view class="calendar">
-    <view wx:for="{{days}}" wx:key="date" class="day {{item.empty?'empty':''}}"bindtap="choose" data-date="{{item.date}}" data-record="{{item.record}}">
-      <view wx:if="{{!item.empty}}" class="date" style="background:{{item.color||'transparent'}}">
-        {{item.day}}
+    <view
+      wx:for="{{days}}"
+      wx:key="date"
+      class="day {{item.empty?'empty':''}} {{item.hasRecords?'has-records':''}}"
+      bindtap="choose"
+      data-date="{{item.date}}"
+      data-has-records="{{item.hasRecords}}"
+    >
+      <view
+        wx:if="{{!item.empty}}"
+        class="date {{item.isToday ? 'date-today' : ''}}"
+        style="background:{{item.heatColor}}"
+      >
+        <text class="date-num">{{item.day}}</text>
+        <!-- 当天主要心情 emoji -->
+        <text class="mood-emoji" wx:if="{{item.hasRecords}}">{{item.dominantEmoji}}</text>
+        <!-- 记录数角标 -->
+        <text class="count-badge" wx:if="{{item.count > 1}}">{{item.count}}</text>
       </view>
     </view>
   </view>
 
-  <view wx:if="{{selected}}" class="mask" bindtap="close">
-    <view class="sheet" catchtap="">
-      <view class="sheet-mood">{{selected.emoji}} {{selected.mood}}</view>
-      <view class="muted">{{selected.date}} · {{selected.weather || '未记录天气'}}</view>
-      <view class="note">{{selected.note || '没有留下文字备注'}}</view>
-      <view class="actions">
-        <button bindtap="edit">编辑</button>
-        <button class="danger" bindtap="remove">删除</button>
+  <!-- ============================================================ -->
+  <!-- 底部动作面板：两个按钮 -->
+  <!-- ============================================================ -->
+  <view wx:if="{{showActions}}" class="mask" bindtap="closeActions">
+    <view class="action-sheet" catchtap="">
+      <view class="as-header">
+        <text class="as-date">{{actionDate}}</text>
+        <text class="as-sub">选择操作</text>
+      </view>
+      <view class="as-buttons">
+        <button class="as-btn" bindtap="showBrief" hover-class="as-btn-hover" style="position: relative; left: 0rpx; top: 0rpx; width: 550rpx; display: flex; box-sizing: border-box">
+          <text class="as-btn-icon">🌤️</text>
+          <view class="as-btn-text">
+            <text class="as-btn-title">天气 - 心情简报</text>
+            <text class="as-btn-desc">天气 · 心情均分 · 高频诱因 · 代表句</text>
+          </view>
+        </button>
+        <button class="as-btn" bindtap="showDayEdit" hover-class="as-btn-hover" style="display: flex; box-sizing: border-box; left: 0rpx; top: 0rpx; width: 550rpx">
+          <text class="as-btn-icon">📝</text>
+          <view class="as-btn-text">
+            <text class="as-btn-title">编辑当日心情</text>
+            <text class="as-btn-desc">查看 / 编辑 / 新增 / 删除记录</text>
+          </view>
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- ============================================================ -->
+  <!-- 天气 - 心情简报弹窗（增强） -->
+  <!-- ============================================================ -->
+  <view wx:if="{{showBrief && briefData}}" class="mask" bindtap="closeBrief">
+    <view class="brief-sheet" catchtap="">
+      <!-- 头部 -->
+      <view class="brief-header">
+        <text class="brief-title">🌤️ 心情简报</text>
+        <text class="brief-date">{{briefData.date}}</text>
+      </view>
+
+      <!-- 核心指标行 -->
+      <view class="brief-stats">
+        <view class="brief-stat">
+          <text class="brief-stat-value">{{briefData.avgScore}}</text>
+          <text class="brief-stat-label">均分 / 5</text>
+        </view>
+        <view class="brief-divider"></view>
+        <view class="brief-stat">
+          <text class="brief-stat-value">{{briefData.recordCount}}</text>
+          <text class="brief-stat-label">条记录</text>
+        </view>
+        <view class="brief-divider"></view>
+        <view class="brief-stat">
+          <text class="brief-stat-value">{{briefData.weather}}</text>
+          <text class="brief-stat-label">主要天气</text>
+        </view>
+      </view>
+
+      <!-- 评分条 -->
+      <view class="brief-score-bar">
+        <view class="brief-score-fill" style="width:{{briefData.avgScore/5*100}}'%'"></view>
+        <text class="brief-score-label">{{briefData.scoreLabel}}</text>
+      </view>
+
+      <!-- 心情标签 -->
+      <view class="brief-moods">
+        <text class="brief-mood-tag" wx:for="{{briefData.moodNames}}" wx:key="*this">{{item}}</text>
+      </view>
+
+      <!-- 时段分布 -->
+      <view class="brief-section">
+        <text class="brief-section-title">⏰ 时段分布 · 共{{briefData.periodTotal}}条</text>
+        <view class="brief-period-cards">
+          <view class="bp-card {{briefData.periodDist.morning > 0 ? 'bp-card-active' : ''}}">
+            <text class="bp-card-emoji">☀️</text>
+            <text class="bp-card-name">上午</text>
+            <text class="bp-card-count">{{briefData.periodDist.morning}}条</text>
+          </view>
+          <view class="bp-card {{briefData.periodDist.afternoon > 0 ? 'bp-card-active' : ''}}">
+            <text class="bp-card-emoji">🌤️</text>
+            <text class="bp-card-name">下午</text>
+            <text class="bp-card-count">{{briefData.periodDist.afternoon}}条</text>
+          </view>
+          <view class="bp-card {{briefData.periodDist.evening > 0 ? 'bp-card-active' : ''}}">
+            <text class="bp-card-emoji">🌙</text>
+            <text class="bp-card-name">晚上</text>
+            <text class="bp-card-count">{{briefData.periodDist.evening}}条</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 高频诱因 -->
+      <view class="brief-section" wx:if="{{briefData.triggers.length > 0}}">
+        <text class="brief-section-title">🔍 高频诱因</text>
+        <view class="brief-tags">
+          <text class="brief-tag" wx:for="{{briefData.triggers}}" wx:key="*this">{{item}}</text>
+        </view>
+      </view>
+
+      <!-- 身体感受 -->
+      <view class="brief-section" wx:if="{{briefData.feelings.length > 0}}">
+        <text class="brief-section-title">💪 身体感受</text>
+        <view class="brief-tags">
+          <text class="brief-tag" wx:for="{{briefData.feelings}}" wx:key="*this">{{item}}</text>
+        </view>
+      </view>
+
+      <!-- 地点汇总 -->
+      <view class="brief-section" wx:if="{{briefData.topLocations.length > 0}}">
+        <text class="brief-section-title">📍 地点</text>
+        <view class="brief-tags">
+          <text class="brief-tag" wx:for="{{briefData.topLocations}}" wx:key="*this">{{item}}</text>
+        </view>
+      </view>
+
+      <!-- 照片缩略图 -->
+      <view class="brief-section" wx:if="{{briefData.photos.length > 0}}">
+        <text class="brief-section-title">📷 照片 ({{briefData.photos.length}})</text>
+        <view class="brief-photos">
+          <image
+            wx:for="{{briefData.photos}}"
+            wx:key="index"
+            class="brief-photo"
+            src="{{item}}"
+            mode="aspectFill"
+          ></image>
+        </view>
+      </view>
+
+      <!-- 代表句 -->
+      <view class="brief-section" wx:if="{{briefData.excerpt}}">
+        <text class="brief-section-title">✍️ 代表句</text>
+        <view class="brief-excerpt">{{briefData.excerpt}}</view>
+      </view>
+
+      <!-- 无数据兜底 -->
+      <view wx:if="{{!briefData.triggers.length && !briefData.feelings.length && !briefData.excerpt && !briefData.topLocations.length && !briefData.photos.length}}" class="brief-empty">
+        这一天留下的文字不多，去「编辑当日心情」添加更多细节吧。
+      </view>
+    </view>
+  </view>
+
+  <!-- ============================================================ -->
+  <!-- 编辑当日心情面板 -->
+  <!-- ============================================================ -->
+  <view wx:if="{{showDayEdit}}" class="mask" bindtap="closeDayEdit">
+    <view class="edit-sheet" catchtap="">
+      <!-- 头部 -->
+      <view class="edit-header">
+        <text class="edit-title">📝 {{editDate}} · 心情记录</text>
+        <text class="edit-count">{{editRecords.length}} 条</text>
+        <text class="edit-close" bindtap="closeDayEdit">✕</text>
+      </view>
+
+      <!-- 记录卡片列表 -->
+      <scroll-view scroll-y class="edit-list" wx:if="{{editRecords.length > 0}}">
+        <view class="edit-card" wx:for="{{editRecords}}" wx:key="id">
+          <!-- 卡片头 -->
+          <view class="ec-header">
+            <view class="ec-mood">
+              <text class="ec-emoji">{{item.moodInfo.emoji}}</text>
+              <text class="ec-mood-name">{{item.moodInfo.name}}</text>
+            </view>
+            <text class="ec-weather">{{item.weatherText || item.weather || '未知天气'}}</text>
+          </view>
+
+          <!-- 身体感受 -->
+          <view class="ec-feelings" wx:if="{{item.bodyFeelings && item.bodyFeelings.length > 0}}">
+            <text class="ec-tag" wx:for="{{item.bodyFeelings}}" wx:key="*this">{{item}}</text>
+          </view>
+
+          <!-- 诱因 -->
+          <view class="ec-triggers" wx:if="{{item.triggerItems && item.triggerItems.length > 0}}">
+            <text class="ec-tag ec-tag-trigger" wx:for="{{item.triggerItems}}" wx:key="*this">{{item}}</text>
+          </view>
+
+          <!-- 备注 -->
+          <view class="ec-note" wx:if="{{item.note}}">{{item.note}}</view>
+
+          <!-- 操作按钮 -->
+          <view class="ec-actions">
+            <button class="ec-btn ec-btn-edit" bindtap="editRecord" data-id="{{item.id}}">编辑</button>
+            <button class="ec-btn ec-btn-del" bindtap="removeRecord" data-id="{{item.id}}">删除</button>
+          </view>
+        </view>
+      </scroll-view>
+
+      <!-- 空状态 -->
+      <view wx:else class="edit-empty">该日期暂无记录</view>
+
+      <!-- 新增按钮 -->
+      <view class="edit-add" bindtap="addRecord">
+        <text>＋ 新增一条心情记录</text>
       </view>
     </view>
   </view>
