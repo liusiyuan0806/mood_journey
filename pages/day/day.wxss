@@ -344,6 +344,54 @@
 }
 
 /* ===================================================== */
+/* Action Buttons                                        */
+/* ===================================================== */
+.rc-actions {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx dashed rgba(180, 160, 145, 0.25);
+}
+.rc-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 16rpx 0;
+  border-radius: 16rpx;
+  font-size: 25rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+  transition: all 0.2s ease;
+  border: 1rpx solid transparent;
+}
+.rc-action-icon {
+  font-size: 26rpx;
+  line-height: 1;
+}
+.rc-action-edit {
+  background: rgba(232, 133, 106, 0.08);
+  color: #E8856A;
+  border-color: rgba(232, 133, 106, 0.15);
+}
+.rc-action-edit:active {
+  background: rgba(232, 133, 106, 0.18);
+  transform: scale(0.96);
+}
+.rc-action-delete {
+  background: rgba(245, 34, 45, 0.04);
+  color: #D4807B;
+  border-color: rgba(245, 34, 45, 0.1);
+}
+.rc-action-delete:active {
+  background: rgba(245, 34, 45, 0.12);
+  transform: scale(0.96);
+  color: #F5222D;
+}
+
+/* ===================================================== */
 /* Daily Insights                                        */
 /* ===================================================== */
 .insights-card {
