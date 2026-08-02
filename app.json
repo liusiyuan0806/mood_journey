@@ -8,7 +8,8 @@
     "pages/edit-profile/edit-profile",
     "pages/day/day",
     "pages/favorites/favorites",
-    "pages/weather-mood/weather-mood"
+    "pages/weather-mood/weather-mood",
+    "pages/weekly-report/weekly-report"
   ],
   "window": {
     "navigationBarTitleText": "情绪手账",

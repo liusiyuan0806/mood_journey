@@ -22,7 +22,7 @@ function xingkaiFont(self) {
 }
 
 Page({
-  data: { profile: null, stats: {}, shareImagePath: '', showShareModal: false, xingkaiFont: '' },
+  data: { profile: null, stats: {}, shareImagePath: '', showShareModal: false, xingkaiFont: '', showWatermark: true },
   onShow() { this.refresh(); },
   onLoad() { this._loadXingkaiFont(); },
 
@@ -87,7 +87,7 @@ Page({
     });
   },
 
-  report() { this.generateShareCard(); },
+  report() { wx.navigateTo({ url: '/pages/weekly-report/weekly-report' }); },
 
   generateShareCard() {
     wx.showLoading({ title: '生成中...', mask: true });
@@ -115,35 +115,35 @@ Page({
       const dailyQuote = randomQuote();
       console.log('[generateShareCard] dailyQuote=', dailyQuote);
 
-      // ===== 数据准备：按设计稿的 7 个模块 =====
+      // ===== 数据准备：当日心情分析 =====
       const records = getRecords();
-      const nowTs = Date.now();
-      const sevenDaysAgo = nowTs - 7 * 24 * 60 * 60 * 1000;
+      const nowDate = new Date();
+      const todayStr = `${nowDate.getFullYear()}-${String(nowDate.getMonth() + 1).padStart(2, '0')}-${String(nowDate.getDate()).padStart(2, '0')}`;
 
-      // 本周记录
-      const weekRecords = records.filter(r => {
+      // 今天记录
+      const todayRecords = records.filter(r => {
         const t = r.timestamp || (r.date ? new Date(r.date).getTime() : 0);
-        return t >= sevenDaysAgo;
+        const d = new Date(t);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` === todayStr;
       });
 
-      // 1. 本周主导心情
-      const moodCount = {};
-      weekRecords.forEach(r => {
-        if (r.mood) moodCount[r.mood] = (moodCount[r.mood] || 0) + 1;
-      });
-      const dominantName = Object.keys(moodCount).sort((a, b) => moodCount[b] - moodCount[a])[0] || '平静';
-      const dominant = byName(dominantName);
-      const dominantCount = moodCount[dominantName] || 0;
+      // 折线图数据：时间 + 分数（按时间排序）
+      const chartData = todayRecords.map(r => {
+        const t = new Date(r.timestamp || r.date);
+        const timeStr = `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
+        const moodObj = byName(r.mood);
+        return { time: timeStr, score: moodObj.score, emoji: moodObj.emoji, name: r.mood, color: moodObj.color };
+      }).sort((a, b) => a.time.localeCompare(b.time));
 
-      // 2. 一周心情色卡（最近 7 条，缺位用浅灰占位）
-      const last7 = records.slice(-7);
-      const weekColors = last7.map(r => byName(r.mood).color);
+      // 当日心情色卡
+      const todayColors = todayRecords.map(r => byName(r.mood).color);
+      const todayMoods = todayRecords.map(r => ({ emoji: byName(r.mood).emoji, name: r.mood }));
 
-      // 3. EHI 情绪健康指数：本周均分×18 + 连续天数×2，封顶 100
-      const weekAvgScore = weekRecords.length
-        ? weekRecords.reduce((s, r) => s + byName(r.mood).score, 0) / weekRecords.length
+      // EHI 情绪健康指数：基于全部记录均分×18 + 连续天数×2，封顶 100
+      const allAvgScore = records.length
+        ? records.reduce((s, r) => s + byName(r.mood).score, 0) / records.length
         : 0;
-      const ehi = Math.max(0, Math.min(100, Math.round((weekAvgScore || 3) * 18 + days * 2)));
+      const ehi = Math.max(0, Math.min(100, Math.round((allAvgScore || 3) * 18 + days * 2)));
 
       // 4. 天气 × 心情速览（取最新一条）
       const latest = records[records.length - 1] || {};
@@ -182,8 +182,9 @@ Page({
         }
         this._drawContent(ctx, {
           profile, nickname, avatarImg, total, days, avg, dailyQuote,
-          dominant, weekColors, ehi, latestWeatherEmoji, latestWeatherName, latestMoodObj, latestMoodName,
-          dominantCount, weekRecordCount: weekRecords.length
+          chartData, todayColors, todayMoods, todayCount: todayRecords.length,
+          ehi, latestWeatherEmoji, latestWeatherName, latestMoodObj, latestMoodName,
+          showWatermark: this.data.showWatermark
         });
         this._exportCanvas(canvas);
       });
@@ -193,11 +194,13 @@ Page({
   _drawContent(ctx, data) {
     const {
       profile, nickname, avatarImg, total, days, avg, dailyQuote,
-      dominant, weekColors, ehi, latestWeatherEmoji, latestWeatherName, latestMoodObj, latestMoodName
+      chartData, todayColors, todayMoods, todayCount,
+      ehi, latestWeatherEmoji, latestWeatherName, latestMoodObj, latestMoodName,
+      showWatermark
     } = data;
-    console.log('[draw] ENTER _drawContent, dailyQuote=', dailyQuote);
+    console.log('[draw] ENTER _drawContent, todayRecords=', todayCount, 'dailyQuote=', dailyQuote);
 
-    // ===== 全局半透蒙版（让背景图变淡，文字可读）=====
+    // ===== 全局半透蒙版 =====
     try {
       ctx.fillStyle = 'rgba(255, 252, 248, 0.55)';
       ctx.fillRect(0, 0, 750, 1334);
@@ -211,11 +214,10 @@ Page({
       ctx.textBaseline = 'alphabetic';
       ctx.fillText('我的心情日记', 375, 90);
 
-      ctx.fillStyle = '#8B776B';
+      ctx.fillStyle = '#4A3A32';
       ctx.font = this._fontXingkai(24);
       ctx.fillText('·  记录生活的温度  ·', 375, 132);
 
-      // 装饰小横线
       ctx.strokeStyle = '#B8A59A';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
@@ -224,10 +226,9 @@ Page({
       ctx.stroke();
     } catch (e) { console.error('[draw] 标题失败:', e); }
 
-    // ===== 2. 头像 · 昵称 · 日期（横向一行）=====
+    // ===== 2. 头像 · 昵称 · 日期 =====
     try {
       const headY = 200;
-      // 头像
       ctx.save();
       ctx.beginPath();
       ctx.arc(120, headY, 38, 0, Math.PI * 2);
@@ -245,128 +246,49 @@ Page({
       ctx.strokeStyle = '#FFFFFF';
       ctx.stroke();
 
-      // 昵称
       ctx.fillStyle = '#2c3e50';
       ctx.font = this._fontXingkai(34, 'bold');
       ctx.textAlign = 'left';
       ctx.fillText(nickname, 180, headY - 4);
 
-      // 日期副标
       const now = new Date();
       const weekArr = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
       const dateStr = `${now.getMonth() + 1}月${now.getDate()}日 · ${weekArr[now.getDay()]}`;
-      ctx.fillStyle = '#8B776B';
+      ctx.fillStyle = '#4A3A32';
       ctx.font = this._fontXingkai(22);
       ctx.fillText(dateStr, 180, headY + 28);
     } catch (e) { console.error('[draw] 头像失败:', e); }
 
-    // ===== 3. 本周主导心情 =====
+    // ===== 3. 今日心情折线图 =====
     try {
-      const y = 310;
-      // 小标题
-      ctx.fillStyle = '#8B776B';
-      ctx.font = this._fontXingkai(24);
-      ctx.textAlign = 'center';
-      ctx.fillText('—  本周主导心情  —', 375, y);
+      this._drawMoodChart(ctx, chartData, 310);
+    } catch (e) { console.error('[draw] 折线图失败:', e); }
 
-      // 大 emoji + 名称
-      const cx = 280, cy = y + 70;
-      // 圆形浅色底
-      const bgG = ctx.createLinearGradient(cx - 50, cy - 50, cx + 50, cy + 50);
-      bgG.addColorStop(0, dominant.color);
-      bgG.addColorStop(1, '#FFFFFF');
-      ctx.fillStyle = bgG;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 50, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
-      // emoji
-      ctx.font = this._fontSans(56);
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(dominant.emoji, cx, cy + 2);
-
-      // 右侧：名称 + 频次
-      ctx.fillStyle = '#2c3e50';
-      ctx.font = this._fontXingkai(40, 'bold');
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'alphabetic';
-      ctx.fillText(dominant.name, 360, cy - 5);
-
-      ctx.fillStyle = '#8B776B';
-      ctx.font = this._fontXingkai(20);
-      const moodCount = dominant && (data.dominantCount || 0);
-      const weekRecordCount = data.weekRecordCount || 0;
-      ctx.fillText(`本周出现 ${moodCount} 次`, 360, cy + 28);
-    } catch (e) { console.error('[draw] 主导心情失败:', e); }
-
-    // ===== 4. 一周心情色卡 =====
+    // ===== 4. 今日心情色卡 =====
     try {
-      const y = 460;
-      // 小标题
-      ctx.fillStyle = '#8B776B';
-      ctx.font = this._fontXingkai(24);
-      ctx.textAlign = 'center';
-      ctx.fillText('—  一周心情色卡  —', 375, y);
-
-      // 7 个色块
-      const swatchY = y + 30;
-      const swatchH = 48;
-      const swatchW = 76;
-      const gap = 12;
-      const totalW = swatchW * 7 + gap * 6;
-      const startX = (750 - totalW) / 2;
-      const dayLabels = ['日', '一', '二', '三', '四', '五', '六'];
-
-      for (let i = 0; i < 7; i++) {
-        const x = startX + i * (swatchW + gap);
-        const hasData = i < weekColors.length;
-        const color = hasData ? weekColors[i] : '#EEE5DD';
-
-        // 圆角色块
-        this._roundRect(ctx, x, swatchY, swatchW, swatchH, 12);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // 下方日期标签
-        ctx.fillStyle = '#7A665C';
-        ctx.font = this._fontSans(20);
-        ctx.textAlign = 'center';
-        ctx.fillText(dayLabels[i], x + swatchW / 2, swatchY + swatchH + 24);
-      }
+      this._drawTodaySwatches(ctx, todayColors, todayMoods, 560);
     } catch (e) { console.error('[draw] 色卡失败:', e); }
 
     // ===== 5. 情绪健康指数 EHI =====
     try {
-      const y = 600;
-      // 小标题
-      ctx.fillStyle = '#8B776B';
+      const y = 650;
+      ctx.fillStyle = '#4A3A32';
       ctx.font = this._fontXingkai(24);
       ctx.textAlign = 'left';
       ctx.fillText('情绪健康指数 EHI', 90, y);
 
-      // 数字
       ctx.fillStyle = '#2c3e50';
       ctx.font = this._fontSans(48, 'bold');
       ctx.textAlign = 'right';
       ctx.fillText(`${ehi}`, 600, y + 4);
       ctx.font = this._fontXingkai(22);
-      ctx.fillStyle = '#8B776B';
+      ctx.fillStyle = '#4A3A32';
       ctx.fillText('分', 660, y + 4);
 
-      // 进度条
       const barX = 90, barY = y + 30, barW = 570, barH = 18;
-      // 底
       this._roundRect(ctx, barX, barY, barW, barH, 9);
       ctx.fillStyle = 'rgba(200, 180, 165, 0.25)';
       ctx.fill();
-      // 进度
       const w = (ehi / 100) * barW;
       if (w > 1) {
         const g = ctx.createLinearGradient(barX, 0, barX + barW, 0);
@@ -377,13 +299,12 @@ Page({
         ctx.fill();
       }
 
-      // 评价文字
       let comment = '继续保持';
       if (ehi >= 80) comment = '状态极佳 ✨';
       else if (ehi >= 60) comment = '状态良好';
       else if (ehi >= 40) comment = '需要关注';
       else if (ehi > 0) comment = '温柔对待自己';
-      ctx.fillStyle = '#8B776B';
+      ctx.fillStyle = '#4A3A32';
       ctx.font = this._fontXingkai(20);
       ctx.textAlign = 'left';
       ctx.fillText(comment, 90, y + 76);
@@ -391,74 +312,32 @@ Page({
 
     // ===== 6. 连续打卡天数 =====
     try {
-      const y = 740;
-      ctx.fillStyle = '#8B776B';
+      const y = 810;
+      ctx.fillStyle = '#4A3A32';
       ctx.font = this._fontXingkai(24);
       ctx.textAlign = 'left';
       ctx.fillText('连续打卡天数', 90, y);
 
-      // 大数字 + 单位
       ctx.fillStyle = '#E8856A';
       ctx.font = this._fontSans(60, 'bold');
       ctx.textAlign = 'right';
       ctx.fillText(String(days), 580, y + 14);
-      ctx.fillStyle = '#8B776B';
+      ctx.fillStyle = '#4A3A32';
       ctx.font = this._fontXingkai(26);
       ctx.fillText('天', 660, y + 14);
 
-      // 装饰
       ctx.font = this._fontSans(36);
       ctx.fillText('🔥', 670, y + 6);
     } catch (e) { console.error('[draw] 连续打卡失败:', e); }
 
-    // ===== 7. 每日一句 =====
+    // ===== 7. 天气 × 心情速览 =====
     try {
-      const y = 850;
-      if (dailyQuote) {
-        // 装饰分隔线
-        ctx.strokeStyle = '#B8A59A';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(150, y);
-        ctx.lineTo(280, y);
-        ctx.moveTo(470, y);
-        ctx.lineTo(600, y);
-        ctx.stroke();
-        ctx.fillStyle = '#B8A59A';
-        ctx.beginPath();
-        ctx.arc(375, y, 4, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 标签
-        ctx.fillStyle = '#8B776B';
-        ctx.font = this._fontXingkai(22);
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'alphabetic';
-        ctx.fillText('✦  每 日 一 句  ✦', 375, y + 34);
-
-        // 主体 —— 自动换行
-        ctx.fillStyle = '#1a1a1a';
-        ctx.font = this._fontXingkai(34, 'bold');
-        const maxWidth = 580;
-        const lines = this._wrapText(ctx, dailyQuote, maxWidth);
-        const lineH = 46;
-        const startY = y + 80;
-        for (let i = 0; i < lines.length; i++) {
-          ctx.fillText(lines[i], 375, startY + i * lineH);
-        }
-      }
-    } catch (e) { console.error('[draw] 每日一句失败:', e); }
-
-    // ===== 8. 天气 × 心情速览 =====
-    try {
-      const y = 1060;
-      // 小标题
-      ctx.fillStyle = '#8B776B';
+      const y = 930;
+      ctx.fillStyle = '#4A3A32';
       ctx.font = this._fontXingkai(24);
       ctx.textAlign = 'center';
       ctx.fillText('—  天气 × 心情速览  —', 375, y);
 
-      // 卡片
       const cardY = y + 30;
       const cardH = 90;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
@@ -468,7 +347,6 @@ Page({
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // 左：天气
       ctx.font = this._fontSans(48);
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -478,18 +356,16 @@ Page({
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
       ctx.fillText(latestWeatherName, 220, cardY + 36);
-      ctx.fillStyle = '#8B776B';
+      ctx.fillStyle = '#4A3A32';
       ctx.font = this._fontXingkai(18);
       ctx.fillText('今日天气', 220, cardY + 64);
 
-      // 中间连接符
       ctx.fillStyle = '#B8A59A';
       ctx.font = this._fontSans(36);
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('×', 375, cardY + cardH / 2);
 
-      // 右：心情
       ctx.font = this._fontSans(48);
       ctx.fillText(latestMoodObj.emoji, 480, cardY + cardH / 2);
       ctx.fillStyle = '#2c3e50';
@@ -497,34 +373,235 @@ Page({
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
       ctx.fillText(latestMoodName, 525, cardY + 36);
-      ctx.fillStyle = '#8B776B';
+      ctx.fillStyle = '#4A3A32';
       ctx.font = this._fontXingkai(18);
       ctx.fillText('最近心情', 525, cardY + 64);
     } catch (e) { console.error('[draw] 天气速览失败:', e); }
 
-    // ===== 9. Footer =====
+    // ===== 8. 每日一句（底部，不写「每日一句」标签）=====
     try {
-      // 装饰分隔线
-      ctx.strokeStyle = 'rgba(184, 165, 154, 0.4)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(180, 1240);
-      ctx.lineTo(570, 1240);
-      ctx.stroke();
+      if (dailyQuote) {
+        const y = 1100;
+        // 装饰分隔线
+        ctx.strokeStyle = '#B8A59A';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(180, y);
+        ctx.lineTo(300, y);
+        ctx.moveTo(450, y);
+        ctx.lineTo(570, y);
+        ctx.stroke();
+        ctx.fillStyle = '#B8A59A';
+        ctx.beginPath();
+        ctx.arc(375, y, 4, 0, Math.PI * 2);
+        ctx.fill();
 
-      const now = new Date();
-      const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
-      ctx.fillStyle = '#7A665C';
-      ctx.font = this._fontXingkai(22, 'bold');
-      ctx.textAlign = 'center';
-      ctx.fillText(dateStr, 375, 1278);
+        // 直接写句子（行楷 30px），自动换行
+        ctx.fillStyle = '#1a1a1a';
+        ctx.font = this._fontXingkai(30, 'bold');
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        const maxWidth = 560;
+        const lines = this._wrapText(ctx, dailyQuote, maxWidth);
+        const lineH = 42;
+        const startY = y + 48;
+        for (let i = 0; i < lines.length; i++) {
+          ctx.fillText(lines[i], 375, startY + i * lineH);
+        }
+      }
+    } catch (e) { console.error('[draw] 每日一句失败:', e); }
 
-      ctx.fillStyle = '#8B776B';
-      ctx.font = this._fontXingkai(20);
-      ctx.fillText('Mood Journey · 心情日记', 375, 1310);
-    } catch (e) { console.error('[draw] footer 失败:', e); }
+    // ===== 9. Footer（水印可控）=====
+    if (showWatermark) {
+      try {
+        ctx.strokeStyle = 'rgba(184, 165, 154, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(180, 1240);
+        ctx.lineTo(570, 1240);
+        ctx.stroke();
+
+        const now2 = new Date();
+        const dateStr2 = `${now2.getFullYear()}.${String(now2.getMonth() + 1).padStart(2, '0')}.${String(now2.getDate()).padStart(2, '0')}`;
+        ctx.fillStyle = '#3A2A22';
+        ctx.font = this._fontXingkai(22, 'bold');
+        ctx.textAlign = 'center';
+        ctx.fillText(dateStr2, 375, 1278);
+
+        ctx.fillStyle = '#4A3A32';
+        ctx.font = this._fontXingkai(20);
+        ctx.fillText('Mood Journey · 心情日记', 375, 1310);
+      } catch (e) { console.error('[draw] footer 失败:', e); }
+    }
 
     console.log('[draw] EXIT _drawContent');
+  },
+
+  // ===== 当日心情折线图 =====
+  _drawMoodChart(ctx, chartData, startY) {
+    const chartX = 70, chartW = 610, chartH = 210;
+    const scoreMin = 1, scoreMax = 5;
+
+    // 小标题
+    ctx.fillStyle = '#4A3A32';
+    ctx.font = this._fontXingkai(22);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('—  今日心情波动  —', 375, startY);
+
+    const plotTop = startY + 28;
+    const plotBottom = plotTop + chartH;
+    const plotLeft = chartX + 40;
+    const plotRight = chartX + chartW - 10;
+
+    if (!chartData || chartData.length === 0) {
+      // 无记录：显示提示
+      ctx.fillStyle = '#4A3A32';
+      ctx.font = this._fontXingkai(28);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('今天还没有记录心情，去记录一笔吧 🌱', 375, plotTop + chartH / 2);
+      return;
+    }
+
+    // 背景底板
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+    this._roundRect(ctx, chartX, plotTop, chartW, chartH, 14);
+    ctx.fill();
+
+    // Y 轴刻度线 + 标签
+    ctx.strokeStyle = 'rgba(184, 165, 154, 0.25)';
+    ctx.lineWidth = 0.8;
+    ctx.setLineDash([4, 4]);
+    ctx.fillStyle = '#4A3A32';
+    ctx.font = this._fontSans(18);
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let s = scoreMin; s <= scoreMax; s++) {
+      const y = plotBottom - ((s - scoreMin) / (scoreMax - scoreMin)) * chartH;
+      ctx.beginPath();
+      ctx.moveTo(plotLeft, y);
+      ctx.lineTo(plotRight, y);
+      ctx.stroke();
+      ctx.fillText(String(s), plotLeft - 8, y);
+    }
+    ctx.setLineDash([]);
+
+    // 数据点映射到坐标
+    const points = chartData.map((d, i) => {
+      const x = plotLeft + (chartData.length === 1 ? chartW / 2 : (i / (chartData.length - 1)) * (chartW - 40));
+      const y = plotBottom - ((d.score - scoreMin) / (scoreMax - scoreMin)) * chartH;
+      return { x, y, ...d };
+    });
+
+    // 单条记录：只画一个大圆点
+    if (points.length === 1) {
+      const p = points[0];
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = this._fontSans(28);
+      ctx.textAlign = 'center';
+      ctx.fillText(p.emoji, p.x, p.y - 28);
+      ctx.font = this._fontXingkai(20);
+      ctx.fillStyle = '#4A3A32';
+      ctx.fillText(`${p.time} · ${p.name}`, p.x, p.y + 32);
+      return;
+    }
+
+    // 多条记录：连线 + 渐变填充
+    // 渐变填充区域
+    const grad = ctx.createLinearGradient(0, plotTop, 0, plotBottom);
+    grad.addColorStop(0, 'rgba(232, 133, 106, 0.2)');
+    grad.addColorStop(1, 'rgba(232, 133, 106, 0.02)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, plotBottom);
+    for (let i = 0; i < points.length; i++) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.lineTo(points[points.length - 1].x, plotBottom);
+    ctx.closePath();
+    ctx.fill();
+
+    // 连线
+    ctx.strokeStyle = '#E8856A';
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (let i = 0; i < points.length; i++) {
+      if (i === 0) ctx.moveTo(points[i].x, points[i].y);
+      else ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.stroke();
+
+    // 数据点 + emoji + 时间标签
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+      // 圆点
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Emoji（交替上下偏移防重叠）
+      const emojiOffset = i % 2 === 0 ? -26 : 26;
+      ctx.font = this._fontSans(22);
+      ctx.fillStyle = '#2c3e50';
+      ctx.textAlign = 'center';
+      ctx.fillText(p.emoji, p.x, p.y + emojiOffset);
+
+      // 时间标签（只在点下方）
+      ctx.font = this._fontSans(16);
+      ctx.fillStyle = '#4A3A32';
+      ctx.fillText(p.time, p.x, plotBottom + 22);
+    }
+  },
+
+  // ===== 今日心情色卡 =====
+  _drawTodaySwatches(ctx, colors, moods, startY) {
+    if (!colors || colors.length === 0) return;
+
+    ctx.fillStyle = '#4A3A32';
+    ctx.font = this._fontXingkai(22);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('—  今日心情色卡  —', 375, startY);
+
+    const swatchY = startY + 28;
+    const swatchH = 44;
+    const maxW = 580, gap = 10;
+    const count = Math.min(colors.length, 7);
+    const swatchW = (maxW - gap * (count - 1)) / count;
+    const startX = (750 - (swatchW * count + gap * (count - 1))) / 2;
+
+    for (let i = 0; i < count; i++) {
+      const x = startX + i * (swatchW + gap);
+      this._roundRect(ctx, x, swatchY, swatchW, swatchH, 10);
+      ctx.fillStyle = colors[i];
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // 色块内 emoji
+      ctx.font = this._fontSans(22);
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const m = moods[i] || {};
+      ctx.fillText(m.emoji || '', x + swatchW / 2, swatchY + swatchH / 2);
+    }
   },
 
   _exportCanvas(canvas) {
@@ -627,6 +704,7 @@ Page({
     return lines.length ? lines : [text];
   },
 
+  toggleWatermark() { this.setData({ showWatermark: !this.data.showWatermark }); },
   closeShareModal() { this.setData({ showShareModal: false }); },
 
   saveShareImage() {

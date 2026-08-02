@@ -1,0 +1,675 @@
+/* ===== 本周情绪报告 · 温暖色调 ===== */
+
+.page {
+  padding: 28rpx 30rpx 60rpx;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+/* ===== 加载状态 ===== */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 200rpx 0;
+}
+.loading-spinner {
+  width: 64rpx;
+  height: 64rpx;
+  border: 6rpx solid #FFE8DD;
+  border-top-color: #E8856A;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 24rpx;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.loading-text {
+  font-size: 26rpx;
+  color: #B5A69C;
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 160rpx 0 80rpx;
+}
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 28rpx;
+}
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  margin-bottom: 12rpx;
+}
+.empty-desc {
+  font-size: 26rpx;
+  color: #B5A69C;
+  margin-bottom: 40rpx;
+  text-align: center;
+  line-height: 1.6;
+}
+.empty-state .primary-btn {
+  width: 60%;
+}
+
+/* ===== 报告头部 ===== */
+.report-header {
+  background: linear-gradient(135deg, #FFE8DD 0%, #FFF8F2 60%, #FFF1E6 100%);
+  border-radius: 28rpx;
+  padding: 36rpx 30rpx 28rpx;
+  margin-bottom: 8rpx;
+  position: relative;
+  overflow: hidden;
+}
+.report-header::before {
+  content: '';
+  position: absolute;
+  top: -50rpx;
+  right: -30rpx;
+  width: 180rpx;
+  height: 180rpx;
+  background: radial-gradient(circle, rgba(240, 178, 122, 0.18) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-bottom: 8rpx;
+}
+.header-icon {
+  font-size: 38rpx;
+}
+.header-text {
+  font-size: 38rpx;
+  font-weight: 800;
+  color: #4A3A32;
+  letter-spacing: 1rpx;
+}
+.header-date {
+  font-size: 26rpx;
+  color: #8B776B;
+  margin-bottom: 24rpx;
+}
+.header-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.hs-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+.hs-num {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: #E8856A;
+  line-height: 1;
+  letter-spacing: -1rpx;
+}
+.hs-unit {
+  font-size: 22rpx;
+  font-weight: 500;
+  color: #B5A69C;
+}
+.hs-label {
+  font-size: 22rpx;
+  color: #8B776B;
+}
+.hs-divider {
+  width: 1rpx;
+  height: 56rpx;
+  background: #F5E6DB;
+}
+
+/* ===== EHI 卡片 ===== */
+.ehi-card {
+  padding: 32rpx 30rpx;
+  background: linear-gradient(135deg, #FFFBF7 0%, #FFFFFF 60%, #FFF1E6 100%);
+}
+.ehi-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+.ehi-score-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+}
+.ehi-score {
+  font-size: 80rpx;
+  font-weight: 800;
+  color: #E8856A;
+  line-height: 1;
+  letter-spacing: -2rpx;
+}
+.ehi-total {
+  font-size: 28rpx;
+  color: #B5A69C;
+}
+.ehi-level {
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 8rpx 24rpx;
+  border-radius: 24rpx;
+}
+.ehi-level-excellent {
+  background: rgba(82, 196, 26, 0.12);
+  color: #52C41A;
+}
+.ehi-level-good {
+  background: rgba(232, 133, 106, 0.12);
+  color: #E8856A;
+}
+.ehi-level-attention {
+  background: rgba(245, 158, 11, 0.12);
+  color: #D4940A;
+}
+.ehi-level-care {
+  background: rgba(139, 119, 107, 0.12);
+  color: #8B776B;
+}
+.ehi-progress {
+  height: 16rpx;
+  background: #F5E6DB;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+.ehi-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #F0B27A 0%, #E8856A 100%);
+  border-radius: 20rpx;
+  transition: width 0.6s ease;
+  box-shadow: 0 2rpx 6rpx rgba(232, 133, 106, 0.3);
+}
+.ehi-compare {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 20rpx;
+  font-size: 24rpx;
+}
+.ec-label {
+  color: #8B776B;
+}
+.ec-trend {
+  font-weight: 600;
+}
+.ec-trend.up {
+  color: #52C41A;
+}
+.ec-trend.down {
+  color: #E8856A;
+}
+.ec-trend.flat {
+  color: #B5A69C;
+}
+
+/* ===== 情绪分布 ===== */
+.dist-card {
+  padding: 28rpx 26rpx;
+}
+.dist-color-bar {
+  display: flex;
+  height: 36rpx;
+  border-radius: 18rpx;
+  overflow: hidden;
+  margin-bottom: 20rpx;
+  background: #F5E6DB;
+}
+.dist-color-seg {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+.dist-ratio {
+  display: flex;
+  gap: 28rpx;
+  margin-bottom: 24rpx;
+}
+.dr-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.dr-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+}
+.dr-positive { background: #B9E6C9; }
+.dr-neutral { background: #F8E7A7; }
+.dr-negative { background: #F7B7A5; }
+.dr-label {
+  font-size: 24rpx;
+  color: #8B776B;
+}
+.dist-top {
+  padding-top: 20rpx;
+  border-top: 1rpx solid #F5EBE3;
+}
+.dt-label {
+  font-size: 24rpx;
+  color: #B5A69C;
+  margin-bottom: 14rpx;
+}
+.dt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+.dt-item {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 14rpx 18rpx;
+  background: #FFFBF7;
+  border-radius: 16rpx;
+}
+.dt-rank {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #E8856A;
+  width: 36rpx;
+  text-align: center;
+}
+.dt-emoji {
+  font-size: 36rpx;
+}
+.dt-name {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3A32;
+}
+.dt-count {
+  font-size: 24rpx;
+  color: #B5A69C;
+}
+
+/* ===== 情绪走势 ===== */
+.trend-card {
+  padding: 28rpx 20rpx 24rpx;
+}
+.trend-chart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 280rpx;
+  padding: 0 8rpx 16rpx;
+  border-bottom: 1rpx solid #F5EBE3;
+  margin-bottom: 20rpx;
+}
+.trend-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 8rpx;
+}
+.tc-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+.tc-emoji {
+  font-size: 24rpx;
+  margin-bottom: 4rpx;
+}
+.tc-bar {
+  width: 36rpx;
+  border-radius: 18rpx 18rpx 4rpx 4rpx;
+  min-height: 8rpx;
+  transition: height 0.5s ease;
+  box-shadow: 0 2rpx 6rpx rgba(200, 130, 90, 0.15);
+}
+.tc-weekday {
+  font-size: 22rpx;
+  color: #8B776B;
+  font-weight: 500;
+}
+.tc-date {
+  font-size: 18rpx;
+  color: #C5B5A8;
+}
+.trend-extremes {
+  display: flex;
+  gap: 16rpx;
+}
+.te-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 18rpx;
+}
+.te-peak {
+  background: linear-gradient(135deg, #F0FFE8 0%, #FFFBF7 100%);
+}
+.te-valley {
+  background: linear-gradient(135deg, #FFF0EB 0%, #FFFBF7 100%);
+}
+.te-icon {
+  font-size: 32rpx;
+}
+.te-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+.te-label {
+  font-size: 22rpx;
+  color: #B5A69C;
+}
+.te-value {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #4A3A32;
+}
+
+/* ===== 天气 × 心情 ===== */
+.weather-card {
+  padding: 24rpx 26rpx;
+}
+.wc-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin: 16rpx 0;
+}
+.wc-left {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  width: 180rpx;
+  flex-shrink: 0;
+}
+.wc-emoji {
+  font-size: 32rpx;
+}
+.wc-name {
+  font-size: 26rpx;
+  color: #4A3A32;
+  font-weight: 500;
+}
+.wc-count {
+  font-size: 20rpx;
+  color: #C5B5A8;
+  margin-left: auto;
+}
+.wc-bar-bg {
+  flex: 1;
+  height: 18rpx;
+  background: #FFF1E6;
+  border-radius: 10rpx;
+  overflow: hidden;
+}
+.wc-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #F0B27A, #E8856A);
+  border-radius: 10rpx;
+  transition: width 0.5s ease;
+}
+.wc-score {
+  width: 80rpx;
+  text-align: right;
+  font-size: 24rpx;
+  color: #E8856A;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.wc-impact {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #F5EBE3;
+}
+.wci-label {
+  font-size: 24rpx;
+  color: #B5A69C;
+  margin-bottom: 12rpx;
+}
+.wci-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.wci-tag {
+  font-size: 24rpx;
+  color: #8B776B;
+  background: #FFF1E6;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+}
+
+/* ===== 情绪诱因 ===== */
+.trigger-card {
+  padding: 24rpx 26rpx;
+}
+.tc-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+.tcs-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+.tcs-icon {
+  font-size: 28rpx;
+  width: 40rpx;
+  text-align: center;
+}
+.tcs-label {
+  font-size: 26rpx;
+  color: #4A3A32;
+  width: 130rpx;
+}
+.tcs-count {
+  font-size: 22rpx;
+  color: #B5A69C;
+  width: 60rpx;
+  text-align: right;
+}
+.tcs-bar-bg {
+  flex: 1;
+  height: 14rpx;
+  background: #F5E6DB;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+.tcs-bar {
+  height: 100%;
+  border-radius: 8rpx;
+  transition: width 0.5s ease;
+}
+.tc-top {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #F5EBE3;
+}
+.tct-label {
+  font-size: 24rpx;
+  color: #B5A69C;
+  margin-bottom: 12rpx;
+}
+.tct-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.tct-tag {
+  font-size: 24rpx;
+  color: #E8856A;
+  background: rgba(232, 133, 106, 0.08);
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+}
+
+/* ===== 身体感受 & 地点 ===== */
+.extra-card {
+  padding: 24rpx 26rpx;
+}
+.ec-section {
+  padding: 4rpx 0;
+}
+.ec-divider {
+  height: 1rpx;
+  background: #F5EBE3;
+  margin: 20rpx 0;
+}
+.ecs-label {
+  font-size: 24rpx;
+  color: #B5A69C;
+  margin-bottom: 14rpx;
+}
+.ecs-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.ecs-tag {
+  font-size: 24rpx;
+  color: #8B776B;
+  background: #FFF1E6;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+}
+.ecs-tag-loc {
+  color: #6B8B9A;
+  background: #EBF2F5;
+}
+
+/* ===== 本周高光时刻 ===== */
+.highlight-card {
+  position: relative;
+  border-radius: 28rpx;
+  overflow: hidden;
+  margin-bottom: 8rpx;
+}
+.hl-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.hl-content {
+  position: relative;
+  z-index: 1;
+  padding: 28rpx 26rpx;
+}
+.hl-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.hl-emoji {
+  font-size: 56rpx;
+}
+.hl-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+.hl-mood {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #4A3A32;
+}
+.hl-date {
+  font-size: 23rpx;
+  color: #8B776B;
+}
+.hl-weather {
+  font-size: 24rpx;
+  color: #B5A69C;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+}
+.hl-note {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #5D4A40;
+  line-height: 1.7;
+  font-style: italic;
+  padding: 16rpx 20rpx;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 16rpx;
+  border-left: 4rpx solid rgba(232, 133, 106, 0.3);
+}
+
+/* ===== 温柔总结 ===== */
+.summary-card {
+  position: relative;
+  background: linear-gradient(135deg, #FFFBF7 0%, #FFF1E6 100%);
+  border-radius: 28rpx;
+  padding: 40rpx 30rpx 32rpx;
+  margin-bottom: 32rpx;
+  border: 1rpx solid rgba(232, 133, 106, 0.06);
+  box-shadow: 0 8rpx 28rpx rgba(200, 130, 90, 0.08);
+}
+.sum-quote {
+  position: absolute;
+  top: 16rpx;
+  left: 24rpx;
+  font-size: 80rpx;
+  color: rgba(232, 133, 106, 0.15);
+  font-family: Georgia, serif;
+  line-height: 1;
+  pointer-events: none;
+}
+.sum-body {
+  font-size: 28rpx;
+  color: #5D4A40;
+  line-height: 2;
+  letter-spacing: 0.5rpx;
+  position: relative;
+  z-index: 1;
+}
+.sum-footer {
+  margin-top: 24rpx;
+  text-align: right;
+  font-size: 22rpx;
+  color: #C5B5A8;
+  letter-spacing: 1rpx;
+}
+
+/* ===== 操作区 ===== */
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+  margin-top: 12rpx;
+}
+.actions .primary-btn {
+  width: 100%;
+}
+.action-secondary {
+  font-size: 26rpx;
+  color: #E8856A;
+  padding: 12rpx 24rpx;
+}
+.action-secondary:active {
+  opacity: 0.7;
+}

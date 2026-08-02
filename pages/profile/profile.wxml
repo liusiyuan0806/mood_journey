@@ -22,8 +22,12 @@
   <view class="menu card">
     <view bindtap="goFavorites">我收藏的句子  <text></text></view>
     <view bindtap="goWeatherMood">天气心情地图  <text></text></view>
-    <view bindtap="report">生成本周情绪报告 <text></text></view>
+    <view bindtap="report">生成本周情绪报告 <text>›</text></view>
     <view bindtap="generateShareCard">生成分享卡片 <text>›</text></view>
+    <view class="watermark-toggle" bindtap="toggleWatermark">
+      <text>分享卡底部水印</text>
+      <switch checked="{{showWatermark}}" color="#E8856A" />
+    </view>
     <view class="delete" bindtap="clear">清除所有数据 <text>›</text></view>
   </view>
   <!-- 隐藏的画布，用于绘制分享卡 -->

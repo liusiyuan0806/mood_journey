@@ -139,6 +139,21 @@
   color: #E8A898;
 }
 
+.watermark-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.watermark-toggle text {
+  color: #4A3A32;
+  font-size: 28rpx;
+}
+
+.watermark-toggle:active {
+  opacity: 0.7;
+}
+
 /* ===== 分享卡预览弹窗 ===== */
 .share-modal {
   position: fixed;

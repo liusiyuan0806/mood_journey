@@ -1,0 +1,250 @@
+<view class="page">
+
+  <!-- ===== 加载中 ===== -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在生成你的情绪报告...</text>
+  </view>
+
+  <!-- ===== 空状态 ===== -->
+  <view class="empty-state" wx:elif="{{report.empty}}">
+    <view class="empty-icon">🌿</view>
+    <view class="empty-title">还没有足够的数据</view>
+    <view class="empty-desc">记录几天心情后，这里会为你生成本周情绪报告</view>
+    <button class="primary-btn" bindtap="goRecord">去记录心情</button>
+  </view>
+
+  <!-- ===== 报告内容 ===== -->
+  <block wx:else>
+
+    <!-- ===== 报告头部 ===== -->
+    <view class="report-header">
+      <view class="header-title">
+        <text class="header-icon">📊</text>
+        <text class="header-text">本周情绪报告</text>
+      </view>
+      <view class="header-date">{{report.dateRange.start}} — {{report.dateRange.end}}</view>
+      <view class="header-stats">
+        <view class="hs-item">
+          <text class="hs-num">{{report.totalRecords}}</text>
+          <text class="hs-label">记录次数</text>
+        </view>
+        <view class="hs-divider"></view>
+        <view class="hs-item">
+          <text class="hs-num">{{report.recordingDays}}<text class="hs-unit">/7</text></text>
+          <text class="hs-label">记录天数</text>
+        </view>
+        <view class="hs-divider"></view>
+        <view class="hs-item">
+          <text class="hs-num">{{report.streakDays}}<text class="hs-unit">天</text></text>
+          <text class="hs-label">连续打卡</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 情绪健康指数 EHI ===== -->
+    <view class="section-title">情绪健康指数</view>
+    <view class="ehi-card card">
+      <view class="ehi-main">
+        <view class="ehi-score-wrap">
+          <text class="ehi-score">{{report.ehi}}</text>
+          <text class="ehi-total">/100</text>
+        </view>
+        <view class="ehi-level ehi-level-{{report.ehiLevelClass}}">{{report.ehiLevelText}}</view>
+      </view>
+      <view class="ehi-progress">
+        <view class="ehi-progress-bar" style="width:{{report.ehi}}%"></view>
+      </view>
+      <!-- 与上周对比 -->
+      <view class="ehi-compare" wx:if="{{report.lastWeekEhi > 0}}">
+        <text class="ec-label">较上周</text>
+        <view class="ec-trend {{report.ehiTrend}}">
+          <text wx:if="{{report.ehiTrend === 'up'}}">↑ {{report.ehiChange}} 分</text>
+          <text wx:elif="{{report.ehiTrend === 'down'}}">↓ {{report.ehiChange}} 分</text>
+          <text wx:else>— 持平</text>
+        </view>
+      </view>
+      <view class="ehi-compare" wx:else>
+        <text class="ec-label">上周暂无数据，继续记录吧</text>
+      </view>
+    </view>
+
+    <!-- ===== 情绪分布 ===== -->
+    <view class="section-title">情绪分布</view>
+    <view class="dist-card card">
+      <!-- 心情色卡条 -->
+      <view class="dist-color-bar">
+        <block wx:for="{{report.moodDistribution}}" wx:key="name">
+          <view wx:if="{{item.percentage > 0}}"
+            class="dist-color-seg"
+            style="width:{{item.percentage}}%; background:{{item.color}};">
+          </view>
+        </block>
+      </view>
+      <!-- 正负面比例 -->
+      <view class="dist-ratio">
+        <view class="dr-item">
+          <view class="dr-dot dr-positive"></view>
+          <text class="dr-label">积极 {{report.positiveRatio}}%</text>
+        </view>
+        <view class="dr-item">
+          <view class="dr-dot dr-neutral"></view>
+          <text class="dr-label">平稳 {{report.neutralRatio}}%</text>
+        </view>
+        <view class="dr-item">
+          <view class="dr-dot dr-negative"></view>
+          <text class="dr-label">低落 {{report.negativeRatio}}%</text>
+        </view>
+      </view>
+      <!-- Top 3 心情 -->
+      <view class="dist-top">
+        <view class="dt-label">本周高频心情</view>
+        <view class="dt-list">
+          <view wx:for="{{report.topMoods}}" wx:key="name" class="dt-item">
+            <text class="dt-rank">{{index + 1}}</text>
+            <text class="dt-emoji">{{item.emoji}}</text>
+            <text class="dt-name">{{item.name}}</text>
+            <text class="dt-count">{{item.count}}次</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 情绪走势 ===== -->
+    <view class="section-title">情绪走势</view>
+    <view class="trend-card card">
+      <view class="trend-chart">
+        <view wx:for="{{report.dailyTrend}}" wx:key="date" class="trend-col">
+          <view class="tc-bar-wrap">
+            <text class="tc-emoji" wx:if="{{item.recordCount > 0}}">{{item.topMoodEmoji}}</text>
+            <view class="tc-bar" style="height:{{item.barHeight}}; background:{{item.topMoodColor}};"></view>
+          </view>
+          <text class="tc-weekday">{{item.weekDay}}</text>
+          <text class="tc-date">{{item.dateLabel}}</text>
+        </view>
+      </view>
+      <!-- 峰值 & 低谷 -->
+      <view class="trend-extremes" wx:if="{{report.peakDay && report.valleyDay}}">
+        <view class="te-item te-peak">
+          <text class="te-icon">🌟</text>
+          <view class="te-info">
+            <text class="te-label">状态最好</text>
+            <text class="te-value">{{report.peakDay.dateLabel}} {{report.peakDay.weekDay}}</text>
+          </view>
+        </view>
+        <view class="te-item te-valley">
+          <text class="te-icon">🌧️</text>
+          <view class="te-info">
+            <text class="te-label">需要关注</text>
+            <text class="te-value">{{report.valleyDay.dateLabel}} {{report.valleyDay.weekDay}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 天气 × 心情 ===== -->
+    <view class="section-title">天气 × 心情</view>
+    <view class="weather-card card">
+      <view wx:for="{{report.weatherCorrelation}}" wx:key="weather" class="wc-row">
+        <view class="wc-left">
+          <text class="wc-emoji">{{item.emoji}}</text>
+          <text class="wc-name">{{item.weather}}</text>
+          <text class="wc-count">{{item.count}}次</text>
+        </view>
+        <view class="wc-bar-bg">
+          <view class="wc-bar" style="width:{{item.barWidth}}"></view>
+        </view>
+        <text class="wc-score">{{item.avgScore}}分</text>
+      </view>
+      <!-- 天气影响自述 -->
+      <view class="wc-impact" wx:if="{{report.weatherImpactStats.length > 0}}">
+        <view class="wci-label">你觉得天气对你的影响</view>
+        <view class="wci-tags">
+          <view wx:for="{{report.weatherImpactStats}}" wx:key="label" class="wci-tag">
+            {{item.label}} · {{item.count}}次
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 情绪诱因 ===== -->
+    <view class="section-title" wx:if="{{report.hasTriggers}}">情绪诱因</view>
+    <view class="trigger-card card" wx:if="{{report.hasTriggers}}">
+      <view class="tc-stats">
+        <view wx:for="{{report.triggerStats}}" wx:key="key" class="tcs-item">
+          <text class="tcs-icon">{{item.icon}}</text>
+          <text class="tcs-label">{{item.label}}</text>
+          <text class="tcs-count">{{item.count}}次</text>
+          <view class="tcs-bar-bg">
+            <view class="tcs-bar" style="width:{{item.percentage}}%; background:{{item.color}};"></view>
+          </view>
+        </view>
+      </view>
+      <view class="tc-top" wx:if="{{report.topTriggers.length > 0}}">
+        <view class="tct-label">高频诱因</view>
+        <view class="tct-list">
+          <view wx:for="{{report.topTriggers}}" wx:key="name" class="tct-tag">
+            {{item.name}} · {{item.count}}次
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 身体感受 & 地点 ===== -->
+    <view class="section-title" wx:if="{{report.topBodyFeelings.length > 0 || report.topLocations.length > 0}}">身体感受 & 地点</view>
+    <view class="extra-card card" wx:if="{{report.topBodyFeelings.length > 0 || report.topLocations.length > 0}}">
+      <!-- 身体感受 -->
+      <view class="ec-section" wx:if="{{report.topBodyFeelings.length > 0}}">
+        <view class="ecs-label">身体感受</view>
+        <view class="ecs-tags">
+          <view wx:for="{{report.topBodyFeelings}}" wx:key="name" class="ecs-tag">
+            {{item.name}} · {{item.count}}
+          </view>
+        </view>
+      </view>
+      <view class="ec-divider" wx:if="{{report.topBodyFeelings.length > 0 && report.topLocations.length > 0}}"></view>
+      <!-- 地点分布 -->
+      <view class="ec-section" wx:if="{{report.topLocations.length > 0}}">
+        <view class="ecs-label">常去地点</view>
+        <view class="ecs-tags">
+          <view wx:for="{{report.topLocations}}" wx:key="name" class="ecs-tag ecs-tag-loc">
+            {{item.name}} · {{item.count}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 本周高光时刻 ===== -->
+    <view class="section-title" wx:if="{{report.highlight}}">本周高光时刻</view>
+    <view class="highlight-card" wx:if="{{report.highlight}}">
+      <view class="hl-bg" style="background: linear-gradient(135deg, {{report.highlight.color}}33, {{report.highlight.color}}11);"></view>
+      <view class="hl-content">
+        <view class="hl-header">
+          <text class="hl-emoji">{{report.highlight.emoji}}</text>
+          <view class="hl-info">
+            <text class="hl-mood">{{report.highlight.mood}}</text>
+            <text class="hl-date">{{report.highlight.dateLabel}} {{report.highlight.weekDay}} {{report.highlight.time}}</text>
+          </view>
+          <text class="hl-weather" wx:if="{{report.highlight.weather}}">{{report.highlight.weather}}</text>
+        </view>
+        <view class="hl-note" wx:if="{{report.highlight.note}}">"{{report.highlight.note}}"</view>
+      </view>
+    </view>
+
+    <!-- ===== 温柔总结 ===== -->
+    <view class="section-title">温柔总结</view>
+    <view class="summary-card">
+      <view class="sum-quote">"</view>
+      <view class="sum-body">{{report.summary}}</view>
+      <view class="sum-footer">— Mood Journey · 情绪手账</view>
+    </view>
+
+    <!-- ===== 操作区 ===== -->
+    <view class="actions">
+      <button class="primary-btn" bindtap="goRecord">继续记录心情</button>
+      <view class="action-secondary" bindtap="goInsights">查看更多分析 ›</view>
+    </view>
+
+  </block>
+
+</view>
