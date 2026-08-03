@@ -191,20 +191,21 @@
   flex-shrink: 0;
 }
 
-/* ===== 创新功能入口网格 ===== */
+/* ===== 创新功能入口网格（2×2 布局） ===== */
 .feature-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 16rpx;
+  justify-content: space-between;
   margin-top: 20rpx;
 }
 .feature-item {
-  width: calc(50% - 8rpx);
-  padding: 28rpx 20rpx;
+  width: 48%;
+  box-sizing: border-box;
+  margin: 0 0 28rpx 0;
+  padding: 32rpx 20rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-radius: 24rpx;
 }
 .feature-item:active {
   transform: scale(0.96);
@@ -224,6 +225,7 @@
   font-size: 22rpx;
   color: #B5A69C;
 }
+
 
 /* ===== 云同步状态 ===== */
 .sync-status {
