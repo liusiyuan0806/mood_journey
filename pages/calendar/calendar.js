@@ -126,13 +126,13 @@ Page({
       let avgScore = 0;
       let dominantEmoji = '';
       if (hasRecords) {
-        const totalScore = dayRecords.reduce((s, r) => s + (byName(r.mood)?.score || 3), 0);
+        const totalScore = dayRecords.reduce((s, r) => s + ((byName(r.mood) || {}).score || 3), 0);
         avgScore = Math.round((totalScore / dayRecords.length) * 10) / 10;
         // 取当天出现最多的心情 emoji
         const moodCounts = {};
         dayRecords.forEach(r => { moodCounts[r.mood] = (moodCounts[r.mood] || 0) + 1; });
         const dominantMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0];
-        dominantEmoji = dominantMood ? (byName(dominantMood[0])?.emoji || '') : '';
+        dominantEmoji = dominantMood ? ((byName(dominantMood[0]) || {}).emoji || '') : '';
       }
 
       days.push({
@@ -162,7 +162,7 @@ Page({
     // Month avg score
     let monthAvgScore = 0;
     if (monthly.length > 0) {
-      monthAvgScore = Math.round(monthly.reduce((s, r) => s + (byName(r.mood)?.score || 3), 0) / monthly.length * 10) / 10;
+      monthAvgScore = Math.round(monthly.reduce((s, r) => s + ((byName(r.mood) || {}).score || 3), 0) / monthly.length * 10) / 10;
     }
 
     // Trend vs prev month
@@ -172,7 +172,7 @@ Page({
     const prevMonthly = records.filter(r => r.date.startsWith(prevMonthPrefix));
     let prevMonthAvgScore = 0;
     if (prevMonthly.length > 0) {
-      prevMonthAvgScore = Math.round(prevMonthly.reduce((s, r) => s + (byName(r.mood)?.score || 3), 0) / prevMonthly.length * 10) / 10;
+      prevMonthAvgScore = Math.round(prevMonthly.reduce((s, r) => s + ((byName(r.mood) || {}).score || 3), 0) / prevMonthly.length * 10) / 10;
     }
 
     let trendDisplay = '—';
@@ -209,7 +209,7 @@ Page({
         day: best.day,
         date: best.date,
         score: best.avgScore,
-        emoji: bestMoodInfo?.emoji || '😊',
+        emoji: (bestMoodInfo || {}).emoji || '😊',
         moodName: bestMoodName || '开心'
       };
 
@@ -225,7 +225,7 @@ Page({
           day: worst.day,
           date: worst.date,
           score: worst.avgScore,
-          emoji: worstMoodInfo?.emoji || '😔',
+          emoji: (worstMoodInfo || {}).emoji || '😔',
           moodName: worstMoodName || '低落'
         };
       }
@@ -307,7 +307,7 @@ Page({
     const dayRecords = this.data.records.filter(r => r.date === date);
     if (dayRecords.length === 0) return;
 
-    const scores = dayRecords.map(r => byName(r.mood)?.score || 3);
+    const scores = dayRecords.map(r => (byName(r.mood) || {}).score || 3);
     const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10;
     const moodNames = [...new Set(dayRecords.map(r => r.mood))];
 

@@ -1,0 +1,73 @@
+<view class="page">
+
+  <!-- ===== 头部统计 ===== -->
+  <view class="badges-header card">
+    <view class="bh-circle">
+      <view class="bh-circle-bg">
+        <text class="bh-num">{{unlockedCount}}</text>
+        <text class="bh-total">/{{totalCount}}</text>
+      </view>
+      <text class="bh-label">已解锁徽章</text>
+    </view>
+    <view class="bh-progress-area">
+      <view class="bh-progress-track">
+        <view class="bh-progress-fill" style="width:{{progressPercent}}%"></view>
+      </view>
+      <text class="bh-progress-text">完成度 {{progressPercent}}%</text>
+      <text class="bh-hint">继续记录心情，解锁更多徽章</text>
+    </view>
+  </view>
+
+  <!-- ===== 徽章网格 ===== -->
+  <view class="section-title">全部徽章</view>
+  <view class="badges-grid">
+    <view
+      wx:for="{{badges}}"
+      wx:key="id"
+      class="badge-card {{item.unlocked ? '' : 'badge-locked'}}"
+      data-idx="{{index}}"
+      bindtap="tapBadge"
+    >
+      <view class="badge-icon-wrap" style="{{item.unlocked ? 'background:' + item.color + '22' : ''}}">
+        <text class="badge-icon {{item.unlocked ? '' : 'badge-icon-locked'}}">{{item.unlocked ? item.icon : '🔒'}}</text>
+        <view class="badge-shine" wx:if="{{item.unlocked}}"></view>
+      </view>
+      <text class="badge-name {{item.unlocked ? '' : 'badge-name-locked'}}">{{item.name}}</text>
+      <text class="badge-desc">{{item.desc}}</text>
+      <view class="badge-status" wx:if="{{item.unlocked}}">
+        <text class="badge-status-text">已解锁</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 操作 ===== -->
+  <view class="badges-actions">
+    <button class="primary-btn" bindtap="goRecord">去记录心情</button>
+  </view>
+
+  <!-- ===== 解锁动画弹层 ===== -->
+  <view class="unlock-mask" wx:if="{{showUnlockAnimation}}" bindtap="closeUnlockAnimation">
+    <view class="unlock-content" catchtap="">
+      <!-- 撒花动画 -->
+      <view class="confetti-area">
+        <view class="confetti c1">🎉</view>
+        <view class="confetti c2">✨</view>
+        <view class="confetti c3">🎊</view>
+        <view class="confetti c4">⭐</view>
+        <view class="confetti c5">🌸</view>
+        <view class="confetti c6">💫</view>
+        <view class="confetti c7">🎉</view>
+        <view class="confetti c8">✨</view>
+      </view>
+
+      <view class="unlock-badge-circle" style="background:{{unlockBadge.color}}22;border-color:{{unlockBadge.color}}">
+        <text class="unlock-badge-icon">{{unlockBadge.icon}}</text>
+      </view>
+      <text class="unlock-title">徽章解锁！</text>
+      <text class="unlock-name">{{unlockBadge.name}}</text>
+      <text class="unlock-desc">{{unlockBadge.desc}}</text>
+      <view class="unlock-btn" bindtap="closeUnlockAnimation">好开心！</view>
+    </view>
+  </view>
+
+</view>

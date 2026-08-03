@@ -9,7 +9,13 @@
     "pages/day/day",
     "pages/favorites/favorites",
     "pages/weather-mood/weather-mood",
-    "pages/weekly-report/weekly-report"
+    "pages/weekly-report/weekly-report",
+    "pages/mood-tree/mood-tree",
+    "pages/badges/badges",
+    "pages/breathing/breathing",
+    "pages/data-export/data-export",
+    "pages/onboarding/onboarding",
+    "pages/empathy-wall/empathy-wall"
   ],
   "window": {
     "navigationBarTitleText": "情绪手账",
@@ -44,6 +50,10 @@
       {
         "pagePath": "pages/insights/insights",
         "text": "情绪分析"
+      },
+      {
+        "pagePath": "pages/empathy-wall/empathy-wall",
+        "text": "共情墙"
       },
       {
         "pagePath": "pages/profile/profile",

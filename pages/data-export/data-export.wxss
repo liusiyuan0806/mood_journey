@@ -1,0 +1,169 @@
+/* ===== 数据管理页面 ===== */
+
+.page {
+  padding: 24rpx 28rpx 180rpx;
+  min-height: 100vh;
+}
+
+/* ===== 数据概览 ===== */
+.overview-card {
+  display: flex;
+  align-items: center;
+  padding: 32rpx;
+  margin-bottom: 10rpx;
+  background: linear-gradient(135deg, #FFF8F2 0%, #FFF0E8 100%);
+}
+.ov-icon {
+  font-size: 56rpx;
+  margin-right: 24rpx;
+}
+.ov-info {
+  flex: 1;
+}
+.ov-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  display: block;
+  margin-bottom: 4rpx;
+}
+.ov-count {
+  font-size: 26rpx;
+  color: #E8856A;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4rpx;
+}
+.ov-range {
+  font-size: 22rpx;
+  color: #B5A69C;
+}
+
+/* ===== 格式选择 ===== */
+.format-list {
+  margin-bottom: 20rpx;
+}
+.format-card {
+  display: flex;
+  align-items: center;
+  padding: 28rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  margin-bottom: 12rpx;
+  border: 3rpx solid transparent;
+  box-shadow: 0 4rpx 16rpx rgba(200, 130, 90, 0.06);
+  transition: all 0.2s ease;
+}
+.format-card.selected {
+  border-color: #E8856A;
+  background: #FFF8F2;
+}
+.format-card:active {
+  transform: scale(0.98);
+}
+.fc-icon-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.fc-icon {
+  font-size: 36rpx;
+}
+.fc-info {
+  flex: 1;
+}
+.fc-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #4A3A32;
+  display: block;
+  margin-bottom: 4rpx;
+}
+.fc-desc {
+  font-size: 22rpx;
+  color: #B5A69C;
+}
+.fc-check {
+  font-size: 32rpx;
+  color: #E8856A;
+  font-weight: 700;
+}
+
+/* ===== 导出操作 ===== */
+.export-actions {
+  text-align: center;
+  margin: 30rpx 0;
+}
+.export-hint {
+  font-size: 22rpx;
+  color: #B5A69C;
+  margin-top: 12rpx;
+}
+
+/* ===== 数据管理 ===== */
+.manage-card {
+  overflow: hidden;
+}
+.mc-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx;
+}
+.mc-item:active {
+  background: #FFF8F2;
+}
+.mc-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+.mc-info {
+  flex: 1;
+}
+.mc-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3A32;
+  display: block;
+  margin-bottom: 4rpx;
+}
+.mc-desc {
+  font-size: 22rpx;
+  color: #B5A69C;
+}
+.mc-arrow {
+  font-size: 32rpx;
+  color: #D4C4B8;
+}
+.mc-divider {
+  height: 1rpx;
+  background: #F3E6DD;
+  margin-left: 80rpx;
+}
+.mc-danger .mc-name {
+  color: #E85A4A;
+}
+
+/* ===== 隐私说明 ===== */
+.privacy-note {
+  display: flex;
+  align-items: flex-start;
+  padding: 24rpx;
+  margin-top: 30rpx;
+  background: #F8F5F0;
+  border-radius: 16rpx;
+}
+.pn-icon {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+.pn-text {
+  font-size: 22rpx;
+  color: #8B776B;
+  line-height: 1.6;
+}

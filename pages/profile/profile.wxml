@@ -19,19 +19,61 @@
     <view><text>{{stats.streak}}</text><text>连续打卡天数</text></view>
     <view><text>{{stats.avg}}</text><text>平均心情值</text></view>
   </view>
+
+  <!-- 节奏建议卡片 -->
+  <view class="rhythm-card card" wx:if="{{rhythmSuggestion}}" bindtap="goRhythmSuggestion">
+    <text class="rhythm-icon">{{rhythmSuggestion.icon}}</text>
+    <view class="rhythm-info">
+      <text class="rhythm-title">{{rhythmSuggestion.title}}</text>
+      <text class="rhythm-desc">{{rhythmSuggestion.desc}}</text>
+    </view>
+    <text class="rhythm-action">{{rhythmSuggestion.action}} ›</text>
+  </view>
+
+  <!-- 创新功能入口 -->
+  <view class="feature-grid">
+    <view class="feature-item card" bindtap="goMoodTree">
+      <text class="feature-icon">🌳</text>
+      <text class="feature-name">情绪树</text>
+      <text class="feature-sub">看着它成长</text>
+    </view>
+    <view class="feature-item card" bindtap="goBadges">
+      <text class="feature-icon">🏆</text>
+      <text class="feature-name">成就徽章</text>
+      <text class="feature-sub">{{badgeCount}}枚已解锁</text>
+    </view>
+    <view class="feature-item card" bindtap="goBreathing">
+      <text class="feature-icon">🧘</text>
+      <text class="feature-name">呼吸练习</text>
+      <text class="feature-sub">3分钟放松</text>
+    </view>
+    <view class="feature-item card" bindtap="report">
+      <text class="feature-icon">📊</text>
+      <text class="feature-name">情绪周报</text>
+      <text class="feature-sub">每周回顾</text>
+    </view>
+  </view>
+
   <view class="menu card">
-    <view bindtap="goFavorites">我收藏的句子  <text></text></view>
-    <view bindtap="goWeatherMood">天气心情地图  <text></text></view>
-    <view bindtap="report">生成本周情绪报告 <text>›</text></view>
+    <view bindtap="goFavorites">我收藏的句子  <text>›</text></view>
+    <view bindtap="goWeatherMood">天气心情地图  <text>›</text></view>
     <view bindtap="generateShareCard">生成分享卡片 <text>›</text></view>
+    <view bindtap="goDataExport">数据导出与备份 <text>›</text></view>
     <view class="watermark-toggle" bindtap="toggleWatermark">
       <text>分享卡底部水印</text>
       <switch checked="{{showWatermark}}" color="#E8856A" />
     </view>
     <view class="delete" bindtap="clear">清除所有数据 <text>›</text></view>
   </view>
+
+  <!-- 云同步状态 -->
+  <view class="sync-status" wx:if="{{syncStatus && syncStatus.pendingCount > 0}}">
+    <text class="sync-icon">☁️</text>
+    <text class="sync-text">{{syncStatus.pendingCount}}条记录待同步</text>
+  </view>
+
   <!-- 隐藏的画布，用于绘制分享卡 -->
-<canvas type="2d" id="shareCanvas" 
+<canvas type="2d" id="shareCanvas"
         style="position:fixed; top:0; left:100vw; width:750rpx; height:1334rpx; pointer-events:none;">
 
 </canvas>

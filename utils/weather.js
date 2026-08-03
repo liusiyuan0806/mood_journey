@@ -224,7 +224,8 @@ function generateWeather(date) {
   const totalWeight = pool.reduce((s, w) => s + w.weight, 0);
   let roll = seededRandom(baseSeed) * totalWeight;
   let weatherItem = pool[0];
-  for (const w of pool) {
+  for (var _i = 0; _i < pool.length; _i++) {
+    var w = pool[_i];
     roll -= w.weight;
     if (roll <= 0) { weatherItem = w; break; }
   }
@@ -391,8 +392,8 @@ function getContextQuestion(weatherData) {
 // ==================== 即时反馈生成 ====================
 function generateFeedback(newRecord, allRecords) {
   const { mood, emoji, weatherImpact } = newRecord;
-  const weatherText = newRecord.weatherText || newRecord.weather || newRecord.weatherSnapshot?.weatherText || '今天';
-  const weatherCategory = newRecord.weatherCategory || newRecord.weatherSnapshot?.weatherCategory || 'sunny';
+  var weatherText = newRecord.weatherText || newRecord.weather || (newRecord.weatherSnapshot && newRecord.weatherSnapshot.weatherText) || '今天';
+  var weatherCategory = newRecord.weatherCategory || (newRecord.weatherSnapshot && newRecord.weatherSnapshot.weatherCategory) || 'sunny';
   const now = new Date();
   const isNight = now.getHours() < 6 || now.getHours() >= 19;
 
@@ -471,28 +472,27 @@ function mergeRealWeather(baseData, realData) {
   const isNight = hour < 6 || hour >= 19;
 
   // 用真实数据覆盖模拟数据的关键字段
-  const merged = {
-    ...baseData,
-    temp: realData.temp ?? baseData.temp,
-    feelsLike: realData.feelsLike ?? baseData.feelsLike,
-    humidity: realData.humidity ?? baseData.humidity,
-    rainProb: realData.rainProb ?? baseData.rainProb,
-    wind: realData.wind ?? baseData.wind,
-    windLevel: realData.windLevel ?? baseData.windLevel,
+  const merged = Object.assign({}, baseData, {
+    temp: realData.temp != null ? realData.temp : baseData.temp,
+    feelsLike: realData.feelsLike != null ? realData.feelsLike : baseData.feelsLike,
+    humidity: realData.humidity != null ? realData.humidity : baseData.humidity,
+    rainProb: realData.rainProb != null ? realData.rainProb : baseData.rainProb,
+    wind: realData.wind != null ? realData.wind : baseData.wind,
+    windLevel: realData.windLevel != null ? realData.windLevel : baseData.windLevel,
     weatherType: realData.weatherType || baseData.weatherType,
     weatherIcon: realData.weatherIcon || baseData.weatherIcon,
     weatherText: realData.weatherText || baseData.weatherText,
     weatherCategory: realData.weatherCategory || baseData.weatherCategory,
     sunrise: realData.sunrise || baseData.sunrise,
     sunset: realData.sunset || baseData.sunset,
-    aqi: realData.aqi ?? baseData.aqi,
+    aqi: realData.aqi != null ? realData.aqi : baseData.aqi,
     aqiLevel: realData.aqiLevel || baseData.aqiLevel,
-    pressure: realData.pressure ?? baseData.pressure,
-    hasWarning: realData.hasWarning ?? baseData.hasWarning,
+    pressure: realData.pressure != null ? realData.pressure : baseData.pressure,
+    hasWarning: realData.hasWarning != null ? realData.hasWarning : baseData.hasWarning,
     warningText: realData.warningText || baseData.warningText,
-    isNight,
-    isRealData: true, // 标记为真实数据
-  };
+    isNight: isNight,
+    isRealData: true // 标记为真实数据
+  });
 
   // 重新确定背景类型（基于真实天气类别）
   let backgroundClass = merged.weatherCategory;

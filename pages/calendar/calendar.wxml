@@ -180,7 +180,7 @@
 
       <!-- 评分条 -->
       <view class="brief-score-bar">
-        <view class="brief-score-fill" style="width:{{briefData.avgScore/5*100}}'%'"></view>
+        <view class="brief-score-fill" style="width:{{briefData.avgScore/5*100}}%"></view>
         <text class="brief-score-label">{{briefData.scoreLabel}}</text>
       </view>
 

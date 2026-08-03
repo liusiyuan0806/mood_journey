@@ -1,0 +1,142 @@
+<view class="page">
+
+  <!-- ===== 头部 ===== -->
+  <view class="wall-header">
+    <view class="wh-title-row">
+      <text class="wh-icon">💌</text>
+      <text class="wh-title">共情墙</text>
+    </view>
+    <view class="wh-desc">每一份感受都值得被看见，每一个拥抱都是温柔的陪伴</view>
+    <view class="wh-stats">
+      <view class="ws-item">
+        <text class="ws-num">{{totalCount}}</text>
+        <text class="ws-label">条心声</text>
+      </view>
+      <view class="ws-divider"></view>
+      <view class="ws-item">
+        <text class="ws-num">{{totalHugs}}</text>
+        <text class="ws-label">个拥抱</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 筛选栏 ===== -->
+  <scroll-view scroll-x class="filter-bar" enhanced show-scrollbar="{{false}}">
+    <view class="filter-list">
+      <view
+        wx:for="{{filterCategories}}"
+        wx:key="key"
+        class="filter-chip {{activeFilter === item.key ? 'active' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="tapFilter"
+      >
+        <text class="fc-emoji">{{item.emoji}}</text>
+        <text class="fc-label">{{item.label}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- ===== 帖子列表 ===== -->
+  <view class="post-list">
+    <view wx:for="{{posts}}" wx:key="id" class="post-card card">
+      <!-- 帖子头部 -->
+      <view class="pc-header">
+        <view class="pc-mood-badge" style="background:{{item.color}}1A">
+          <text class="pc-mood-emoji">{{item.emoji}}</text>
+          <text class="pc-mood-name" style="color:{{item.color}}">{{item.mood}}</text>
+        </view>
+        <view class="pc-meta">
+          <text class="pc-author">{{item.author}}</text>
+          <text class="pc-time">{{item.timeText}}</text>
+        </view>
+      </view>
+
+      <!-- 帖子内容 -->
+      <view class="pc-content">{{item.content}}</view>
+
+      <!-- 帖子底部 -->
+      <view class="pc-footer">
+        <view
+          class="pc-hug-btn {{item.hugged ? 'hugged' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="tapHug"
+        >
+          <text class="pc-hug-icon">{{item.hugged ? '🤗' : '🫂'}}</text>
+          <text class="pc-hug-count">{{item.hugs}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{posts.length === 0}}">
+    <text class="empty-icon">🌿</text>
+    <text class="empty-text">这个分类还没有心声</text>
+    <text class="empty-hint">成为第一个分享的人吧</text>
+  </view>
+
+  <!-- 底部留白 -->
+  <view style="height: 180rpx;"></view>
+
+  <!-- ===== 发布按钮 ===== -->
+  <view class="fab-btn" bindtap="openPostModal">
+    <text class="fab-icon">✏️</text>
+    <text class="fab-text">分享心声</text>
+  </view>
+
+  <!-- ===== 发布弹窗 ===== -->
+  <view class="modal-mask" wx:if="{{showPostModal}}" bindtap="closePostModal">
+    <view class="modal-content" catchtap="stopPropagation">
+
+      <!-- 弹窗头部 -->
+      <view class="modal-header">
+        <text class="modal-title">分享你的心声</text>
+        <text class="modal-close" bindtap="closePostModal">✕</text>
+      </view>
+
+      <!-- 选择心情 -->
+      <view class="modal-section">
+        <view class="ms-label">此刻的心情</view>
+        <view class="mood-picker">
+          <view
+            wx:for="{{availableMoods}}"
+            wx:key="name"
+            class="mp-item {{selectedMood === item.name ? 'selected' : ''}}"
+            data-name="{{item.name}}"
+            bindtap="selectPostMood"
+            style="{{selectedMood === item.name ? 'border-color:' + item.color + ';background:' + item.color + '15' : ''}}"
+          >
+            <text class="mp-emoji">{{item.emoji}}</text>
+            <text class="mp-name">{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 输入内容 -->
+      <view class="modal-section">
+        <view class="ms-label">想说什么</view>
+        <textarea
+          class="modal-textarea"
+          placeholder="写下此刻的感受，会被匿名分享到共情墙..."
+          placeholder-class="textarea-placeholder"
+          maxlength="200"
+          value="{{postContent}}"
+          bindinput="inputContent"
+          auto-height
+        />
+        <view class="textarea-count">{{postContentCount}}/200</view>
+      </view>
+
+      <!-- 发布按钮 -->
+      <button class="primary-btn modal-submit" bindtap="submitPost">
+        匿名发布
+      </button>
+
+      <view class="modal-hint">
+        <text>🔒 你的身份会保持匿名，请温柔对待每一份分享</text>
+      </view>
+
+    </view>
+  </view>
+
+</view>

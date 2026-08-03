@@ -144,6 +144,48 @@
 </view>
 
 <!-- ================================================================ -->
+<!-- 智能提醒卡片 -->
+<!-- ================================================================ -->
+<view class="smart-reminders" wx:if="{{showReminders && smartReminders.length > 0}}">
+  <view 
+    wx:for="{{smartReminders}}" 
+    wx:key="type"
+    class="reminder-card {{item.priority === 'high' ? 'reminder-high' : ''}}"
+    data-action="{{item.action || ''}}"
+    bindtap="tapReminder"
+  >
+    <text class="reminder-icon">{{item.icon}}</text>
+    <view class="reminder-body">
+      <text class="reminder-title">{{item.title}}</text>
+      <text class="reminder-text">{{item.body}}</text>
+    </view>
+    <text class="reminder-close" catchtap="dismissReminder" data-type="{{item.type}}">✕</text>
+  </view>
+</view>
+
+<!-- 节奏建议卡片 -->
+<view class="rhythm-suggestion" wx:if="{{rhythmSuggestion}}" bindtap="tapRhythmSuggestion">
+  <text class="rs-icon">{{rhythmSuggestion.icon}}</text>
+  <view class="rs-body">
+    <text class="rs-title">{{rhythmSuggestion.title}}</text>
+    <text class="rs-desc">{{rhythmSuggestion.desc}}</text>
+  </view>
+  <text class="rs-action">{{rhythmSuggestion.action}} ›</text>
+</view>
+
+<!-- 快捷工具入口 -->
+<view class="quick-tools">
+  <view class="qt-item" bindtap="goBreathing">
+    <text class="qt-icon">🧘</text>
+    <text class="qt-label">呼吸练习</text>
+  </view>
+  <view class="qt-item" bindtap="goMoodTree">
+    <text class="qt-icon">🌳</text>
+    <text class="qt-label">情绪树</text>
+  </view>
+</view>
+
+<!-- ================================================================ -->
 <!-- 第二层：一问一答式记录 -->
 <!-- ================================================================ -->
 

@@ -47,9 +47,9 @@ function isFutureDate(dateStr) {
 
 function daySummary(records) {
   if (!records || records.length === 0) return null;
-  const scores = records.map(r => byName(r.mood)?.score || 3);
+  const scores = records.map(r => (byName(r.mood) || {}).score || 3);
   const avg = Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10;
-  const emoji = byName(records[0].mood)?.emoji || '·';
+  const emoji = (byName(records[0].mood) || {}).emoji || '·';
   return { emoji, score: avg };
 }
 
@@ -120,33 +120,32 @@ Page({
         };
       }
 
-      return {
-        ...r,
-        moodInfo,
-        period,
-        triggerInfo,
-        weatherImpactInfo,
-        hasSnapshot,
-        weatherDisplay,
-        audioDurationDisplay: formatAudioDuration(r.audioDuration),
-      };
+      return Object.assign({}, r, {
+        moodInfo: moodInfo,
+        period: period,
+        triggerInfo: triggerInfo,
+        weatherImpactInfo: weatherImpactInfo,
+        hasSnapshot: hasSnapshot,
+        weatherDisplay: weatherDisplay,
+        audioDurationDisplay: formatAudioDuration(r.audioDuration)
+      });
     });
 
     // ---- Avg score ----
     let avgScore = 0;
     if (enriched.length > 0) {
-      const total = enriched.reduce((s, r) => s + (r.moodInfo?.score || 3), 0);
+      const total = enriched.reduce((s, r) => s + ((r.moodInfo || {}).score || 3), 0);
       avgScore = Math.round((total / enriched.length) * 10) / 10;
     }
     const scoreLabel = avgScore >= 4.5 ? '非常好' : avgScore >= 3.5 ? '还不错' : avgScore >= 2.5 ? '一般' : '不太好';
 
     // ---- Mood color strip ----
-    const moodColors = enriched.map(r => r.moodInfo?.color || '#EAE4D7');
+    const moodColors = enriched.map(r => (r.moodInfo || {}).color || '#EAE4D7');
 
     // ---- Mood range ----
     let moodRange = null;
     if (enriched.length >= 2) {
-      const sorted = [...enriched].sort((a, b) => (b.moodInfo?.score || 3) - (a.moodInfo?.score || 3));
+      const sorted = [...enriched].sort((a, b) => ((b.moodInfo || {}).score || 3) - ((a.moodInfo || {}).score || 3));
       const hi = sorted[0];
       const lo = sorted[sorted.length - 1];
       if (hi.moodInfo.score !== lo.moodInfo.score) {
@@ -174,7 +173,7 @@ Page({
         period: p,
         icon: p === '上午' ? '☀️' : p === '下午' ? '🌤️' : '🌙',
         records: groups[p],
-        avgScore: Math.round(groups[p].reduce((s, r) => s + (r.moodInfo?.score || 3), 0) / groups[p].length * 10) / 10,
+        avgScore: Math.round(groups[p].reduce((s, r) => s + ((r.moodInfo || {}).score || 3), 0) / groups[p].length * 10) / 10,
         count: groups[p].length,
       }));
 
@@ -187,15 +186,15 @@ Page({
         if (r.triggerCategory) catCounts[r.triggerCategory] = (catCounts[r.triggerCategory] || 0) + 1;
       });
       const topCat = Object.entries(catCounts).sort((a, b) => b[1] - a[1])[0];
-      const dominantTrigger = topCat ? { ...TRIGGER_CAT_INFO[topCat[0]], count: topCat[1] } : null;
+      const dominantTrigger = topCat ? Object.assign({}, TRIGGER_CAT_INFO[topCat[0]], { count: topCat[1] }) : null;
 
       // Weather-mood correlation
       let weatherMood = null;
       const wGroups = {};
       enriched.forEach(r => {
-        const w = (r.hasSnapshot ? r.weatherDisplay?.text : null) || r.weatherText || r.weather || '未知';
+        const w = (r.hasSnapshot ? (r.weatherDisplay || {}).text : null) || r.weatherText || r.weather || '未知';
         if (!wGroups[w]) wGroups[w] = [];
-        wGroups[w].push(r.moodInfo?.score || 3);
+        wGroups[w].push((r.moodInfo || {}).score || 3);
       });
       const wEntries = Object.entries(wGroups);
       if (wEntries.length >= 2) {
@@ -217,8 +216,8 @@ Page({
     // ---- Header color ----
     let headerColor = '#FFF1E6';
     if (enriched.length > 0) {
-      const bestMood = [...enriched].sort((a, b) => (b.moodInfo?.score || 3) - (a.moodInfo?.score || 3))[0];
-      headerColor = bestMood.moodInfo?.color || '#FFF1E6';
+      const bestMood = [...enriched].sort((a, b) => ((b.moodInfo || {}).score || 3) - ((a.moodInfo || {}).score || 3))[0];
+      headerColor = (bestMood.moodInfo || {}).color || '#FFF1E6';
     }
 
     // ---- Prev / Next day ----
@@ -239,8 +238,8 @@ Page({
       moodColors,
       timeline,
       insights,
-      prevDay: { date: prevDate, emoji: prevSum?.emoji || '', score: prevSum?.score || 0 },
-      nextDay: { date: nextDate, emoji: nextSum?.emoji || '', score: nextSum?.score || 0 },
+      prevDay: { date: prevDate, emoji: (prevSum || {}).emoji || '', score: (prevSum || {}).score || 0 },
+      nextDay: { date: nextDate, emoji: (nextSum || {}).emoji || '', score: (nextSum || {}).score || 0 },
       isFuture: future,
       isToday,
       headerColor,

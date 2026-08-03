@@ -184,6 +184,50 @@
       <view class="tr-hint">看看你在哪个温度区间心情最好</view>
     </view>
 
+    <!-- 情绪预测 -->
+    <view class="section-title" wx:if="{{prediction && prediction.hasData}}">情绪预测</view>
+    <view class="prediction-card card" wx:if="{{prediction && prediction.hasData}}">
+      <!-- 趋势标签 -->
+      <view class="pred-header">
+        <text class="pred-title">未来3天趋势</text>
+        <view class="pred-trend-badge pred-trend-{{prediction.trend}}">
+          <text>{{prediction.trendText}}</text>
+        </view>
+      </view>
+
+      <!-- 预测柱状图 -->
+      <view class="pred-chart">
+        <view wx:for="{{predictionBars}}" wx:key="date" class="pred-bar-col">
+          <view class="pred-bar-track {{item.type === 'prediction' ? 'pred-bar-future' : ''}}">
+            <view class="pred-bar-fill" style="height:{{item.height}};background:{{item.type === 'prediction' ? '#E8856A88' : item.color}};{{item.type === 'prediction' ? 'border:2rpx dashed #E8856A' : ''}}"></view>
+          </view>
+          <text class="pred-bar-score">{{item.score}}</text>
+          <text class="pred-bar-date">{{item.date}}</text>
+          <text class="pred-bar-label" wx:if="{{item.type === 'prediction'}}">预测</text>
+        </view>
+      </view>
+
+      <!-- 预测文本 -->
+      <view class="pred-text">{{predictionText}}</view>
+
+      <!-- 预警卡片 -->
+      <view class="pred-warning" wx:if="{{prediction.warning}}">
+        <text class="pw-icon">{{prediction.warning.icon}}</text>
+        <view class="pw-body">
+          <text class="pw-title">{{prediction.warning.title}}</text>
+          <text class="pw-desc">{{prediction.warning.desc}}</text>
+        </view>
+        <view class="pw-action" catchtap="goBreathing">呼吸练习 ›</view>
+      </view>
+    </view>
+
+    <!-- 预测数据不足提示 -->
+    <view class="section-title" wx:if="{{prediction && !prediction.hasData}}">情绪预测</view>
+    <view class="prediction-empty card" wx:if="{{prediction && !prediction.hasData}}">
+      <text class="pe-icon">📊</text>
+      <text class="pe-text">{{prediction.message}}</text>
+    </view>
+
     <!-- Warning -->
     <view wx:if="{{warning}}" class="alert">连续 3 天情绪偏低。请给自己一点休息空间，也可以找信任的人聊聊。</view>
 

@@ -1,0 +1,156 @@
+<view class="page">
+
+  <!-- ===== 空状态 ===== -->
+  <view class="empty-state" wx:if="{{!tree || tree.totalRecords === 0}}">
+    <view class="empty-seed">🌰</view>
+    <view class="empty-title">种下你的第一颗情绪种子</view>
+    <view class="empty-desc">每次记录心情，树上就会长出一颗果实</view>
+    <view class="empty-desc">颜色代表当时的心情，大小代表笔记的丰富度</view>
+    <button class="primary-btn" bindtap="goRecord">去记录第一笔心情</button>
+  </view>
+
+  <block wx:else>
+
+    <!-- ===== 树等级与进度 ===== -->
+    <view class="tree-header card">
+      <view class="th-left">
+        <view class="th-level-badge" style="background:{{tree.level.color}}22;color:{{tree.level.color}}">
+          <text class="th-level-icon">🌳</text>
+          <text class="th-level-name">{{tree.level.name}}</text>
+        </view>
+      </view>
+      <view class="th-right">
+        <view class="th-stats">
+          <view class="th-stat">
+            <text class="th-stat-num">{{tree.totalRecords}}</text>
+            <text class="th-stat-label">总记录</text>
+          </view>
+          <view class="th-stat">
+            <text class="th-stat-num">{{tree.fruitCount}}</text>
+            <text class="th-stat-label">果实数</text>
+          </view>
+        </view>
+        <view class="th-progress" wx:if="{{tree.progress.next}}">
+          <view class="th-progress-track">
+            <view class="th-progress-fill" style="width:{{tree.progress.progress}}%;background:{{tree.level.color}}"></view>
+          </view>
+          <text class="th-progress-text">再记录{{tree.progress.remaining}}次升级到「{{tree.progress.next.name}}」</text>
+        </view>
+        <view class="th-progress" wx:else>
+          <text class="th-max-text">已达到最高等级 ✨</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 情绪树主体 ===== -->
+    <view class="tree-canvas">
+
+      <!-- 天空背景 -->
+      <view class="sky-bg"></view>
+      <view class="cloud cloud-a"></view>
+      <view class="cloud cloud-b"></view>
+
+      <!-- 太阳/月亮 -->
+      <view class="sun"></view>
+
+      <!-- 地面 -->
+      <view class="ground">
+        <view class="grass"></view>
+      </view>
+
+      <!-- 树干 -->
+      <view class="trunk" style="height:{{tree.level.trunkHeight}}rpx"></view>
+
+      <!-- 树枝 -->
+      <view class="branches">
+        <view 
+          wx:for="{{tree.branches}}" 
+          wx:key="index"
+          class="branch branch-{{index}}"
+          style="{{item.type === 'trunk' ? '' : ''}}"
+        ></view>
+      </view>
+
+      <!-- 树叶 -->
+      <view class="leaves">
+        <view
+          wx:for="{{tree.leaves}}"
+          wx:key="index"
+          class="leaf"
+          style="left:{{item.x}}rpx;top:{{item.y}}rpx;width:{{item.size}}rpx;height:{{item.size * 0.7}}rpx;transform:rotate({{item.rotation}}deg);animation-delay:{{item.delay}}s"
+        ></view>
+      </view>
+
+      <!-- 心情果实 -->
+      <view class="fruits">
+        <view
+          wx:for="{{tree.fruits}}"
+          wx:key="id"
+          class="fruit {{item.hasNote ? 'fruit-glow' : ''}}"
+          style="left:{{item.cx}}rpx;top:{{item.cy}}rpx;width:{{item.r * 2}}rpx;height:{{item.r * 2}}rpx;background:{{item.color}};animation-delay:{{item.delay}}s"
+          data-id="{{item.id}}"
+          bindtap="tapFruit"
+        >
+          <text class="fruit-emoji" style="font-size:{{item.r * 1.2}}rpx">{{item.emoji}}</text>
+        </view>
+      </view>
+
+      <!-- 装饰小花 -->
+      <view class="flower flower-1">🌸</view>
+      <view class="flower flower-2">🌼</view>
+      <view class="flower flower-3">🌷</view>
+    </view>
+
+    <!-- ===== 果实图例 ===== -->
+    <view class="legend card">
+      <view class="legend-title">心情果实分布</view>
+      <view class="legend-list" wx:if="{{tree.moodList.length > 0}}">
+        <view class="legend-item" wx:for="{{tree.moodList}}" wx:key="name" wx:if="{{index < 6}}">
+          <view class="legend-dot" style="background:{{item.color}}"></view>
+          <text class="legend-emoji">{{item.emoji}}</text>
+          <text class="legend-name">{{item.name}}</text>
+          <text class="legend-count">{{item.count}}</text>
+        </view>
+      </view>
+      <view class="legend-hint">点击树上的果实可以查看当时的记录</view>
+    </view>
+
+    <!-- ===== 操作按钮 ===== -->
+    <view class="tree-actions">
+      <button class="primary-btn" bindtap="goRecord">记录心情，让树成长</button>
+      <view class="action-secondary" bindtap="shareTree">分享我的情绪树 📤</view>
+    </view>
+
+  </block>
+
+  <!-- ===== 果实详情弹层 ===== -->
+  <view class="fruit-detail-mask" wx:if="{{showFruitDetail}}" bindtap="closeFruitDetail">
+    <view class="fruit-detail" catchtap="">
+      <view class="fd-header" style="background:linear-gradient(135deg,{{selectedFruit.color}}33,{{selectedFruit.color}}11)">
+        <view class="fd-emoji-circle" style="background:{{selectedFruit.color}}">
+          <text class="fd-emoji">{{selectedFruit.emoji}}</text>
+        </view>
+        <view class="fd-info">
+          <text class="fd-mood">{{selectedFruit.moodName}}</text>
+          <text class="fd-score">{{selectedFruit.score}}/5 · {{selectedFruit.scoreLabel}}</text>
+        </view>
+        <view class="fd-close" bindtap="closeFruitDetail">✕</view>
+      </view>
+      <view class="fd-body">
+        <view class="fd-meta">
+          <text class="fd-date">📅 {{selectedFruit.date}}</text>
+          <text class="fd-time" wx:if="{{selectedFruit.time}}">⏰ {{selectedFruit.time}}</text>
+          <text class="fd-weather" wx:if="{{selectedFruit.weather}}">🌤️ {{selectedFruit.weather}}</text>
+        </view>
+        <view class="fd-note" wx:if="{{selectedFruit.note}}">
+          <text class="fd-note-label">当时写下的：</text>
+          <text class="fd-note-text">"{{selectedFruit.note}}"</text>
+        </view>
+        <view class="fd-no-note" wx:else>
+          <text>这笔记录没有写笔记，但情绪被认真记录了 🌿</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+</view>

@@ -154,6 +154,96 @@
   opacity: 0.7;
 }
 
+/* ===== 节奏建议卡片 ===== */
+.rhythm-card {
+  display: flex;
+  align-items: center;
+  padding: 28rpx;
+  margin-top: 20rpx;
+  background: linear-gradient(135deg, #FFF8F2 0%, #FFF0E8 100%);
+  border: 1rpx solid rgba(232, 133, 106, 0.15);
+}
+.rhythm-card:active { opacity: 0.85; }
+.rhythm-icon {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.rhythm-info {
+  flex: 1;
+}
+.rhythm-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  display: block;
+  margin-bottom: 4rpx;
+}
+.rhythm-desc {
+  font-size: 24rpx;
+  color: #8B776B;
+  line-height: 1.5;
+}
+.rhythm-action {
+  font-size: 24rpx;
+  color: #E8856A;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ===== 创新功能入口网格 ===== */
+.feature-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+.feature-item {
+  width: calc(50% - 8rpx);
+  padding: 28rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 24rpx;
+}
+.feature-item:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+.feature-icon {
+  font-size: 48rpx;
+  margin-bottom: 12rpx;
+}
+.feature-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  margin-bottom: 4rpx;
+}
+.feature-sub {
+  font-size: 22rpx;
+  color: #B5A69C;
+}
+
+/* ===== 云同步状态 ===== */
+.sync-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx;
+  margin-top: 16rpx;
+  background: #FFF3E0;
+  border-radius: 16rpx;
+}
+.sync-icon {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+.sync-text {
+  font-size: 24rpx;
+  color: #E8856A;
+}
+
 /* ===== 分享卡预览弹窗 ===== */
 .share-modal {
   position: fixed;

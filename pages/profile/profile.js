@@ -1,6 +1,8 @@
-const { getProfile, saveProfile, getRecords, streak } = require('../../utils/store');
+const { getProfile, saveProfile, getRecords, streak, getSyncStatus } = require('../../utils/store');
 const { byName } = require('../../utils/moods');
 const { randomQuote } = require('../../utils/quotes');
+const { getUnlockedCount } = require('../../utils/achievements');
+const { getRhythmSuggestion } = require('../../utils/smartReminder');
 
 function getRandomShareImage() {
   const idx = Math.floor(Math.random() * 13) + 1;
@@ -22,10 +24,10 @@ function xingkaiFont(self) {
 }
 
 Page({
-  data: { profile: null, stats: {}, shareImagePath: '', showShareModal: false, xingkaiFont: '', showWatermark: true },
+  data: { profile: null, stats: {}, shareImagePath: '', showShareModal: false, xingkaiFont: '', showWatermark: true, badgeCount: 0, syncStatus: null, rhythmSuggestion: null },
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 3 });
+      this.getTabBar().setData({ selected: 4 });
     }
     this.refresh();
   },
@@ -66,7 +68,10 @@ Page({
     const avg = records.length
       ? (records.reduce((s, r) => s + byName(r.mood).score, 0) / records.length).toFixed(1)
       : '--';
-    this.setData({ profile, stats: { total: records.length, streak: streak(records), avg } });
+    const badgeCount = getUnlockedCount();
+    const syncStatus = getSyncStatus();
+    const rhythmSuggestion = getRhythmSuggestion(records);
+    this.setData({ profile, stats: { total: records.length, streak: streak(records), avg }, badgeCount, syncStatus, rhythmSuggestion });
   },
   login() {
     wx.showLoading({ title: '正在登录' });
@@ -85,6 +90,20 @@ Page({
   edit() { wx.navigateTo({ url: '/pages/edit-profile/edit-profile' }); },
   goFavorites() { wx.navigateTo({ url: '/pages/favorites/favorites' }); },
   goWeatherMood() { wx.navigateTo({ url: '/pages/weather-mood/weather-mood' }); },
+  goMoodTree() { wx.navigateTo({ url: '/pages/mood-tree/mood-tree' }); },
+  goBadges() { wx.navigateTo({ url: '/pages/badges/badges' }); },
+  goBreathing() { wx.navigateTo({ url: '/pages/breathing/breathing' }); },
+  goDataExport() { wx.navigateTo({ url: '/pages/data-export/data-export' }); },
+  goRhythmSuggestion() {
+    var action = this.data.rhythmSuggestion ? this.data.rhythmSuggestion.action : '';
+    if (action === '开始呼吸练习') {
+      this.goBreathing();
+    } else if (action === '查看周报') {
+      this.report();
+    } else {
+      wx.switchTab({ url: '/pages/home/home' });
+    }
+  },
   clear() {
     wx.showModal({
       title: '清除数据', content: '所有心情记录将被永久清除。',
@@ -496,7 +515,7 @@ Page({
     const points = chartData.map((d, i) => {
       const x = plotLeft + (chartData.length === 1 ? chartW / 2 : (i / (chartData.length - 1)) * (chartW - 40));
       const y = plotBottom - ((d.score - scoreMin) / (scoreMax - scoreMin)) * chartH;
-      return { x, y, ...d };
+      return Object.assign({ x: x, y: y }, d);
     });
 
     // 单条记录：只画一个大圆点

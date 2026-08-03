@@ -14,6 +14,8 @@ const {
   generateWeatherAdvice
 } = require('../../utils/weather');
 const { quotes, randomQuote } = require('../../utils/quotes');
+const { getSmartReminders } = require('../../utils/smartReminder');
+const { getRhythmSuggestion } = require('../../utils/smartReminder');
 Page({
   data:{ 
     moods, 
@@ -46,8 +48,20 @@ Page({
     // ===== 天气前瞻与微行动 =====
     weatherAdvice: null,
     showAdvice: true,
+
+    // ===== 智能提醒与节奏建议 =====
+    smartReminders: [],
+    rhythmSuggestion: null,
+    showReminders: true,
   },
   onShow() {
+    // 检查是否需要首次引导
+    var app = getApp();
+    if (app.globalData && app.globalData.needOnboarding) {
+      app.globalData.needOnboarding = false;
+      wx.navigateTo({ url: '/pages/onboarding/onboarding' });
+    }
+
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 0 });
     }
@@ -66,6 +80,9 @@ Page({
 
     // 先检查是否需要显示天气影响追问（记录页保存后回来）
     this.checkPendingWeatherImpact();
+
+    // 智能提醒与节奏建议
+    this.loadSmartReminders();
   },
   onUnload(){ 
     clearInterval(this.timer); 
@@ -89,7 +106,7 @@ Page({
       // 1. 获取今天的天气文案（可以是模拟数据，也可以是真实天气数据）
       const weatherData = this.data.weatherData;
       const todayWeatherText = weatherData
-        ? (weatherData.weatherText || weatherData.weatherSnapshot?.weatherText || '晴')
+        ? (weatherData.weatherText || (weatherData.weatherSnapshot && weatherData.weatherSnapshot.weatherText) || '晴')
         : '晴';
 
       // 2. 生成明日预报（模拟）
@@ -234,7 +251,7 @@ Page({
         this._cacheCity(cacheKey, realData.city);
       }
     } else {
-      console.warn('云函数返回失败:', res.result?.error);
+      console.warn('云函数返回失败:', res.result && res.result.error);
       if (baseWeatherData.city === '定位中…') {
         baseWeatherData.city = '你的城市';
         this.applyWeather(baseWeatherData, false);
@@ -260,7 +277,7 @@ Page({
 
   applyWeather(weatherData, isReal) {
     const contextQuestion = getContextQuestion(weatherData);
-    wx.setStorageSync('cached_weather', { ...weatherData, cachedAt: Date.now() });
+    wx.setStorageSync('cached_weather', Object.assign({}, weatherData, { cachedAt: Date.now() }));
     this.setData({
       weatherData, isRealWeather: isReal, contextQuestion,
       weather: { city: weatherData.city, icon: weatherData.weatherIcon, temp: weatherData.temp + '°' }
@@ -384,11 +401,10 @@ Page({
       return;
     }
     // 更新已有记录，补上天气影响字段
-    const updatedRecord = {
-      ...this._pendingRecord,
+    const updatedRecord = Object.assign({}, this._pendingRecord, {
       weatherImpact: impact,
       updatedAt: Date.now()
-    };
+    });
     saveRecord(updatedRecord);
 
     // 生成反馈并显示
@@ -441,5 +457,75 @@ Page({
 
   dismissFeedback() {
     this.setData({ showFeedback: false });
+  },
+
+  // ===== 智能提醒与节奏建议 =====
+  loadSmartReminders() {
+    try {
+      var records = getRecords();
+      var reminders = getSmartReminders(records);
+      var suggestion = getRhythmSuggestion(records);
+
+      // 过滤已关闭的提醒
+      var dismissedKey = 'dismissed_reminders_' + dateKey();
+      var dismissed = wx.getStorageSync(dismissedKey) || [];
+      reminders = reminders.filter(function(r) {
+        return dismissed.indexOf(r.type) < 0;
+      });
+
+      this.setData({
+        smartReminders: reminders,
+        rhythmSuggestion: suggestion,
+        showReminders: reminders.length > 0
+      });
+    } catch (err) {
+      console.error('[智能提醒] 加载失败:', err);
+    }
+  },
+
+  dismissReminder(e) {
+    var type = e.currentTarget.dataset.type;
+    var dismissedKey = 'dismissed_reminders_' + dateKey();
+    var dismissed = wx.getStorageSync(dismissedKey) || [];
+    dismissed.push(type);
+    wx.setStorageSync(dismissedKey, dismissed);
+
+    var reminders = this.data.smartReminders.filter(function(r) {
+      return r.type !== type;
+    });
+    this.setData({
+      smartReminders: reminders,
+      showReminders: reminders.length > 0
+    });
+  },
+
+  tapReminder(e) {
+    var action = e.currentTarget.dataset.action;
+    if (action === 'breathing') {
+      wx.navigateTo({ url: '/pages/breathing/breathing' });
+    } else if (action === 'weekly_report') {
+      wx.navigateTo({ url: '/pages/weekly-report/weekly-report' });
+    } else {
+      wx.navigateTo({ url: '/pages/record/record' });
+    }
+  },
+
+  goBreathing() {
+    wx.navigateTo({ url: '/pages/breathing/breathing' });
+  },
+
+  goMoodTree() {
+    wx.navigateTo({ url: '/pages/mood-tree/mood-tree' });
+  },
+
+  tapRhythmSuggestion() {
+    var action = this.data.rhythmSuggestion ? this.data.rhythmSuggestion.action : '';
+    if (action === '开始呼吸练习') {
+      this.goBreathing();
+    } else if (action === '查看周报') {
+      wx.navigateTo({ url: '/pages/weekly-report/weekly-report' });
+    } else {
+      wx.navigateTo({ url: '/pages/record/record' });
+    }
   },
 });

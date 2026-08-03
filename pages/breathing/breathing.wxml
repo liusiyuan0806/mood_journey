@@ -1,0 +1,140 @@
+<view class="page breathing-page {{isRunning ? 'running' : ''}} {{currentPhase ? 'phase-' + selectedExercise.id : ''}}">
+
+  <!-- ===== 练习选择（未运行时）===== -->
+  <block wx:if="{{!isRunning && !showCompletion}}">
+
+    <view class="breathing-intro">
+      <view class="bi-icon">🧘</view>
+      <view class="bi-title">呼吸练习</view>
+      <view class="bi-desc">花几分钟，给身心一个温柔的暂停</view>
+    </view>
+
+    <!-- 练习选择 -->
+    <view class="exercise-list">
+      <view
+        wx:for="{{exercises}}"
+        wx:key="id"
+        class="exercise-card {{selectedExerciseId === item.id ? 'selected' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="selectExercise"
+        style="{{selectedExerciseId === item.id ? 'border-color:' + item.color + ';background:' + item.color + '0A' : ''}}"
+      >
+        <view class="ec-left">
+          <view class="ec-icon-wrap" style="background:{{item.color}}1A">
+            <text class="ec-icon">{{item.icon}}</text>
+          </view>
+          <view class="ec-info">
+            <text class="ec-name">{{item.name}}</text>
+            <text class="ec-subtitle">{{item.subtitle}}</text>
+            <text class="ec-desc">{{item.desc}}</text>
+          </view>
+        </view>
+        <view class="ec-right">
+          <text class="ec-rounds">{{item.rounds}}轮</text>
+          <text class="ec-duration">约{{item.rounds * 12}}秒</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 开始按钮 -->
+    <view class="start-area">
+      <button class="primary-btn breathing-start-btn" style="background:linear-gradient(135deg,{{selectedExercise.color}}DD,{{selectedExercise.color}})" bindtap="startExercise">
+        开始练习
+      </button>
+      <view class="start-hint">建议在安静的环境下进行</view>
+    </view>
+
+    <!-- 放松小贴士 -->
+    <view class="section-title">放松小贴士</view>
+    <view class="tips-list">
+      <view class="tip-card card" wx:for="{{tips}}" wx:key="title">
+        <text class="tip-icon">{{item.icon}}</text>
+        <view class="tip-info">
+          <text class="tip-title">{{item.title}}</text>
+          <text class="tip-desc">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+
+  </block>
+
+  <!-- ===== 练习进行中 ===== -->
+  <block wx:if="{{isRunning}}">
+
+    <!-- 顶部进度 -->
+    <view class="running-header">
+      <view class="rh-round">
+        <text class="rh-round-num">{{currentRound + 1}}</text>
+        <text class="rh-round-total">/{{selectedExercise.rounds}}</text>
+        <text class="rh-round-label">轮</text>
+      </view>
+      <view class="rh-exercise-name">{{selectedExercise.name}}</view>
+      <view class="rh-stop" bindtap="stopExercise">退出</view>
+    </view>
+
+    <!-- 呼吸圆环动画区 -->
+    <view class="breathing-arena">
+      <view class="breath-circle-wrap">
+        <!-- 外圈 -->
+        <view class="breath-ring outer-ring" style="border-color:{{selectedExercise.color}}44">
+          <view class="breath-ring middle-ring" style="border-color:{{selectedExercise.color}}66">
+            <view class="breath-circle {{currentPhase ? 'phase-' + currentPhase.id : ''}}" style="background:radial-gradient(circle,{{selectedExercise.color}}88,{{selectedExercise.color}}44)">
+              <text class="breath-countdown" wx:if="{{countdown > 0}}">{{countdown}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 指令文字 -->
+      <view class="breath-instruction" wx:if="{{currentPhase}}">
+        <text class="bi-phase-name">{{currentPhase.name}}</text>
+        <text class="bi-phase-text">{{currentPhase.instruction}}</text>
+      </view>
+
+      <!-- 暂停按钮 -->
+      <view class="pause-btn" bindtap="togglePause">
+        <text>{{isPaused ? '▶ 继续' : '⏸ 暂停'}}</text>
+      </view>
+    </view>
+
+    <!-- 底部进度条 -->
+    <view class="running-progress">
+      <view class="rp-track">
+        <view class="rp-fill" style="width:{{totalDuration > 0 ? (elapsed / totalDuration * 100) : 0}}%;background:{{selectedExercise.color}}"></view>
+      </view>
+      <text class="rp-text">{{elapsed}}s / {{totalDuration}}s</text>
+    </view>
+
+  </block>
+
+  <!-- ===== 完成弹层 ===== -->
+  <block wx:if="{{showCompletion}}">
+    <view class="completion-view">
+      <view class="comp-circle">
+        <text class="comp-emoji">🌿</text>
+      </view>
+      <view class="comp-title">练习完成</view>
+      <view class="comp-message">{{completionMessage}}</view>
+
+      <view class="comp-divider"></view>
+
+      <view class="section-title comp-section-title">试试这些放松方式</view>
+      <view class="tips-list">
+        <view class="tip-card card" wx:for="{{tips}}" wx:key="title">
+          <text class="tip-icon">{{item.icon}}</text>
+          <view class="tip-info">
+            <text class="tip-title">{{item.title}}</text>
+            <text class="tip-desc">{{item.desc}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="comp-actions">
+        <button class="primary-btn" bindtap="startExercise">再来一次</button>
+        <view class="comp-secondary" bindtap="goRecord">去记录此刻心情</view>
+        <view class="comp-secondary" bindtap="goBack">返回</view>
+      </view>
+    </view>
+  </block>
+
+</view>

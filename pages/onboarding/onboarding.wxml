@@ -1,0 +1,33 @@
+<view class="onboarding-page">
+
+  <!-- 跳过按钮 -->
+  <view class="skip-btn" bindtap="skip" wx:if="{{current < steps.length - 1}}">跳过</view>
+
+  <!-- 内容区 -->
+  <view class="ob-content">
+    <view class="ob-icon-area" style="background:{{steps[current].color}}15">
+      <text class="ob-icon" style="color:{{steps[current].color}}">{{steps[current].icon}}</text>
+    </view>
+    <view class="ob-title">{{steps[current].title}}</view>
+    <view class="ob-desc">{{steps[current].desc}}</view>
+  </view>
+
+  <!-- 指示器 -->
+  <view class="ob-indicators">
+    <view
+      wx:for="{{steps}}"
+      wx:key="index"
+      class="ob-dot {{current === index ? 'active' : ''}}"
+      style="{{current === index ? 'background:' + steps[current].color + ';width:40rpx' : ''}}"
+    ></view>
+  </view>
+
+  <!-- 按钮区 -->
+  <view class="ob-actions">
+    <view class="ob-prev" bindtap="prev" wx:if="{{current > 0}}">上一步</view>
+    <button class="ob-next-btn" style="background:{{steps[current].color}}" bindtap="next">
+      {{current === steps.length - 1 ? '开始使用' : '下一步'}}
+    </button>
+  </view>
+
+</view>

@@ -18,6 +18,11 @@ Component({
         icon: '📊'
       },
       {
+        pagePath: '/pages/empathy-wall/empathy-wall',
+        text: '共情墙',
+        icon: '💌'
+      },
+      {
         pagePath: '/pages/profile/profile',
         text: '我的',
         icon: '🌿'

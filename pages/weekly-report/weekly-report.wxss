@@ -673,3 +673,4 @@
 .action-secondary:active {
   opacity: 0.7;
 }
+

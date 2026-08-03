@@ -1160,6 +1160,126 @@
   position: relative;
 }
 
+/* ===== 智能提醒 ===== */
+.smart-reminders {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 16rpx;
+}
+.reminder-card {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 28rpx;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 24rpx;
+  margin-bottom: 12rpx;
+  box-shadow: 0 4rpx 16rpx rgba(200, 130, 90, 0.06);
+  border: 1rpx solid rgba(232, 133, 106, 0.08);
+}
+.reminder-card:active { opacity: 0.85; }
+.reminder-high {
+  background: rgba(255, 248, 240, 0.95);
+  border-color: rgba(232, 133, 106, 0.2);
+}
+.reminder-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.reminder-body {
+  flex: 1;
+}
+.reminder-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3A32;
+  display: block;
+  margin-bottom: 4rpx;
+}
+.reminder-text {
+  font-size: 24rpx;
+  color: #8B776B;
+  line-height: 1.5;
+}
+.reminder-close {
+  font-size: 28rpx;
+  color: #C9B9AE;
+  padding: 8rpx;
+  flex-shrink: 0;
+}
+
+/* 节奏建议 */
+.rhythm-suggestion {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 28rpx;
+  background: linear-gradient(135deg, rgba(255, 241, 230, 0.95) 0%, rgba(255, 248, 242, 0.95) 100%);
+  border-radius: 24rpx;
+  margin-bottom: 16rpx;
+  position: relative;
+  z-index: 1;
+  border: 1rpx solid rgba(232, 133, 106, 0.12);
+}
+.rhythm-suggestion:active { opacity: 0.85; }
+.rs-icon {
+  font-size: 44rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.rs-body {
+  flex: 1;
+}
+.rs-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3A32;
+  display: block;
+  margin-bottom: 4rpx;
+}
+.rs-desc {
+  font-size: 23rpx;
+  color: #8B776B;
+  line-height: 1.5;
+}
+.rs-action {
+  font-size: 24rpx;
+  color: #E8856A;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* 快捷工具 */
+.quick-tools {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+  position: relative;
+  z-index: 1;
+}
+.qt-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(200, 130, 90, 0.06);
+}
+.qt-item:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+.qt-icon {
+  font-size: 40rpx;
+  margin-bottom: 8rpx;
+}
+.qt-label {
+  font-size: 24rpx;
+  color: #4A3A32;
+  font-weight: 500;
+}
+
 /* ===== 天气前瞻与微行动 ===== */
 
 /* 区块外包装 */

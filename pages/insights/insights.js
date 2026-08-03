@@ -1,5 +1,6 @@
 const { getRecords, streak } = require('../../utils/store');
 const { byName } = require('../../utils/moods');
+const { predictMood, getPredictionText } = require('../../utils/moodPrediction');
 
 const rangeStart = (type) => {
   const d = new Date();
@@ -79,7 +80,7 @@ const computePrevEHI = (all, type) => {
   if (!prevRecords.length) return null;
   const scores = prevRecords.map(r => byName(r.mood).score);
   const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-  const std = Math.sqrt(scores.reduce((s, n) => s + (n - avg) ** 2, 0) / scores.length);
+  const std = Math.sqrt(scores.reduce((s, n) => s + Math.pow(n - avg, 2), 0) / scores.length);
   let low = 0;
   for (let i = scores.length - 1; i >= 0 && scores[i] <= 2; i--) low++;
   return Math.max(0, Math.min(100, Math.round(avg / 5 * 100 - std * 3 - low)));
@@ -116,6 +117,10 @@ Page({
     weatherConclusion: '',
     tempRanges: [],
     warning: false,
+    // 情绪预测
+    prediction: null,
+    predictionText: '',
+    predictionBars: [],
   },
 
   onShow() {
@@ -181,7 +186,7 @@ Page({
     // ===== EHI computation =====
     const scores = records.map(r => byName(r.mood).score);
     const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-    const std = Math.sqrt(scores.reduce((s, n) => s + (n - avg) ** 2, 0) / scores.length);
+    const std = Math.sqrt(scores.reduce((s, n) => s + Math.pow(n - avg, 2), 0) / scores.length);
     let low = 0;
     for (let i = scores.length - 1; i >= 0 && scores[i] <= 2; i--) low++;
 
@@ -224,6 +229,52 @@ Page({
 
     this.buildTrendChart();
     this.buildWeatherCorrelation(records);
+    this.buildPrediction(all);
+  },
+
+  // ===== 情绪预测 =====
+  buildPrediction(allRecords) {
+    try {
+      var prediction = predictMood(allRecords, 3);
+      var predictionText = getPredictionText(prediction);
+
+      // 构建预测柱状图数据
+      var predictionBars = [];
+      if (prediction.hasData && prediction.chartData) {
+        // 历史数据
+        prediction.chartData.historical.forEach(function(d) {
+          predictionBars.push({
+            type: 'history',
+            date: d.date.slice(5),
+            score: d.score,
+            height: Math.round(d.score / 5 * 100) + '%',
+            color: byName('还好').color
+          });
+        });
+        // 预测数据
+        prediction.chartData.predictions.forEach(function(d) {
+          predictionBars.push({
+            type: 'prediction',
+            date: d.date.slice(5),
+            score: d.score,
+            height: Math.round(d.score / 5 * 100) + '%',
+            color: '#E8856A'
+          });
+        });
+      }
+
+      this.setData({
+        prediction: prediction,
+        predictionText: predictionText,
+        predictionBars: predictionBars
+      });
+    } catch (err) {
+      console.error('[prediction] error:', err);
+    }
+  },
+
+  goBreathing() {
+    wx.navigateTo({ url: '/pages/breathing/breathing' });
   },
 
   // ===== Trend chart =====

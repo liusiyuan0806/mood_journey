@@ -1,0 +1,86 @@
+<view class="page">
+
+  <!-- ===== 数据概览 ===== -->
+  <view class="overview-card card">
+    <view class="ov-icon">📊</view>
+    <view class="ov-info">
+      <text class="ov-title">你的情绪数据</text>
+      <text class="ov-count">{{recordCount}} 条记录</text>
+      <text class="ov-range" wx:if="{{dateRange}}">{{dateRange}}</text>
+    </view>
+  </view>
+
+  <!-- ===== 导出格式选择 ===== -->
+  <view class="section-title">选择导出格式</view>
+  <view class="format-list">
+    <view class="format-card {{exportFormat === 'json' ? 'selected' : ''}}" data-format="json" bindtap="selectFormat">
+      <view class="fc-icon-wrap" style="background:#F0B27A22">
+        <text class="fc-icon">📄</text>
+      </view>
+      <view class="fc-info">
+        <text class="fc-name">JSON 格式</text>
+        <text class="fc-desc">完整数据结构，适合备份和导入</text>
+      </view>
+      <view class="fc-check" wx:if="{{exportFormat === 'json'}}">✓</view>
+    </view>
+
+    <view class="format-card {{exportFormat === 'markdown' ? 'selected' : ''}}" data-format="markdown" bindtap="selectFormat">
+      <view class="fc-icon-wrap" style="background:#55A86822">
+        <text class="fc-icon">📝</text>
+      </view>
+      <view class="fc-info">
+        <text class="fc-name">Markdown 日记</text>
+        <text class="fc-desc">按日期整理的日记格式，可阅读</text>
+      </view>
+      <view class="fc-check" wx:if="{{exportFormat === 'markdown'}}">✓</view>
+    </view>
+
+    <view class="format-card {{exportFormat === 'csv' ? 'selected' : ''}}" data-format="csv" bindtap="selectFormat">
+      <view class="fc-icon-wrap" style="background:#3498DB22">
+        <text class="fc-icon">📈</text>
+      </view>
+      <view class="fc-info">
+        <text class="fc-name">CSV 表格</text>
+        <text class="fc-desc">Excel 可打开，适合数据分析</text>
+      </view>
+      <view class="fc-check" wx:if="{{exportFormat === 'csv'}}">✓</view>
+    </view>
+  </view>
+
+  <!-- ===== 导出按钮 ===== -->
+  <view class="export-actions">
+    <button class="primary-btn" bindtap="exportData" loading="{{exporting}}">
+      {{exporting ? '正在导出...' : '导出数据'}}
+    </button>
+    <view class="export-hint">导出后可分享到微信或复制到剪贴板</view>
+  </view>
+
+  <!-- ===== 数据管理 ===== -->
+  <view class="section-title">数据管理</view>
+  <view class="manage-card card">
+    <view class="mc-item" bindtap="importData">
+      <text class="mc-icon">📥</text>
+      <view class="mc-info">
+        <text class="mc-name">导入数据</text>
+        <text class="mc-desc">从 JSON 文件导入记录</text>
+      </view>
+      <text class="mc-arrow">›</text>
+    </view>
+    <view class="mc-divider"></view>
+    <view class="mc-item mc-danger" bindtap="clearData">
+      <text class="mc-icon">🗑️</text>
+      <view class="mc-info">
+        <text class="mc-name">清除所有数据</text>
+        <text class="mc-desc">永久删除所有记录，请先备份</text>
+      </view>
+      <text class="mc-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- ===== 隐私说明 ===== -->
+  <view class="privacy-note">
+    <text class="pn-icon">🔒</text>
+    <text class="pn-text">你的所有数据仅保存在本地和你的个人云开发环境中，不会上传到任何第三方服务器。</text>
+  </view>
+
+</view>

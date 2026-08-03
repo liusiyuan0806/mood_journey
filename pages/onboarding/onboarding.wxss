@@ -1,0 +1,117 @@
+/* ===== 引导页 ===== */
+
+.onboarding-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #FFF8F2 0%, #FFF0E8 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 50rpx;
+  position: relative;
+}
+
+/* 跳过 */
+.skip-btn {
+  position: absolute;
+  top: 100rpx;
+  right: 40rpx;
+  font-size: 28rpx;
+  color: #B5A69C;
+  padding: 10rpx 20rpx;
+}
+
+/* 内容 */
+.ob-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 100rpx;
+}
+.ob-icon-area {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 50rpx;
+  animation: iconBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes iconBounce {
+  0% { transform: scale(0.3); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.ob-icon {
+  font-size: 100rpx;
+}
+.ob-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  margin-bottom: 24rpx;
+  text-align: center;
+  animation: textFade 0.5s ease 0.1s backwards;
+}
+.ob-desc {
+  font-size: 28rpx;
+  color: #8B776B;
+  text-align: center;
+  line-height: 2;
+  animation: textFade 0.5s ease 0.2s backwards;
+}
+@keyframes textFade {
+  from { opacity: 0; transform: translateY(20rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 指示器 */
+.ob-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 12rpx;
+  margin-bottom: 60rpx;
+}
+.ob-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 8rpx;
+  background: #D4C4B8;
+  transition: all 0.3s ease;
+}
+.ob-dot.active {
+  height: 16rpx;
+  border-radius: 8rpx;
+}
+
+/* 按钮 */
+.ob-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30rpx;
+  margin-bottom: 80rpx;
+}
+.ob-prev {
+  font-size: 28rpx;
+  color: #B5A69C;
+  padding: 20rpx 30rpx;
+}
+.ob-next-btn {
+  flex: 1;
+  max-width: 400rpx;
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: 600;
+  border-radius: 48rpx;
+  line-height: 90rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.1);
+}
+.ob-next-btn::after {
+  border: none;
+}
+.ob-next-btn:active {
+  opacity: 0.85;
+  transform: scale(0.98);
+}

@@ -1,6 +1,10 @@
 const { moods, byName } = require('../../utils/moods');
 const { getRecords, saveRecord } = require('../../utils/store');
 const { generateWeather } = require('../../utils/weather');
+const { getBadgeStatus } = require('../../utils/achievements');
+
+// 低落情绪列表，记录这些情绪时推荐呼吸练习
+var LOW_MOODS = ['焦虑', '压力大', '烦躁', '难过', '委屈', '生气', '害怕', '孤单', '疲惫', '迷茫'];
 
 // 根据天气类型和昼夜计算 CSS class 名（WXSS 中预定义渐变）
 function getWeatherBgClass(cat, isNight) {
@@ -288,12 +292,11 @@ Page({
       '多云': 'sunny', '雷阵雨': 'stormy', '雾': 'foggy', '大风': 'windy'
     };
     const category = categoryMap[weatherText] || 'sunny';
-    const snapshot = {
-      ...this.data.weatherSnapshot,
-      weatherText,
+    const snapshot = Object.assign({}, this.data.weatherSnapshot, {
+      weatherText: weatherText,
       weatherCategory: category,
       bgClass: getWeatherBgClass(category, this.data.weatherSnapshot.isNight)
-    };
+    });
     this.setData({ weather: weatherText, weatherSnapshot: snapshot });
   },
 
@@ -433,6 +436,7 @@ Page({
 
     const recordId = this.data.id || Date.now().toString();
     const isNew = !this.data.id;
+    const selectedMood = this.data.selected;
 
     saveRecord({
       id: recordId,
@@ -443,8 +447,8 @@ Page({
       emoji: mood.emoji,
       note: this.data.note,
       weather: this.data.weather,
-      weatherText: this.data.weatherSnapshot?.weatherText || this.data.weather,
-      weatherCategory: this.data.weatherSnapshot?.weatherCategory || 'sunny',
+      weatherText: (this.data.weatherSnapshot && this.data.weatherSnapshot.weatherText) || this.data.weather,
+      weatherCategory: (this.data.weatherSnapshot && this.data.weatherSnapshot.weatherCategory) || 'sunny',
       location: this.data.location,
       triggers: this.data.triggers,
       images: this.data.images,
@@ -466,7 +470,43 @@ Page({
       wx.setStorageSync('pending_weather_impact_id', recordId);
     }
 
-    wx.showToast({ title: '已保存' });
-    setTimeout(() => wx.navigateBack(), 500);
+    // 检查徽章解锁
+    if (isNew) {
+      var allRecords = getRecords();
+      var badgeStatus = getBadgeStatus(allRecords);
+      var newlyUnlocked = badgeStatus.newlyUnlocked;
+
+      // 如果有新徽章解锁，延迟显示
+      if (newlyUnlocked.length > 0) {
+        setTimeout(function() {
+          wx.showToast({
+            title: '🎉 解锁徽章：' + newlyUnlocked[0].name,
+            icon: 'none',
+            duration: 3000
+          });
+        }, 1000);
+      }
+    }
+
+    // 低落情绪时推荐呼吸练习
+    if (isNew && LOW_MOODS.indexOf(selectedMood) >= 0) {
+      wx.showModal({
+        title: '要试试呼吸练习吗？',
+        content: '检测到你记录了「' + selectedMood + '」，3分钟的呼吸练习可以帮助你放松',
+        confirmText: '去试试',
+        cancelText: '不用了',
+        success: function(res) {
+          if (res.confirm) {
+            wx.redirectTo({ url: '/pages/breathing/breathing?exercise=478' });
+          } else {
+            wx.showToast({ title: '已保存' });
+            setTimeout(function() { wx.navigateBack(); }, 500);
+          }
+        }
+      });
+    } else {
+      wx.showToast({ title: '已保存' });
+      setTimeout(function() { wx.navigateBack(); }, 500);
+    }
   },
 });
