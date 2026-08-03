@@ -1,45 +1,194 @@
-<view class="page">
-  <view class="score card">
-    <view class="muted">情绪健康指数(EHI)</view>
-    <view class="score-line">
-      <text>{{score}}</text>
-      <text>/ 100 · {{level}}</text>
+<view class="page" bindtap="closeBarPopup">
+  <!-- ===== EHI 情绪健康指数 ===== -->
+  <view class="ehi-card card">
+    <view class="ehi-header">
+      <text class="ehi-title">情绪健康指数</text>
+      <view class="ehi-trend-badge" wx:if="{{ehiTrend}}" style="color:{{ehiTrend.up ? '#7BC97D' : '#E8856A'}};background:{{ehiTrend.up ? 'rgba(123,201,125,0.12)' : 'rgba(232,133,106,0.10)'}}">
+        <text class="ehi-trend-arrow">{{ehiTrend.up ? '↑' : '↓'}}</text>
+        <text>{{ehiTrend.diff}}</text>
+      </view>
     </view>
-    <view class="progress">
-      <view style="width: {{score+'%'}}"></view>
+
+    <view class="ehi-main">
+      <view class="ehi-score-block">
+        <text class="ehi-score" style="color:{{ehiLevelColor}}">{{ehiScore}}</text>
+        <text class="ehi-score-unit">/100</text>
+      </view>
+      <view class="ehi-level-badge" style="background:{{ehiLevelColor}}1A;color:{{ehiLevelColor}}">
+        <text>{{ehiLevelIcon}}</text>
+        <text>{{ehiLevel}}</text>
+      </view>
     </view>
-    <view class="formula">
-      情绪健康指数 = (平均分/5)×100 − 标准差×3 − 连续低谷天数×1
+
+    <!-- Gauge -->
+    <view class="gauge">
+      <view class="gauge-track">
+        <view class="gauge-zone" style="background:linear-gradient(90deg,#F5AAA6,#F0B27A);flex:40"></view>
+        <view class="gauge-zone" style="background:linear-gradient(90deg,#F0B27A,#F8E7A7);flex:20"></view>
+        <view class="gauge-zone" style="background:linear-gradient(90deg,#F8E7A7,#CDEFC7);flex:20"></view>
+        <view class="gauge-zone" style="background:linear-gradient(90deg,#CDEFC7,#B9E6C9);flex:20"></view>
+      </view>
+      <view class="gauge-pointer" style="left:{{ehiScore}}%">
+        <view class="gauge-pointer-dot" style="background:{{ehiLevelColor}}"></view>
+      </view>
+    </view>
+    <view class="gauge-labels">
+      <text class="gauge-label">关怀</text>
+      <text class="gauge-label">注意</text>
+      <text class="gauge-label">良好</text>
+      <text class="gauge-label">优秀</text>
+    </view>
+
+    <!-- Advice -->
+    <view class="ehi-advice" wx:if="{{ehiAdvice}}">
+      <text class="ehi-advice-icon">💡</text>
+      <text class="ehi-advice-text">{{ehiAdvice}}</text>
+    </view>
+
+    <!-- Breakdown toggle -->
+    <view class="ehi-toggle" bindtap="toggleBreakdown">
+      <text>{{showBreakdown ? '收起分数构成' : '查看分数构成'}}</text>
+      <text class="ehi-toggle-arrow" style="transform:rotate({{showBreakdown ? 180 : 0}}deg)">⌄</text>
+    </view>
+
+    <!-- Breakdown detail -->
+    <view class="ehi-breakdown" wx:if="{{showBreakdown}}">
+      <view wx:for="{{ehiBreakdown}}" wx:key="label" class="bd-row">
+        <view class="bd-header">
+          <text class="bd-label">{{item.label}}</text>
+          <text class="bd-value" style="color:{{item.color}}">{{item.sign}}{{item.value}}</text>
+        </view>
+        <view class="bd-bar">
+          <view class="bd-bar-fill" style="width:{{item.percent}}%;background:{{item.color}}"></view>
+        </view>
+      </view>
+      <view class="bd-formula">EHI = 均分/5×100 − 波动×3 − 低谷×1 + 连续加成</view>
     </view>
   </view>
-  <view class="tabs">
-    <text data-tab="week" bindtap="setTab" class="{{tab==='week'?'active':''}}">本周</text>
-    <text data-tab="month" bindtap="setTab" class="{{tab==='month'?'active':''}}">本月</text>
-    <text data-tab="all" bindtap="setTab" class="{{tab==='all'?'active':''}}">全部</text>
-  </view>
-  <view wx:if="{{records.length}}">
-    <view class="section-title">情绪走势</view>
-    <view class="chart card">
-      <view class="line-bars">
-        <view wx:for="{{line}}" wx:key="date" class="line-item">
-          <view class="bar-value" style="height:{{item.height}}"></view>
-          <text>{{item.date}}</text>
+
+  <!-- ===== 情绪走势 ===== -->
+    <view class="section-title-row">
+      <text class="section-title">情绪走势</text>
+      <view class="window-fixed-tag">近 7 天</view>
+    </view>
+    <text class="trend-range-text" wx:if="{{trendRange}}">{{trendRange}}</text>
+
+    <view class="chart card" bindtap="closeBarPopup">
+      <view class="trend-chart">
+        <view wx:for="{{trendBars}}" wx:key="fullDate" class="trend-bar-col {{item.empty?'trend-bar-empty':''}}" catchtap="selectBar" data-idx="{{index}}">
+          <!-- 顶部图标区：与柱身分离，避免被裁切或重叠 -->
+          <view class="trend-bar-badges">
+            <text class="tbb-weather" wx:if="{{item.weatherIcon}}">{{item.weatherIcon}}</text>
+            <text class="tbb-mood" wx:if="{{!item.empty && item.moodEmoji}}">{{item.moodEmoji}}</text>
+            <text class="tbb-empty" wx:if="{{item.empty}}">—</text>
+          </view>
+
+          <view class="trend-bar-track" style="background:{{item.weatherBgColor}};border-color:{{item.weatherBorderColor}}">
+            <view class="trend-bar-fill" style="height:{{item.height}};background:linear-gradient(180deg,{{item.moodColor}},{{item.moodColor}}AA)">
+              <text class="trend-bar-score" wx:if="{{!item.empty}}">{{item.score}}</text>
+            </view>
+            <text class="trend-rain-mark" wx:if="{{item.isRain}}">💧</text>
+            <text class="trend-snow-mark" wx:if="{{item.isSnow}}">❄️</text>
+          </view>
+
+          <text class="trend-bar-date">{{item.date}}</text>
+
+          <!-- Popup -->
+          <view class="trend-popup" wx:if="{{selectedBar === index}}" catchtap="jumpToDay" data-date="{{item.fullDate}}">
+            <view class="tp-arrow"></view>
+            <view class="tp-content">
+              <text class="tp-date">{{item.fullDate}}</text>
+              <text class="tp-mood" wx:if="{{!item.empty}}">{{item.moodEmoji}} {{item.dominantMoodName}} · {{item.score}}分</text>
+              <text class="tp-mood" wx:if="{{item.empty}}">当天暂无记录</text>
+              <text class="tp-weather">{{item.weatherIcon}} {{item.weatherKey}} · {{item.count}}条记录</text>
+              <text class="tp-hint" wx:if="{{!item.empty}}">点击查看详情</text>
+              <text class="tp-hint" wx:if="{{item.empty}}">点击去记录心情</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Chart legend: weather + mood -->
+      <view class="trend-legend">
+        <view class="tl-section">
+          <text class="tl-section-title">天气 · 外层色块</text>
+          <view class="tl-items">
+            <view class="tl-item"><view class="tl-dot" style="background:#FFE19A;border-color:rgba(255,185,80,0.70)"></view><text>晴</text></view>
+            <view class="tl-item"><view class="tl-dot" style="background:#F0C27A;border-color:rgba(215,155,60,0.70)"></view><text>多云</text></view>
+            <view class="tl-item"><view class="tl-dot" style="background:#C8C8D0;border-color:rgba(155,155,165,0.75)"></view><text>阴</text></view>
+            <view class="tl-item"><view class="tl-dot" style="background:#BBD4EE;border-color:rgba(125,165,205,0.75)"></view><text>雨</text></view>
+            <view class="tl-item"><view class="tl-dot" style="background:#D0E8F5;border-color:rgba(145,190,215,0.75)"></view><text>雪</text></view>
+          </view>
+        </view>
+        <view class="tl-section">
+          <text class="tl-section-title">心情 · 内层色柱</text>
+          <view class="tl-items">
+            <view class="tl-item"><view class="tl-dot" style="background:#B9E6C9"></view><text>开心 5分</text></view>
+            <view class="tl-item"><view class="tl-dot" style="background:#C8E5D1"></view><text>良好 4分</text></view>
+            <view class="tl-item"><view class="tl-dot" style="background:#F8E7A7"></view><text>一般 3分</text></view>
+            <view class="tl-item"><view class="tl-dot" style="background:#F7B7A5"></view><text>偏差 2分</text></view>
+            <view class="tl-item"><view class="tl-dot" style="background:#BBD4EE"></view><text>低落 1分</text></view>
+          </view>
         </view>
       </view>
     </view>
+
+    <!-- ===== 天气关联 ===== -->
     <view class="section-title">天气关联</view>
-    <view class="chart card">
-      <view wx:for="{{weather}}" wx:key="name" class="weather-row">
-        <text>{{item.name}}</text>
-        <view>
-          <view class="weather-bar" style="width:{{item.value+'%'}}"></view>
+
+    <!-- Conclusion -->
+    <view class="wc-conclusion card" wx:if="{{weatherConclusion}}">
+      <text class="wc-icon">🔍</text>
+      <text class="wc-text">{{weatherConclusion}}</text>
+    </view>
+
+    <!-- Weather group cards -->
+    <view class="weather-groups">
+      <view wx:for="{{weatherGroups}}" wx:key="name" class="wg-card card" style="background:{{item.bgColor || '#FFFFFF'}}">
+        <view class="wg-header">
+          <view class="wg-left">
+            <text class="wg-icon">{{item.icon}}</text>
+            <text class="wg-name">{{item.name}}</text>
+            <text class="wg-count">{{item.count}}条</text>
+          </view>
+          <view class="wg-right">
+            <text class="wg-score" style="color:{{item.color}}">{{item.avgScoreRaw}}</text>
+            <text class="wg-unit">/5</text>
+          </view>
         </view>
-        <text>{{item.value}}分</text>
+        <view class="wg-moods">
+          <view wx:for="{{item.topMoods}}" wx:for-item="mood" wx:key="name" class="wg-mood-tag" style="background:{{mood.color}}26">
+            <text class="wg-mood-emoji">{{mood.emoji}}</text>
+            <text class="wg-mood-pct">{{mood.percent}}%</text>
+          </view>
+        </view>
+        <view class="wg-bar">
+          <view class="wg-bar-fill" style="width:{{item.avgScore}}%;background:{{item.color}}"></view>
+        </view>
       </view>
     </view>
+
+    <!-- Temperature ranges -->
+    <view class="section-title" wx:if="{{tempRanges.length}}">温度 × 心情</view>
+    <view class="temp-card card" wx:if="{{tempRanges.length}}">
+      <view wx:for="{{tempRanges}}" wx:key="range" class="tr-row">
+        <text class="tr-range">{{item.range}}</text>
+        <view class="tr-bar-wrap">
+          <view class="tr-bar-fill" style="width:{{item.barWidth}};background:{{item.color}}"></view>
+        </view>
+        <view class="tr-right">
+          <text class="tr-score">{{item.avgScore}}</text>
+          <text class="tr-count">{{item.count}}条</text>
+        </view>
+      </view>
+      <view class="tr-hint">看看你在哪个温度区间心情最好</view>
+    </view>
+
+    <!-- Warning -->
     <view wx:if="{{warning}}" class="alert">连续 3 天情绪偏低。请给自己一点休息空间，也可以找信任的人聊聊。</view>
-  </view>
-  <view wx:else class="empty card">
+
+  <!-- Empty state -->
+  <view wx:if="{{!records.length}}" class="empty card">
     <text>记录几次心情后，这里会为你呈现专属洞察。</text>
     <button class="primary-btn" bindtap="goRecord">去记录心情</button>
   </view>

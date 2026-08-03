@@ -85,6 +85,9 @@ Page({
   },
 
   onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 1 });
+    }
     const n = new Date();
     if (!this.data.year) {
       this.setData({ year: n.getFullYear(), month: n.getMonth() + 1 });

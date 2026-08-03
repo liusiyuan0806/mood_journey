@@ -23,7 +23,12 @@ function xingkaiFont(self) {
 
 Page({
   data: { profile: null, stats: {}, shareImagePath: '', showShareModal: false, xingkaiFont: '', showWatermark: true },
-  onShow() { this.refresh(); },
+  onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 3 });
+    }
+    this.refresh();
+  },
   onLoad() { this._loadXingkaiFont(); },
 
   // 动态加载网络行楷字体（仅 HTTPS）

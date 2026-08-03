@@ -27,6 +27,7 @@
     "chooseLocation"
   ],
   "tabBar": {
+    "custom": true,
     "color": "#B5A69C",
     "selectedColor": "#E8856A",
     "backgroundColor": "#FFFFFF",
@@ -42,7 +43,7 @@
       },
       {
         "pagePath": "pages/insights/insights",
-        "text": "晴雨表"
+        "text": "情绪分析"
       },
       {
         "pagePath": "pages/profile/profile",

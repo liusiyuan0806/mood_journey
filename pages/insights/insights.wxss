@@ -1,14 +1,14 @@
-/* ===== 晴雨表 · 温暖色调 ===== */
+/* ===== 晴雨表 · 三模块优化 ===== */
 
-/* 情绪健康指数卡片 */
-.score {
-  padding: 32rpx 30rpx;
+/* ===== EHI 情绪健康指数卡片 ===== */
+.ehi-card {
+  padding: 32rpx 30rpx 24rpx;
   background: linear-gradient(135deg, #FFE8DD 0%, #FFFFFF 60%, #FFF1E6 100%);
   position: relative;
   overflow: hidden;
 }
 
-.score::before {
+.ehi-card::before {
   content: '';
   position: absolute;
   top: -40rpx;
@@ -19,57 +19,211 @@
   border-radius: 50%;
 }
 
-.score .muted {
-  font-size: 24rpx;
+.ehi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.ehi-title {
+  font-size: 26rpx;
   color: #8B776B;
   font-weight: 500;
-  margin-bottom: 8rpx;
 }
 
-.score-line {
-  margin: 12rpx 0 20rpx;
+.ehi-trend-badge {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.ehi-trend-arrow {
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.ehi-main {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin: 16rpx 0 24rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.ehi-score-block {
   display: flex;
   align-items: baseline;
+  gap: 4rpx;
 }
 
-.score-line text:first-child {
-  font-size: 76rpx;
+.ehi-score {
+  font-size: 80rpx;
   font-weight: 800;
-  color: #E8856A;
-  letter-spacing: -2rpx;
   line-height: 1;
+  letter-spacing: -2rpx;
+  transition: color 0.3s ease;
 }
 
-.score-line text:last-child {
-  margin-left: 12rpx;
-  color: #8B776B;
+.ehi-score-unit {
   font-size: 26rpx;
+  color: #B5A69C;
+  font-weight: 500;
 }
 
-/* 进度条 */
-.progress {
+.ehi-level-badge {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+/* ===== Gauge ===== */
+.gauge {
+  position: relative;
+  margin: 8rpx 0 10rpx;
+}
+
+.gauge-track {
+  display: flex;
   height: 16rpx;
+  border-radius: 8rpx;
+  overflow: hidden;
+  box-shadow: inset 0 1rpx 3rpx rgba(0,0,0,0.04);
+}
+
+.gauge-zone {
+  height: 100%;
+}
+
+.gauge-pointer {
+  position: absolute;
+  top: -8rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: left 0.5s ease;
+  z-index: 2;
+}
+
+.gauge-pointer-dot {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  border: 4rpx solid #FFFFFF;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.15);
+}
+
+.gauge-labels {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10rpx;
+}
+
+.gauge-label {
+  font-size: 20rpx;
+  color: #B5A69C;
+}
+
+/* ===== Advice ===== */
+.ehi-advice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10rpx;
+  margin-top: 20rpx;
+  padding: 16rpx 20rpx;
+  background: rgba(232, 133, 106, 0.06);
+  border-radius: 16rpx;
+}
+
+.ehi-advice-icon {
+  font-size: 26rpx;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+.ehi-advice-text {
+  font-size: 24rpx;
+  color: #6B5A50;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* ===== Breakdown toggle ===== */
+.ehi-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  margin-top: 16rpx;
+  padding: 12rpx;
+  font-size: 24rpx;
+  color: #B5A69C;
+}
+
+.ehi-toggle-arrow {
+  font-size: 24rpx;
+  transition: transform 0.3s ease;
+}
+
+/* ===== Breakdown detail ===== */
+.ehi-breakdown {
+  margin-top: 8rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #F3E6DD;
+}
+
+.bd-row {
+  margin-bottom: 16rpx;
+}
+
+.bd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6rpx;
+}
+
+.bd-label {
+  font-size: 24rpx;
+  color: #6B5A50;
+}
+
+.bd-value {
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.bd-bar {
+  height: 10rpx;
   background: #F5E6DB;
-  border-radius: 20rpx;
+  border-radius: 5rpx;
   overflow: hidden;
 }
 
-.progress view {
+.bd-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #F0B27A 0%, #E8856A 100%);
-  border-radius: 20rpx;
+  border-radius: 5rpx;
   transition: width 0.5s ease;
-  box-shadow: 0 2rpx 6rpx rgba(232, 133, 106, 0.3);
 }
 
-.formula {
+.bd-formula {
   font-size: 20rpx;
-  color: #B5A69C;
-  margin-top: 20rpx;
+  color: #C5B6AC;
+  margin-top: 12rpx;
+  text-align: center;
   line-height: 1.5;
 }
 
-/* 标签页 */
+/* ===== Tabs (preserved) ===== */
 .tabs {
   display: flex;
   justify-content: center;
@@ -96,78 +250,455 @@
   box-shadow: 0 2rpx 8rpx rgba(232, 133, 106, 0.12);
 }
 
-/* 图表卡片 */
+/* ===== Section title row ===== */
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 36rpx 0 20rpx;
+}
+
+.section-title-row .section-title {
+  margin: 0;
+}
+
+/* ===== Fixed window tag (7-day only) ===== */
+.window-fixed-tag {
+  padding: 8rpx 22rpx;
+  font-size: 22rpx;
+  color: #E8856A;
+  background: #FFF1E6;
+  border-radius: 20rpx;
+  font-weight: 600;
+  letter-spacing: 0.5rpx;
+  flex-shrink: 0;
+}
+
+.trend-range-text {
+  display: block;
+  font-size: 22rpx;
+  color: #B5A69C;
+  margin: -12rpx 0 20rpx;
+  letter-spacing: 0.5rpx;
+}
+
+/* ===== Chart card (preserved) ===== */
 .chart {
   padding: 28rpx 24rpx;
+  overflow: visible;
 }
 
-/* 柱状图 */
-.line-bars {
-  height: 240rpx;
+/* ===== Trend chart ===== */
+.trend-chart {
+  height: 300rpx;
   display: flex;
-  gap: 12rpx;
+  gap: 8rpx;
   align-items: flex-end;
-  padding-top: 20rpx;
+  position: relative;
 }
 
-.line-item {
+.trend-bar-col {
   height: 100%;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  font-size: 20rpx;
-  color: #B5A69C;
-  gap: 10rpx;
+  position: relative;
+  gap: 8rpx;
+  min-width: 0;
 }
 
-.bar-value {
-  width: 28rpx;
-  background: linear-gradient(180deg, #F0B27A 0%, #E8856A 100%);
-  border-radius: 14rpx 14rpx 4rpx 4rpx;
-  min-height: 12rpx;
-  transition: height 0.5s ease;
-  box-shadow: 0 2rpx 6rpx rgba(232, 133, 106, 0.2);
-}
-
-/* 天气关联 */
-.weather-row {
-  display: grid;
-  grid-template-columns: 60rpx 1fr 72rpx;
+.trend-bar-badges {
+  width: 100%;
+  height: 40rpx;
+  display: flex;
   align-items: center;
-  gap: 16rpx;
-  margin: 18rpx 0;
+  justify-content: center;
+  gap: 4rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tbb-weather,
+.tbb-mood,
+.tbb-empty {
   font-size: 26rpx;
+  line-height: 40rpx;
+  text-align: center;
 }
 
-.weather-row > text:first-child {
-  color: #5D4A40;
-  font-weight: 500;
+.tbb-weather {
+  opacity: 0.95;
 }
 
-.weather-row > view {
-  background: #FFF1E6;
-  border-radius: 10rpx;
-  height: 20rpx;
+.tbb-mood {
+  opacity: 0.9;
+}
+
+.tbb-empty {
+  font-size: 22rpx;
+  color: #C5B6AC;
+}
+
+.trend-bar-track {
+  width: 100%;
+  flex: 1;
+  min-height: 60rpx;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-radius: 12rpx;
+  position: relative;
+  max-width: 56rpx;
+  margin: 0 auto;
+  border: 2rpx solid;
+  box-sizing: border-box;
   overflow: hidden;
 }
 
-.weather-bar {
+.trend-bar-empty .trend-bar-track {
+  background: rgba(240,240,240,0.55) !important;
+  border-color: rgba(210,210,210,0.70) !important;
+}
+
+.trend-bar-empty .trend-bar-fill {
+  display: none;
+}
+
+.trend-bar-empty .tbb-empty {
+  color: #C5B6AC;
+  font-size: 22rpx;
+  line-height: 40rpx;
+}
+
+.trend-bar-fill {
+  width: 100%;
+  border-radius: 8rpx 8rpx 4rpx 4rpx;
+  min-height: 12rpx;
+  transition: height 0.4s ease;
+  box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.06);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 4rpx;
+}
+
+.trend-bar-score {
+  font-size: 18rpx;
+  color: #FFFFFF;
+  font-weight: 700;
+  text-shadow: 0 1rpx 2rpx rgba(0,0,0,0.15);
+}
+
+.trend-rain-mark,
+.trend-snow-mark {
+  position: absolute;
+  top: -18rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20rpx;
+}
+
+.trend-bar-date {
+  font-size: 18rpx;
+  color: #B5A69C;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ===== Trend popup ===== */
+.trend-popup {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 14rpx;
+  z-index: 20;
+  width: 240rpx;
+}
+
+.tp-arrow {
+  position: absolute;
+  bottom: -10rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12rpx solid transparent;
+  border-right: 12rpx solid transparent;
+  border-top: 10rpx solid #FFFFFF;
+}
+
+.tp-content {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.12);
+  padding: 16rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.tp-date {
+  font-size: 22rpx;
+  color: #B5A69C;
+  font-weight: 500;
+}
+
+.tp-mood {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #4A3A32;
+}
+
+.tp-weather {
+  font-size: 22rpx;
+  color: #6B5A50;
+}
+
+.tp-hint {
+  font-size: 20rpx;
+  color: #E8856A;
+  margin-top: 4rpx;
+}
+
+/* ===== Trend legend ===== */
+.trend-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #F3E6DD;
+}
+
+.tl-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.tl-section-title {
+  font-size: 22rpx;
+  color: #8B776B;
+  font-weight: 600;
+}
+
+.tl-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx 18rpx;
+}
+
+.tl-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.tl-dot {
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: 5rpx;
+  border: 2rpx solid transparent;
+  box-shadow: inset 0 0 0 1rpx rgba(0,0,0,0.04);
+}
+
+.tl-item text {
+  font-size: 22rpx;
+  color: #6B5A50;
+}
+
+/* ===== Weather conclusion ===== */
+.wc-conclusion {
+  display: flex;
+  align-items: flex-start;
+  gap: 10rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 20rpx;
+  background: linear-gradient(135deg, rgba(232,133,106,0.06) 0%, rgba(255,241,230,0.6) 100%);
+  border: 1rpx solid rgba(232,133,106,0.1);
+}
+
+.wc-icon {
+  font-size: 28rpx;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+.wc-text {
+  font-size: 25rpx;
+  color: #5D4A40;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* ===== Weather group cards ===== */
+.weather-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.wg-card {
+  padding: 22rpx 24rpx;
+  transition: transform 0.15s ease;
+}
+
+.wg-card:active {
+  transform: scale(0.98);
+}
+
+.wg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wg-left {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.wg-icon {
+  font-size: 32rpx;
+}
+
+.wg-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3A32;
+}
+
+.wg-count {
+  font-size: 22rpx;
+  color: #B5A69C;
+  background: rgba(255,255,255,0.6);
+  padding: 2rpx 12rpx;
+  border-radius: 16rpx;
+}
+
+.wg-right {
+  display: flex;
+  align-items: baseline;
+  gap: 2rpx;
+}
+
+.wg-score {
+  font-size: 40rpx;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.wg-unit {
+  font-size: 22rpx;
+  color: #B5A69C;
+}
+
+.wg-moods {
+  display: flex;
+  gap: 10rpx;
+  margin: 14rpx 0 12rpx;
+  flex-wrap: wrap;
+}
+
+.wg-mood-tag {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 20rpx;
+}
+
+.wg-mood-emoji {
+  font-size: 22rpx;
+}
+
+.wg-mood-pct {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #5D4A40;
+}
+
+.wg-bar {
+  height: 8rpx;
+  background: #F5E6DB;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.wg-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #F0B27A, #E8856A);
+  border-radius: 4rpx;
+  transition: width 0.5s ease;
+}
+
+/* ===== Temperature ranges ===== */
+.temp-card {
+  padding: 24rpx;
+}
+
+.tr-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin: 16rpx 0;
+}
+
+.tr-range {
+  font-size: 24rpx;
+  color: #5D4A40;
+  font-weight: 500;
+  width: 120rpx;
+  flex-shrink: 0;
+}
+
+.tr-bar-wrap {
+  flex: 1;
+  height: 20rpx;
+  background: #FFF1E6;
+  border-radius: 10rpx;
+  overflow: hidden;
+}
+
+.tr-bar-fill {
+  height: 100%;
   border-radius: 10rpx;
   transition: width 0.5s ease;
 }
 
-.weather-row > text:last-child {
-  text-align: right;
-  color: #E8856A;
-  font-weight: 600;
-  font-size: 24rpx;
+.tr-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 80rpx;
+  flex-shrink: 0;
 }
 
-/* 警告提示 */
+.tr-score {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  line-height: 1.2;
+}
+
+.tr-count {
+  font-size: 18rpx;
+  color: #B5A69C;
+}
+
+.tr-hint {
+  font-size: 22rpx;
+  color: #B5A69C;
+  text-align: center;
+  margin-top: 16rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid #F3E6DD;
+}
+
+/* ===== Alert (preserved) ===== */
 .alert {
   background: linear-gradient(135deg, #FFF1E9 0%, #FFE8DD 100%);
   color: #B86B4E;
@@ -190,7 +721,7 @@
   font-size: 28rpx;
 }
 
-/* 空状态 */
+/* ===== Empty state (preserved) ===== */
 .empty {
   margin-top: 80rpx;
   padding: 50rpx 30rpx;

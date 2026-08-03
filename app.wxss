@@ -10,7 +10,7 @@ page {
 
 /* ===== 通用容器 ===== */
 .page {
-  padding: 28rpx 30rpx 60rpx;
+  padding: 28rpx 30rpx 180rpx;
   box-sizing: border-box;
   min-height: 100vh;
 }
