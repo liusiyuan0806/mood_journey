@@ -10,6 +10,10 @@ Page({
     shareText: ''
   },
 
+  onLoad() {
+    this.loadTree();
+  },
+
   onShow() {
     this.loadTree();
   },

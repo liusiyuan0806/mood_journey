@@ -111,7 +111,7 @@
   height: 580rpx;
   overflow: hidden;
   border-radius: 28rpx;
-  background: linear-gradient(180deg, #C8E5F0 0%, #E8F4F8 40%, #FFF8F0 70%, #F0E8D8 100%);
+  background: linear-gradient(180deg, #E8F6FC 0%, #F5FBFD 45%, #FFF9F5 75%, #F5EDE4 100%);
   box-shadow: 0 8rpx 28rpx rgba(200, 130, 90, 0.10);
 }
 
@@ -121,51 +121,123 @@
   top: 0; left: 0; right: 0;
   height: 70%;
   background: linear-gradient(180deg, #B8DCEF 0%, #D4EAF5 60%, transparent 100%);
+  z-index: 1;
 }
 
-/* 云 */
+/* 首页风格动态云朵：椭圆主体 + 模糊云瓣 */
 .cloud {
   position: absolute;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 50rpx;
-  animation: cloudDrift 20s linear infinite;
+  pointer-events: none;
+  animation: cloudFloat linear infinite;
+  filter: blur(4rpx);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  z-index: 2;
 }
-.cloud-a {
-  top: 60rpx;
-  left: 40rpx;
-  width: 100rpx;
-  height: 30rpx;
-  animation-duration: 25s;
-}
-.cloud-b {
-  top: 100rpx;
-  right: 60rpx;
-  width: 80rpx;
-  height: 24rpx;
-  animation-duration: 30s;
-  animation-direction: reverse;
-}
-@keyframes cloudDrift {
-  0% { transform: translateX(0); }
-  50% { transform: translateX(30rpx); }
-  100% { transform: translateX(0); }
+.cloud::before,
+.cloud::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: inherit;
+  filter: blur(10rpx);
+  opacity: 0.8;
 }
 
-/* 太阳 */
+/* 云朵1 - 左上方大朵 */
+.cloud-1 {
+  width: 120rpx;
+  height: 48rpx;
+  top: 64rpx;
+  left: 56rpx;
+  animation-duration: 28s;
+  animation-delay: 0s;
+}
+.cloud-1::before {
+  width: 70rpx; height: 70rpx;
+  top: -34rpx; left: 18rpx;
+}
+.cloud-1::after {
+  width: 52rpx; height: 52rpx;
+  top: -24rpx; left: 62rpx;
+}
+
+/* 云朵2 - 右上方小朵 */
+.cloud-2 {
+  width: 84rpx;
+  height: 34rpx;
+  top: 108rpx;
+  right: 64rpx;
+  animation-duration: 22s;
+  animation-delay: 5s;
+}
+.cloud-2::before {
+  width: 48rpx; height: 48rpx;
+  top: -24rpx; left: 12rpx;
+}
+.cloud-2::after {
+  width: 36rpx; height: 36rpx;
+  top: -16rpx; left: 44rpx;
+}
+
+@keyframes cloudFloat {
+  0%   { transform: translateX(0) translateY(0); }
+  25%  { transform: translateX(12rpx) translateY(-4rpx); }
+  50%  { transform: translateX(20rpx) translateY(2rpx); }
+  75%  { transform: translateX(8rpx) translateY(-2rpx); }
+  100% { transform: translateX(0) translateY(0); }
+}
+
+/* 太阳 + 橙色光晕 */
 .sun {
   position: absolute;
   top: 40rpx;
-  right: 60rpx;
-  width: 60rpx;
-  height: 60rpx;
+  right: 66rpx;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.sun-core {
+  position: absolute;
+  width: 52rpx;
+  height: 52rpx;
   border-radius: 50%;
-  background: radial-gradient(circle, #FFE19A 30%, #FFD060 70%, transparent 100%);
-  box-shadow: 0 0 40rpx rgba(255, 209, 102, 0.5);
+  background: radial-gradient(circle at 35% 35%, #FFF8E1 0%, #FFE082 45%, #FFB74D 100%);
+  box-shadow: 0 0 16rpx rgba(255, 183, 77, 0.8);
   animation: sunPulse 4s ease-in-out infinite;
+  z-index: 2;
+}
+.sun-halo {
+  position: absolute;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 183, 77, 0.55) 0%, rgba(255, 167, 38, 0.25) 50%, transparent 70%);
+  animation: haloPulse 4s ease-in-out infinite;
+  z-index: 1;
 }
 @keyframes sunPulse {
-  0%, 100% { transform: scale(1); opacity: 0.9; }
+  0%, 100% { transform: scale(1); opacity: 0.95; }
   50% { transform: scale(1.08); opacity: 1; }
+}
+@keyframes haloPulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+/* 情绪树背景图（image 组件） */
+.tree-bg {
+  position: absolute;
+  left: 50%;
+  bottom: 80rpx;
+  transform: translateX(-50%);
+  width: 480rpx;
+  height: 480rpx;
+  pointer-events: none;
+  z-index: 5;
 }
 
 /* 地面 */
@@ -176,6 +248,7 @@
   right: 0;
   height: 120rpx;
   background: linear-gradient(180deg, transparent 0%, #D4C4A8 20%, #C4B098 100%);
+  z-index: 3;
 }
 .grass {
   position: absolute;
@@ -188,58 +261,6 @@
   transform: scaleY(0.6);
 }
 
-/* 树干 */
-.trunk {
-  position: absolute;
-  bottom: 100rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 24rpx;
-  background: linear-gradient(90deg, #8B6F47 0%, #A0825A 50%, #8B6F47 100%);
-  border-radius: 4rpx;
-  min-height: 40rpx;
-  transition: height 0.8s ease;
-  box-shadow: 2rpx 0 4rpx rgba(0,0,0,0.1);
-}
-
-/* 树枝 (使用伪元素方式, 通过 view 模拟) */
-.branches {
-  position: absolute;
-  bottom: 100rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 300rpx;
-  height: 300rpx;
-  pointer-events: none;
-}
-.branch {
-  position: absolute;
-  background: linear-gradient(90deg, #8B6F47, #A0825A);
-  border-radius: 4rpx;
-  transform-origin: center bottom;
-}
-
-/* 树叶 */
-.leaves {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-.leaf {
-  position: absolute;
-  background: radial-gradient(circle, #8FBC5A 40%, #7BAB4A 80%);
-  border-radius: 50% 0 50% 50%;
-  opacity: 0.85;
-  animation: leafGrow 0.6s ease-out backwards;
-}
-@keyframes leafGrow {
-  0% { transform: scale(0) rotate(0deg); opacity: 0; }
-  100% { opacity: 0.85; }
-}
-
 /* 心情果实 */
 .fruits {
   position: absolute;
@@ -247,6 +268,11 @@
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: 10;
+  pointer-events: none;
+}
+.fruits .fruit {
+  pointer-events: auto;
 }
 .fruit {
   position: absolute;

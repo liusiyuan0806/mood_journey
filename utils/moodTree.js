@@ -5,17 +5,40 @@
  */
 
 var { byName } = require('./moods');
-var { dateKey } = require('./store');
+
+// 画布常量（设计基准 750rpx）
+var CANVAS_W = 750;
+var CANVAS_H = 580;
+
+// 背景图树冠区域（基于 image/tree-bg.png 的 480x480 透明树图，居中放置）
+var BG_W = 480;
+var BG_H = 480;
+var BG_LEFT = (CANVAS_W - BG_W) / 2; // 135
+var BG_TOP = 20; // 背景图顶部距 canvas 顶部
+var BG_BOTTOM = BG_TOP + BG_H; // 500
+
+// 树冠在背景图中的大致区域（相对背景图左上角）
+// 新树冠更宽更扁：中心偏上，水平半径大，垂直半径小
+var CROWN_REL_CX = BG_W / 2; // 240
+var CROWN_REL_CY = 175; // 树冠中心相对背景图顶部
+var CROWN_REL_RX = 220; // 树冠水平半径
+var CROWN_REL_RY = 130; // 树冠垂直半径
+
+// 转换为绝对 canvas 坐标
+var CROWN_CX = BG_LEFT + CROWN_REL_CX; // 375
+var CROWN_CY = BG_TOP + CROWN_REL_CY; // 195
+var CROWN_RX = CROWN_REL_RX; // 220
+var CROWN_RY = CROWN_REL_RY; // 130
 
 // 树的等级配置
 var TREE_LEVELS = [
-  { level: 0, name: '种子', minRecords: 0, trunkHeight: 40, branchCount: 0, leafCount: 0, color: '#D4A574' },
-  { level: 1, name: '嫩芽', minRecords: 1, trunkHeight: 60, branchCount: 2, leafCount: 3, color: '#8FBC5A' },
-  { level: 2, name: '小树苗', minRecords: 5, trunkHeight: 90, branchCount: 4, leafCount: 8, color: '#7BAB4A' },
-  { level: 3, name: '小树', minRecords: 15, trunkHeight: 120, branchCount: 6, leafCount: 15, color: '#6B9B3A' },
-  { level: 4, name: '成长树', minRecords: 30, trunkHeight: 150, branchCount: 8, leafCount: 25, color: '#5B8B2A' },
-  { level: 5, name: '繁茂之树', minRecords: 50, trunkHeight: 170, branchCount: 10, leafCount: 35, color: '#4B7B1A' },
-  { level: 6, name: '智慧之树', minRecords: 100, trunkHeight: 180, branchCount: 12, leafCount: 50, color: '#3B6B0A' }
+  { level: 0, name: '种子', minRecords: 0, fruitScale: 0.0, color: '#D4A574' },
+  { level: 1, name: '嫩芽', minRecords: 1, fruitScale: 0.82, color: '#8FBC5A' },
+  { level: 2, name: '小树苗', minRecords: 5, fruitScale: 0.88, color: '#7BAB4A' },
+  { level: 3, name: '小树', minRecords: 15, fruitScale: 0.94, color: '#6B9B3A' },
+  { level: 4, name: '成长树', minRecords: 30, fruitScale: 1.0, color: '#5B8B2A' },
+  { level: 5, name: '繁茂之树', minRecords: 50, fruitScale: 1.04, color: '#4B7B1A' },
+  { level: 6, name: '智慧之树', minRecords: 100, fruitScale: 1.08, color: '#3B6B0A' }
 ];
 
 // 获取树的当前等级
@@ -64,6 +87,9 @@ function seededRandom(seed) {
 
 // 生成果实数据
 function generateFruits(records) {
+  var level = getTreeLevel(records);
+  var scale = level.fruitScale || 0.82;
+
   // 取最近的记录生成果实（最多50颗，避免过密）
   var maxFruits = 50;
   var recentRecords = records.slice(-maxFruits);
@@ -73,27 +99,31 @@ function generateFruits(records) {
     var noteLen = (r.note || '').length;
     var seed = parseInt((r.id || '').replace(/[^0-9]/g, '').slice(0, 8)) || idx * 1000 + 1;
 
-    // 果实位置：基于种子在树冠区域随机分布
+    // 果实位置：在树冠椭圆内均匀分布
     var angle = seededRandom(seed) * Math.PI * 2;
-    var radius = 30 + seededRandom(seed + 1) * 60;
-    var cx = 150 + Math.cos(angle) * radius;
-    var cy = 100 + Math.sin(angle) * radius * 0.7;
+    var maxRadiusX = CROWN_RX * scale * 0.85;
+    var maxRadiusY = CROWN_RY * scale * 0.85;
+    var t = Math.sqrt(seededRandom(seed + 1));
+    var cx = Math.round(CROWN_CX + Math.cos(angle) * maxRadiusX * t);
+    var cy_ = Math.round(CROWN_CY + Math.sin(angle) * maxRadiusY * t);
 
-    // 果实大小：笔记字数影响（10-26rpx）
-    var size = 10 + Math.min(16, noteLen / 10);
+    // 避免果实沉到树冠主体底部以下（树干顶部约 y=390）
+    var minY = CROWN_CY - CROWN_RY * scale * 0.85;
+    var maxY = CROWN_CY + CROWN_RY * scale * 0.45;
+    cy_ = Math.max(minY, Math.min(maxY, cy_));
 
-    // 果实颜色：情绪分值映射
-    var color = moodInfo.color;
+    // 果实大小：笔记字数影响（10-28rpx）
+    var size = (10 + Math.min(16, noteLen / 10)) * scale;
 
     // 是否有笔记（决定果实是否有光泽）
-    hasNote = noteLen > 0;
+    var hasNote = noteLen > 0;
 
     return {
       id: r.id,
-      cx: Math.round(cx),
-      cy: Math.round(cy),
+      cx: cx,
+      cy: cy_,
       r: Math.round(size),
-      color: color,
+      color: moodInfo.color,
       emoji: moodInfo.emoji,
       moodName: r.mood,
       score: moodInfo.score,
@@ -107,72 +137,10 @@ function generateFruits(records) {
   });
 }
 
-// 生成树枝路径（SVG path）
-function generateBranches(level) {
-  var branches = [];
-  var trunkH = level.trunkHeight;
-  var cx = 150; // 树干中心 x
-  var baseY = 300; // 树干底部 y
-
-  // 主干
-  branches.push({
-    type: 'trunk',
-    d: 'M ' + cx + ' ' + baseY + ' Q ' + (cx - 3) + ' ' + (baseY - trunkH / 2) + ' ' + cx + ' ' + (baseY - trunkH),
-    width: Math.max(4, trunkH / 20)
-  });
-
-  // 侧枝
-  var branchCount = level.branchCount;
-  for (var i = 0; i < branchCount; i++) {
-    var t = (i + 1) / (branchCount + 1);
-    var by = baseY - trunkH * t;
-    var side = i % 2 === 0 ? -1 : 1;
-    var spread = 30 + seededRandom(i * 100 + 7) * 40;
-    var len = 30 + seededRandom(i * 100 + 3) * 30;
-    var endX = cx + side * spread;
-    var endY = by - len;
-    var ctrlX = cx + side * spread * 0.5;
-    var ctrlY = by - len * 0.3;
-
-    branches.push({
-      type: 'branch',
-      d: 'M ' + cx + ' ' + by + ' Q ' + ctrlX + ' ' + ctrlY + ' ' + endX + ' ' + endY,
-      width: Math.max(2, trunkH / 30)
-    });
-  }
-
-  return branches;
-}
-
-// 生成树叶位置
-function generateLeaves(level) {
-  var leaves = [];
-  var count = level.leafCount;
-  for (var i = 0; i < count; i++) {
-    var angle = seededRandom(i * 50 + 11) * Math.PI * 2;
-    var radius = 20 + seededRandom(i * 50 + 22) * 70;
-    var x = 150 + Math.cos(angle) * radius;
-    var y = 200 + Math.sin(angle) * radius * 0.6;
-    var size = 6 + seededRandom(i * 50 + 33) * 6;
-    var rotation = seededRandom(i * 50 + 44) * 360;
-
-    leaves.push({
-      x: Math.round(x),
-      y: Math.round(y),
-      size: Math.round(size),
-      rotation: Math.round(rotation),
-      delay: i * 0.03
-    });
-  }
-  return leaves;
-}
-
 // 生成完整的树数据
 function generateTreeData(records) {
   var level = getTreeLevel(records);
   var progress = getProgressToNext(records);
-  var branches = generateBranches(level);
-  var leaves = generateLeaves(level);
   var fruits = generateFruits(records);
 
   // 统计果实颜色分布
@@ -192,8 +160,6 @@ function generateTreeData(records) {
   return {
     level: level,
     progress: progress,
-    branches: branches,
-    leaves: leaves,
     fruits: fruits,
     moodList: moodList,
     totalRecords: records.length,
@@ -207,7 +173,5 @@ module.exports = {
   getNextLevel: getNextLevel,
   getProgressToNext: getProgressToNext,
   generateFruits: generateFruits,
-  generateBranches: generateBranches,
-  generateLeaves: generateLeaves,
   generateTreeData: generateTreeData
 };

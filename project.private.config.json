@@ -2,7 +2,7 @@
   "libVersion": "3.17.0",
   "projectname": "mood_journey",
   "setting": {
-    "urlCheck": true,
+    "urlCheck": false,
     "coverView": false,
     "lazyloadPlaceholderEnable": false,
     "skylineRenderEnable": false,
@@ -15,7 +15,7 @@
     "showES6CompileOption": false,
     "compileHotReLoad": true,
     "checkInvalidKey": true,
-    "ignoreDevUnusedFiles": true,
+    "ignoreDevUnusedFiles": false,
     "bigPackageSizeSupport": false
   }
 }

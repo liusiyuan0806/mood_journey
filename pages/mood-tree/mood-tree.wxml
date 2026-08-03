@@ -47,38 +47,23 @@
 
       <!-- 天空背景 -->
       <view class="sky-bg"></view>
-      <view class="cloud cloud-a"></view>
-      <view class="cloud cloud-b"></view>
 
-      <!-- 太阳/月亮 -->
-      <view class="sun"></view>
+      <!-- 首页风格动态云朵 -->
+      <view class="cloud cloud-1"></view>
+      <view class="cloud cloud-2"></view>
+
+      <!-- 太阳 + 橙色光晕 -->
+      <view class="sun">
+        <view class="sun-halo"></view>
+        <view class="sun-core"></view>
+      </view>
+
+      <!-- 情绪树背景图（用 image 组件，小程序不支持 WXSS 本地背景图） -->
+      <image class="tree-bg" src="/image/tree-bg.png" mode="aspectFit" lazy-load="false" />
 
       <!-- 地面 -->
       <view class="ground">
         <view class="grass"></view>
-      </view>
-
-      <!-- 树干 -->
-      <view class="trunk" style="height:{{tree.level.trunkHeight}}rpx"></view>
-
-      <!-- 树枝 -->
-      <view class="branches">
-        <view 
-          wx:for="{{tree.branches}}" 
-          wx:key="index"
-          class="branch branch-{{index}}"
-          style="{{item.type === 'trunk' ? '' : ''}}"
-        ></view>
-      </view>
-
-      <!-- 树叶 -->
-      <view class="leaves">
-        <view
-          wx:for="{{tree.leaves}}"
-          wx:key="index"
-          class="leaf"
-          style="left:{{item.x}}rpx;top:{{item.y}}rpx;width:{{item.size}}rpx;height:{{item.size * 0.7}}rpx;transform:rotate({{item.rotation}}deg);animation-delay:{{item.delay}}s"
-        ></view>
       </view>
 
       <!-- 心情果实 -->
@@ -87,7 +72,7 @@
           wx:for="{{tree.fruits}}"
           wx:key="id"
           class="fruit {{item.hasNote ? 'fruit-glow' : ''}}"
-          style="left:{{item.cx}}rpx;top:{{item.cy}}rpx;width:{{item.r * 2}}rpx;height:{{item.r * 2}}rpx;background:{{item.color}};animation-delay:{{item.delay}}s"
+          style="left:{{item.cx - item.r}}rpx;top:{{item.cy - item.r}}rpx;width:{{item.r * 2}}rpx;height:{{item.r * 2}}rpx;background:{{item.color}};animation-delay:{{item.delay}}s"
           data-id="{{item.id}}"
           bindtap="tapFruit"
         >
