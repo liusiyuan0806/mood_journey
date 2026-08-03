@@ -104,6 +104,7 @@ Page({
       wx.switchTab({ url: '/pages/home/home' });
     }
   },
+  goWeatherPersonality() { wx.navigateTo({ url: '/pages/weather-personality/weather-personality' }); },
   clear() {
     wx.showModal({
       title: '清除数据', content: '所有心情记录将被永久清除。',

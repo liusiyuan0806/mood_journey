@@ -15,7 +15,8 @@
     "pages/breathing/breathing",
     "pages/data-export/data-export",
     "pages/onboarding/onboarding",
-    "pages/empathy-wall/empathy-wall"
+    "pages/empathy-wall/empathy-wall",
+    "pages/weather-personality/weather-personality"
   ],
   "window": {
     "navigationBarTitleText": "情绪手账",

@@ -57,6 +57,8 @@
   <view class="menu card">
     <view bindtap="goFavorites">我收藏的句子  <text>›</text></view>
     <view bindtap="goWeatherMood">天气心情地图  <text>›</text></view>
+    <view bindtap="goWeatherPersonality">天气心情人格  <text>›</text></view>
+    <view bindtap="report">生成本周情绪报告 <text>›</text></view>
     <view bindtap="generateShareCard">生成分享卡片 <text>›</text></view>
     <view bindtap="goDataExport">数据导出与备份 <text>›</text></view>
     <view class="watermark-toggle" bindtap="toggleWatermark">

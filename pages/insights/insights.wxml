@@ -168,20 +168,122 @@
       </view>
     </view>
 
-    <!-- Temperature ranges -->
-    <view class="section-title" wx:if="{{tempRanges.length}}">温度 × 心情</view>
-    <view class="temp-card card" wx:if="{{tempRanges.length}}">
-      <view wx:for="{{tempRanges}}" wx:key="range" class="tr-row">
-        <text class="tr-range">{{item.range}}</text>
-        <view class="tr-bar-wrap">
-          <view class="tr-bar-fill" style="width:{{item.barWidth}};background:{{item.color}}"></view>
-        </view>
-        <view class="tr-right">
-          <text class="tr-score">{{item.avgScore}}</text>
-          <text class="tr-count">{{item.count}}条</text>
+    <!-- ===== 天气 × 温度 × 心情 深度关联 ===== -->
+    <view class="section-title" wx:if="{{heatStripHasData || radarHasData}}">天气 × 温度 × 心情</view>
+
+    <!-- Chart 1: 温度区间心情热力带 -->
+    <view class="temp-heat-card card" wx:if="{{heatStripHasData}}">
+      <view class="th-header">
+        <text class="th-title">📊 温度区间心情热力带</text>
+        <view class="th-badges">
+          <text wx:if="{{heatBest}}" class="th-badge th-best">最佳 {{heatBest.label}}</text>
+          <text wx:if="{{heatAttention}}" class="th-badge th-attention">注意 {{heatAttention.label}}</text>
         </view>
       </view>
-      <view class="tr-hint">看看你在哪个温度区间心情最好</view>
+
+      <view class="chart-explain">横轴是温度（-10°C 到 40°C），每段颜色代表该温度区间的心情均分——暖色（橙黄）= 心情好，冷色（蓝绿）= 心情差。一眼看出你在哪个温度最开心。</view>
+
+      <view class="th-strip">
+        <view wx:for="{{heatStrip}}" wx:key="label" class="th-segment {{item.count===0?'th-empty':''}}" style="background:{{item.color}}" catchtap="showHeatSegment" data-idx="{{index}}">
+          <text class="th-seg-score" wx:if="{{item.count>0}}">{{item.avgScore}}</text>
+        </view>
+      </view>
+
+      <view class="th-scale">
+        <text>-10</text>
+        <text>0</text>
+        <text>10</text>
+        <text>20</text>
+        <text>30</text>
+        <text>40°C</text>
+      </view>
+      <view class="th-hint">点击色块查看该温度区间的记录</view>
+    </view>
+
+    <!-- Chart 2: 天气心情雷达图 -->
+    <view class="radar-card card" wx:if="{{radarHasData}}">
+      <text class="radar-title">📡 天气心情雷达图</text>
+
+      <view class="chart-explain">六个方向代表六种天气，越往外说明该天气下心情越好。橙色实线是你的实际心情，灰色虚线是整体平均。形状越饱满说明你各天气下越稳定，凹陷的方向就是你的"软肋"。</view>
+
+      <view class="radar-chart-area">
+        <canvas type="2d" id="radarCanvas" class="radar-canvas"></canvas>
+
+        <!-- Vertex labels -->
+        <view wx:for="{{radarVertices}}" wx:key="name" class="radar-label {{item.insufficient ? 'rl-insufficient' : ''}}" style="left:{{item.labelLeft}};top:{{item.labelTop}}" catchtap="showRadarVertex" data-idx="{{index}}">
+          <view class="rl-icon-row">
+            <text class="rl-icon">{{item.icon}}</text>
+            <text class="rl-name">{{item.name}}</text>
+          </view>
+          <text class="rl-count" wx:if="{{item.count > 0}}">{{item.count}}条 · {{item.avgScore}}</text>
+          <text class="rl-count" wx:else>暂无</text>
+        </view>
+      </view>
+
+      <!-- Radar legend -->
+      <view class="radar-legend">
+        <view class="rleg-item"><view class="rleg-line rleg-solid"></view><text>你的心情</text></view>
+        <view class="rleg-item"><view class="rleg-line rleg-dash"></view><text>整体平均 {{radarAvgScore}}</text></view>
+        <text class="rleg-hint">点击顶点查看该天气的心情分布</text>
+      </view>
+    </view>
+
+    <!-- Personalized conclusion -->
+    <view class="temp-conclusion-card card" wx:if="{{tempMoodConclusion}}">
+      <view class="tcc-header">
+        <text class="tcc-icon">🎯</text>
+        <text class="tcc-title">你的天气心情画像</text>
+      </view>
+      <text class="tcc-text">{{tempMoodConclusion}}</text>
+    </view>
+
+    <!-- Heat segment popup -->
+    <view class="temp-popup-mask" wx:if="{{heatSegmentPopup}}" catchtap="closeBarPopup">
+      <view class="temp-popup" catchtap="noop">
+        <view class="tp-header">
+          <text class="tp-title">{{heatSegmentPopup.label}} · 均分 {{heatSegmentPopup.avgScore}}</text>
+          <text class="tp-close" catchtap="closeBarPopup">✕</text>
+        </view>
+        <scroll-view scroll-y class="tp-scroll">
+          <view wx:for="{{heatSegmentPopup.records}}" wx:key="id" class="tp-record">
+            <text class="tp-emoji">{{item.emoji}}</text>
+            <view class="tp-info">
+              <text class="tp-line1">{{item.date}} · {{item.weather}} · {{item.temp}}°C</text>
+              <text class="tp-line2" wx:if="{{item.note}}">{{item.note}}</text>
+            </view>
+            <text class="tp-score">{{item.score}}分</text>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+
+    <!-- Radar vertex popup -->
+    <view class="temp-popup-mask" wx:if="{{radarPopup}}" catchtap="closeBarPopup">
+      <view class="temp-popup" catchtap="noop">
+        <view class="tp-header">
+          <text class="tp-title">{{radarPopup.icon}} {{radarPopup.name}}天 · 均分 {{radarPopup.avgScore}} · {{radarPopup.count}}条</text>
+          <text class="tp-close" catchtap="closeBarPopup">✕</text>
+        </view>
+
+        <view class="rp-moods" wx:if="{{radarPopup.topMoods.length}}">
+          <view wx:for="{{radarPopup.topMoods}}" wx:key="name" class="rp-mood-tag" style="background:{{item.color}}26">
+            <text class="rp-mood-emoji">{{item.emoji}}</text>
+            <text class="rp-mood-name">{{item.name}}</text>
+            <text class="rp-mood-pct">{{item.percent}}%</text>
+          </view>
+        </view>
+
+        <scroll-view scroll-y class="tp-scroll">
+          <view wx:for="{{radarPopup.records}}" wx:key="id" class="tp-record">
+            <text class="tp-emoji">{{item.emoji}}</text>
+            <view class="tp-info">
+              <text class="tp-line1">{{item.date}} · {{item.weather}}{{item.temp != null ? ' · ' + item.temp + '°C' : ''}}</text>
+              <text class="tp-line2" wx:if="{{item.note}}">{{item.note}}</text>
+            </view>
+            <text class="tp-score">{{item.score}}分</text>
+          </view>
+        </scroll-view>
+      </view>
     </view>
 
     <!-- 情绪预测 -->

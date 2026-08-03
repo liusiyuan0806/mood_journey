@@ -1,0 +1,156 @@
+<view class="page">
+  <!-- 无数据状态 -->
+  <view class="empty-state" wx:if="{{!hasData}}">
+    <text class="empty-emoji">🌤️</text>
+    <text class="empty-title">还没有足够的数据</text>
+    <text class="empty-desc">记录几天心情和天气后，\n就能生成你的专属天气心情人格啦</text>
+    <view class="empty-btn" bindtap="goRecord">去记录心情</view>
+  </view>
+
+  <!-- 有数据 -->
+  <block wx:if="{{hasData}}">
+    <!-- 标题区 -->
+    <view class="header">
+      <text class="header-title">天气心情人格</text>
+      <text class="header-sub">基于 {{totalRecords}} 条记录分析</text>
+    </view>
+
+    <!-- Swiper 卡片 -->
+    <swiper class="card-swiper" indicator-dots="{{true}}" indicator-active-color="#E8856A" indicator-color="rgba(232,133,106,0.2)" current="{{currentSlide}}" bindchange="onSwiperChange" circular="{{false}}">
+
+      <!-- Slide 1: 人格标签 + 描述 -->
+      <swiper-item>
+        <view class="personality-card" style="background:{{personality.bgGradient}}">
+          <view class="pc-emoji-circle" style="border-color:{{personality.color}}">
+            <text class="pc-emoji">{{personality.emoji}}</text>
+          </view>
+          <text class="pc-tag" style="color:{{personality.color}}">{{personality.tag}}</text>
+          <text class="pc-nickname">{{nickname}}</text>
+          <view class="pc-divider" style="background:{{personality.color}}30"></view>
+          <text class="pc-desc">{{personality.desc}}</text>
+          <view class="pc-hint">
+            <text>← 左右滑动查看更多维度 →</text>
+          </view>
+        </view>
+      </swiper-item>
+
+      <!-- Slide 2: 3个关键指标 -->
+      <swiper-item>
+        <view class="metrics-card">
+          <text class="mc-title">关键指标</text>
+          <text class="mc-subtitle">你的天气心情数据画像</text>
+
+          <view class="metric-item">
+            <view class="mi-icon" style="background:rgba(255,179,71,0.15)">☀️</view>
+            <view class="mi-content">
+              <text class="mi-label">晴天均分</text>
+              <text class="mi-desc">晴天+多云天气下的平均心情分</text>
+            </view>
+            <view class="mi-value" style="color:#FFB347">{{sunnyAvg}}</view>
+          </view>
+
+          <view class="metric-item">
+            <view class="mi-icon" style="background:rgba(123,180,232,0.15)">🌧️</view>
+            <view class="mi-content">
+              <text class="mi-label">雨天均分</text>
+              <text class="mi-desc">雨天+雷阵雨天气下的平均心情分</text>
+            </view>
+            <view class="mi-value" style="color:#7BB4E8">{{rainyAvg}}</view>
+          </view>
+
+          <view class="metric-item">
+            <view class="mi-icon" style="background:rgba(232,133,106,0.15)">🌡️</view>
+            <view class="mi-content">
+              <text class="mi-label">温差敏感度</text>
+              <text class="mi-desc">晴天与雨天均分差值的绝对值</text>
+            </view>
+            <view class="mi-value" style="color:#E8856A">{{sensitivity}}</view>
+          </view>
+
+          <view class="mc-legend">
+            <text>敏感度 &gt;1.5 = 温差敏感型</text>
+            <text>敏感度 &lt;0.5 = 恒温稳定型</text>
+          </view>
+        </view>
+      </swiper-item>
+
+      <!-- Slide 3: 天气洞察 -->
+      <swiper-item>
+        <view class="insight-card">
+          <text class="ic-title">天气洞察</text>
+          <text class="ic-subtitle">你的心情在哪种天气下最佳</text>
+
+          <view class="ic-row">
+            <view class="ic-row-icon">🌡️</view>
+            <view class="ic-row-content">
+              <text class="ic-row-label">最佳温度区间</text>
+              <text class="ic-row-desc">你在该温度区间心情均分最高</text>
+            </view>
+            <text class="ic-row-value" style="color:#E8856A">{{bestTempRange}}</text>
+          </view>
+
+          <view class="ic-row">
+            <view class="ic-row-icon">{{bestWeatherEmoji}}</view>
+            <view class="ic-row-content">
+              <text class="ic-row-label">最佳心情天气</text>
+              <text class="ic-row-desc">均分 {{bestWeatherScore}} · 心情最好</text>
+            </view>
+            <text class="ic-row-value" style="color:#81C784">{{bestWeather}}</text>
+          </view>
+
+          <view class="ic-row">
+            <view class="ic-row-icon">{{worstWeatherEmoji}}</view>
+            <view class="ic-row-content">
+              <text class="ic-row-label">最易低落天气</text>
+              <text class="ic-row-desc">均分 {{worstWeatherScore}} · 需要多关照自己</text>
+            </view>
+            <text class="ic-row-value" style="color:#7BB4E8">{{worstWeather}}</text>
+          </view>
+
+          <view class="ic-counts">
+            <view class="ic-count-item">
+              <text class="ic-count-num">{{sunnyCount}}</text>
+              <text class="ic-count-label">晴天记录</text>
+            </view>
+            <view class="ic-count-divider"></view>
+            <view class="ic-count-item">
+              <text class="ic-count-num">{{rainyCount}}</text>
+              <text class="ic-count-label">雨天记录</text>
+            </view>
+            <view class="ic-count-divider"></view>
+            <view class="ic-count-item">
+              <text class="ic-count-num">{{totalRecords}}</text>
+              <text class="ic-count-label">总记录数</text>
+            </view>
+          </view>
+        </view>
+      </swiper-item>
+
+    </swiper>
+
+    <!-- 分享按钮 -->
+    <view class="share-btn-wrap">
+      <view class="share-btn" bindtap="generatePoster">
+        <text class="share-btn-emoji">📤</text>
+        <text>分享我的天气心情人格</text>
+      </view>
+    </view>
+
+    <!-- 隐藏画布 -->
+    <canvas type="2d" id="posterCanvas"
+            style="position:fixed; top:0; left:100vw; width:750rpx; height:1100rpx; pointer-events:none;">
+    </canvas>
+  </block>
+
+  <!-- 分享弹窗 -->
+  <view class="share-modal" wx:if="{{showShareModal}}" catchtap="closeShareModal">
+    <view class="share-modal-content" catchtap="">
+      <view class="share-modal-title">保存到相册分享吧</view>
+      <image class="share-modal-img" src="{{shareImagePath}}" mode="aspectFit"></image>
+      <view class="share-modal-actions">
+        <view class="share-modal-btn share-modal-cancel" bindtap="closeShareModal">取消</view>
+        <view class="share-modal-btn share-modal-save" bindtap="saveShareImage">保存到相册</view>
+      </view>
+    </view>
+  </view>
+</view>
