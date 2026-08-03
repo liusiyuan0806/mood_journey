@@ -30,6 +30,48 @@ const classifyWeather = (w) => {
   return '晴';
 };
 
+// ===== Radar weather classification (6 types: 晴/阴/雨/雪/雷/雾) =====
+const classifyWeatherRadar = (w) => {
+  if (!w) return '晴';
+  if (w.includes('雾') || w.includes('霾')) return '雾';
+  if (w.includes('雷')) return '雷';
+  if (w.includes('雨')) return '雨';
+  if (w.includes('雪')) return '雪';
+  if (w.includes('阴')) return '阴';
+  return '晴';
+};
+
+const RADAR_WEATHERS = [
+  { name: '晴', icon: '☀️', angle: -90 },
+  { name: '阴', icon: '☁️', angle: -30 },
+  { name: '雨', icon: '🌧️', angle: 30 },
+  { name: '雪', icon: '❄️', angle: 90 },
+  { name: '雷', icon: '⛈️', angle: 150 },
+  { name: '雾', icon: '🌫️', angle: 210 },
+];
+
+const RADAR_CX = 50;
+const RADAR_CY = 50;
+const RADAR_R = 36;
+const LABEL_R = 43;
+
+const radarPoint = (angle, score) => {
+  const r = (score / 5) * RADAR_R;
+  const rad = (angle * Math.PI) / 180;
+  return {
+    x: parseFloat((RADAR_CX + r * Math.cos(rad)).toFixed(1)),
+    y: parseFloat((RADAR_CY + r * Math.sin(rad)).toFixed(1)),
+  };
+};
+
+const radarLabelPos = (angle) => {
+  const rad = (angle * Math.PI) / 180;
+  return {
+    left: (50 + LABEL_R * Math.cos(rad)).toFixed(0) + '%',
+    top: (50 + LABEL_R * Math.sin(rad)).toFixed(0) + '%',
+  };
+};
+
 // ===== EHI levels =====
 const EHI_LEVELS = [
   { min: 80, label: '优秀', color: '#7BC97D', icon: '✨' },
@@ -94,6 +136,13 @@ const getTemp = (r) => {
   return isNaN(t) ? null : t;
 };
 
+// Map 1~5 score to cold-blue -> warm-orange for temperature heat strip
+const scoreToHeatColor = (score) => {
+  const t = Math.max(1, Math.min(5, score));
+  const hue = 210 - (t - 1) / 4 * 185;
+  return `hsl(${hue}, 85%, 74%)`;
+};
+
 Page({
   data: {
     records: [],
@@ -114,7 +163,21 @@ Page({
     // Weather correlation
     weatherGroups: [],
     weatherConclusion: '',
-    tempRanges: [],
+    // Temperature visualization
+    heatStrip: [],
+    heatStripHasData: false,
+    heatBest: null,
+    heatAttention: null,
+    heatSegmentPopup: null,
+    // Radar chart
+    radarVertices: [],
+    radarActualPoints: '',
+    radarAvgPoints: '',
+    radarAvgScore: null,
+    radarHasData: false,
+    radarPopup: null,
+    // Personalized conclusion
+    tempMoodConclusion: '',
     warning: false,
   },
 
@@ -129,11 +192,17 @@ Page({
     // 保留以兼容旧版 — 实际已不再使用
   },
 
-  // 点击图表空白处关闭柱子详情小方块
+  // 点击页面空白处关闭各类 popup
   closeBarPopup() {
-    if (this.data.selectedBar !== null) {
-      this.setData({ selectedBar: null });
-    }
+    this.setData({
+      selectedBar: null,
+      heatSegmentPopup: null,
+      radarPopup: null,
+    });
+  },
+
+  noop() {
+    // 用于 popup 内部阻止冒泡，无实际操作
   },
 
   toggleBreakdown() {
@@ -172,7 +241,13 @@ Page({
         trendBars: [],
         weatherGroups: [],
         weatherConclusion: '',
-        tempRanges: [],
+        heatStrip: [],
+        heatStripHasData: false,
+        heatBest: null,
+        heatAttention: null,
+        radarVertices: [],
+        radarHasData: false,
+        tempMoodConclusion: '',
         warning: false,
       });
       return;
@@ -224,6 +299,7 @@ Page({
 
     this.buildTrendChart();
     this.buildWeatherCorrelation(records);
+    this.buildTempVisualization();
   },
 
   // ===== Trend chart =====
@@ -391,33 +467,380 @@ Page({
         weatherGroups[0].avgScoreRaw + '分';
     }
 
-    // Temperature ranges
-    const tempBuckets = [
-      { range: '<10°C', min: -100, max: 10, color: '#BBD4EE' },
-      { range: '10-20°C', min: 10, max: 20, color: '#C8E5D1' },
-      { range: '20-30°C', min: 20, max: 30, color: '#FFE19A' },
-      { range: '30°C+', min: 30, max: 100, color: '#F7B7A5' },
-    ];
+    this.setData({ weatherGroups, weatherConclusion });
+  },
 
-    const tempData = records.filter(r => getTemp(r) != null);
-    const tempRanges = tempBuckets.map(bucket => {
-      const bucketRecords = tempData.filter(r => {
+  // ===== Temperature visualization =====
+  buildTempVisualization() {
+    const records = this.data.records || [];
+    const tempRecords = records.filter(r => getTemp(r) != null);
+
+    // 1. 温度区间心情热力带：-10°C ~ 40°C，每 5°C 一段
+    const heatStrip = [];
+    for (let min = -10; min < 40; min += 5) {
+      const max = min + 5;
+      const label = `${min}~${max}°C`;
+      const bucketRecords = tempRecords.filter(r => {
         const t = getTemp(r);
-        return t >= bucket.min && t < bucket.max;
+        return t >= min && t < max;
       });
-      if (bucketRecords.length === 0) return null;
-      const bScores = bucketRecords.map(r => byName(r.mood).score);
-      const bAvg = bScores.reduce((a, b) => a + b, 0) / bScores.length;
-      return {
-        range: bucket.range,
-        count: bucketRecords.length,
-        avgScore: Math.round(bAvg * 10) / 10,
-        color: bucket.color,
-        barWidth: Math.round(bAvg / 5 * 100) + '%',
-      };
-    }).filter(Boolean);
 
-    this.setData({ weatherGroups, weatherConclusion, tempRanges });
+      if (bucketRecords.length === 0) {
+        heatStrip.push({ min, max, label, count: 0, avgScore: null, color: '#F0F0F0', records: [] });
+        continue;
+      }
+
+      const scores = bucketRecords.map(r => byName(r.mood).score);
+      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+      heatStrip.push({
+        min, max, label,
+        count: bucketRecords.length,
+        avgScore: Math.round(avg * 10) / 10,
+        color: scoreToHeatColor(avg),
+        records: bucketRecords.map(r => ({
+          id: r.id,
+          date: r.date,
+          mood: r.mood,
+          emoji: byName(r.mood).emoji,
+          score: byName(r.mood).score,
+          weather: r.weather || '未知',
+          temp: getTemp(r),
+          note: r.note || '',
+        })),
+      });
+    }
+
+    const filled = heatStrip.filter(b => b.count > 0);
+    const heatStripHasData = filled.length > 0;
+    let heatBest = null;
+    let heatAttention = null;
+    if (filled.length) {
+      heatBest = filled.reduce((a, b) => (a.avgScore >= b.avgScore ? a : b));
+      // 注意区间：与最佳不同且分数最低；若只有一个区间则不重复显示
+      if (filled.length >= 2) {
+        heatAttention = filled
+          .filter(b => b.label !== heatBest.label)
+          .reduce((a, b) => (a.avgScore <= b.avgScore ? a : b));
+      }
+    }
+
+    this.setData({
+      heatStrip,
+      heatStripHasData,
+      heatBest,
+      heatAttention,
+    });
+
+    this.buildRadarChart(heatBest, heatAttention);
+  },
+
+  // ===== Weather mood radar chart =====
+  buildRadarChart(heatBest, heatAttention) {
+    const records = this.data.records || [];
+
+    // Group records by radar weather type
+    const groups = {};
+    RADAR_WEATHERS.forEach(w => { groups[w.name] = []; });
+
+    records.forEach(r => {
+      const key = classifyWeatherRadar(r.weather);
+      if (groups[key]) groups[key].push(r);
+    });
+
+    // Overall average score
+    const allScores = records.map(r => byName(r.mood).score);
+    const overallAvg = allScores.length > 0
+      ? allScores.reduce((a, b) => a + b, 0) / allScores.length
+      : 0;
+
+    const radarVertices = RADAR_WEATHERS.map(w => {
+      const groupRecords = groups[w.name];
+      const count = groupRecords.length;
+      const labelPos = radarLabelPos(w.angle);
+
+      if (count === 0) {
+        return {
+          name: w.name,
+          icon: w.icon,
+          count: 0,
+          avgScore: null,
+          dotX: RADAR_CX,
+          dotY: RADAR_CY,
+          insufficient: true,
+          topMoods: [],
+          records: [],
+          labelLeft: labelPos.left,
+          labelTop: labelPos.top,
+        };
+      }
+
+      const scores = groupRecords.map(r => byName(r.mood).score);
+      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+      const avgRounded = Math.round(avg * 10) / 10;
+      const p = radarPoint(w.angle, avg);
+
+      // Top 3 moods
+      const moodCounts = {};
+      groupRecords.forEach(r => { moodCounts[r.mood] = (moodCounts[r.mood] || 0) + 1; });
+      const topMoods = Object.keys(moodCounts)
+        .sort((a, b) => moodCounts[b] - moodCounts[a])
+        .slice(0, 3)
+        .map(name => {
+          const info = byName(name);
+          return {
+            name,
+            emoji: info.emoji,
+            color: info.color,
+            percent: Math.round(moodCounts[name] / count * 100),
+          };
+        });
+
+      return {
+        name: w.name,
+        icon: w.icon,
+        count,
+        avgScore: avgRounded,
+        dotX: p.x,
+        dotY: p.y,
+        insufficient: count < 3,
+        topMoods,
+        records: groupRecords.map(r => ({
+          id: r.id,
+          date: r.date,
+          mood: r.mood,
+          emoji: byName(r.mood).emoji,
+          score: byName(r.mood).score,
+          weather: r.weather || '未知',
+          temp: getTemp(r),
+          note: r.note || '',
+        })).slice(-10).reverse(),
+        labelLeft: labelPos.left,
+        labelTop: labelPos.top,
+      };
+    });
+
+    // Actual mood polygon points
+    const actualPoints = radarVertices.map(v => {
+      if (v.avgScore == null) return `${RADAR_CX},${RADAR_CY}`;
+      return `${v.dotX},${v.dotY}`;
+    }).join(' ');
+
+    // Average hexagon points
+    const avgPoints = RADAR_WEATHERS.map(w => {
+      const p = radarPoint(w.angle, overallAvg);
+      return `${p.x},${p.y}`;
+    }).join(' ');
+
+    const radarHasData = radarVertices.some(v => v.count > 0);
+
+    this.setData({
+      radarVertices,
+      radarActualPoints: actualPoints,
+      radarAvgPoints: avgPoints,
+      radarAvgScore: Math.round(overallAvg * 10) / 10,
+      radarHasData,
+    }, () => {
+      setTimeout(() => this.drawRadarCanvas(), 80);
+    });
+
+    this.generateTempMoodConclusion(heatBest, heatAttention, radarVertices);
+  },
+
+  // ===== Canvas radar drawing =====
+  drawRadarCanvas(retries) {
+    if (retries === undefined) retries = 0;
+    const query = wx.createSelectorQuery().in(this);
+    query.select('#radarCanvas').fields({ node: true, size: true }).exec((res) => {
+      if (!res || !res[0] || !res[0].node) {
+        // Canvas 节点尚未就绪（wx:if 刚切换），延迟重试
+        if (retries < 6) {
+          setTimeout(() => this.drawRadarCanvas(retries + 1), 100);
+        }
+        return;
+      }
+      const canvas = res[0].node;
+      const ctx = canvas.getContext('2d');
+      const dpr = (wx.getWindowInfo && wx.getWindowInfo().pixelRatio) || 2;
+
+      // 内部分辨率 500×dpr，坐标系 0~100，缩放因子 = 5×dpr
+      const SCALE = 5;
+      canvas.width = 100 * SCALE * dpr;
+      canvas.height = 100 * SCALE * dpr;
+      ctx.scale(SCALE * dpr, SCALE * dpr);
+      ctx.clearRect(0, 0, 100, 100);
+
+      const vertices = this.data.radarVertices || [];
+      const avgScore = this.data.radarAvgScore || 0;
+
+      // 1. Grid hexagons (score 1~5)
+      ctx.strokeStyle = '#E8D8CE';
+      ctx.lineWidth = 0.4;
+      for (let score = 1; score <= 5; score++) {
+        ctx.beginPath();
+        RADAR_WEATHERS.forEach((w, i) => {
+          const p = radarPoint(w.angle, score);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        });
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      // 2. Axis lines
+      ctx.lineWidth = 0.3;
+      RADAR_WEATHERS.forEach(w => {
+        const p = radarPoint(w.angle, 5);
+        ctx.beginPath();
+        ctx.moveTo(RADAR_CX, RADAR_CY);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      });
+
+      // 3. Score scale labels
+      ctx.fillStyle = '#C5B6AC';
+      ctx.font = '3px sans-serif';
+      ctx.textBaseline = 'middle';
+      for (let score = 1; score <= 5; score++) {
+        const p = radarPoint(-90, score);
+        ctx.fillText(String(score), p.x + 2, p.y);
+      }
+
+      // 4. Average polygon (dashed gray)
+      if (avgScore > 0) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = '#B5A69C';
+        ctx.lineWidth = 0.6;
+        ctx.setLineDash([2, 1.2]);
+        RADAR_WEATHERS.forEach((w, i) => {
+          const p = radarPoint(w.angle, avgScore);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        });
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 5. Actual mood polygon (filled + stroke)
+      if (vertices.some(v => v.count > 0)) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(232,133,106,0.18)';
+        ctx.strokeStyle = '#E8856A';
+        ctx.lineWidth = 1.0;
+        ctx.lineJoin = 'round';
+        vertices.forEach((v, i) => {
+          if (i === 0) ctx.moveTo(v.dotX, v.dotY);
+          else ctx.lineTo(v.dotX, v.dotY);
+        });
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 6. Vertex dots
+      vertices.forEach(v => {
+        ctx.beginPath();
+        ctx.fillStyle = v.insufficient ? '#D5C5BA' : '#E8856A';
+        const r = v.insufficient ? 1.0 : 1.8;
+        ctx.arc(v.dotX, v.dotY, r, 0, Math.PI * 2);
+        ctx.fill();
+        // 白色描边增强可见度
+        if (!v.insufficient) {
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = 0.4;
+          ctx.stroke();
+        }
+      });
+    });
+  },
+
+  showRadarVertex(e) {
+    const idx = parseInt(e.currentTarget.dataset.idx);
+    const vertex = this.data.radarVertices[idx];
+    if (!vertex || vertex.count === 0) {
+      this.setData({ radarPopup: null, heatSegmentPopup: null });
+      return;
+    }
+    this.setData({ radarPopup: vertex, heatSegmentPopup: null });
+  },
+
+  showHeatSegment(e) {
+    const idx = parseInt(e.currentTarget.dataset.idx);
+    const bucket = this.data.heatStrip[idx];
+    if (!bucket || bucket.count === 0) {
+      this.setData({ heatSegmentPopup: null, radarPopup: null });
+      return;
+    }
+    this.setData({ heatSegmentPopup: bucket, radarPopup: null });
+  },
+
+  // ===== Personalized conclusion =====
+  generateTempMoodConclusion(heatBest, heatAttention, radarVertices) {
+    const records = this.data.records || [];
+    if (records.length === 0) {
+      this.setData({ tempMoodConclusion: '' });
+      return;
+    }
+
+    const parts = [];
+
+    // Temperature insight
+    if (heatBest) {
+      let tempDesc = '';
+      if (heatBest.min >= 20 && heatBest.min < 30) tempDesc = '温暖舒适';
+      else if (heatBest.min >= 10 && heatBest.min < 20) tempDesc = '凉爽宜人';
+      else if (heatBest.min >= 30) tempDesc = '炎热';
+      else if (heatBest.min < 10) tempDesc = '寒冷';
+
+      parts.push(`在 ${heatBest.label} 时你的心情最好（均分 ${heatBest.avgScore}），说明你偏爱${tempDesc}的环境`);
+
+      if (heatAttention) {
+        let attnDesc = '';
+        if (heatAttention.min >= 30) attnDesc = '高温容易让人烦躁';
+        else if (heatAttention.min < 10) attnDesc = '寒冷天气可能让人提不起劲';
+        else attnDesc = '该温度区间你的情绪相对偏低';
+        parts.push(`而 ${heatAttention.label} 时情绪稍低（${heatAttention.avgScore}分），${attnDesc}`);
+      }
+    }
+
+    // Weather insight from radar
+    const filled = radarVertices.filter(v => v.count > 0 && !v.insufficient);
+    if (filled.length >= 2) {
+      const sorted = [...filled].sort((a, b) => b.avgScore - a.avgScore);
+      const bestW = sorted[0];
+      const worstW = sorted[sorted.length - 1];
+      const diff = bestW.avgScore - worstW.avgScore;
+
+      if (diff >= 1.5) {
+        parts.push(`${bestW.icon}${bestW.name}天是你心情的高光时刻（${bestW.avgScore}分），而${worstW.icon}${worstW.name}天则是你的情绪软肋（${worstW.avgScore}分），相差${diff.toFixed(1)}分，你对天气变化比较敏感`);
+      } else if (diff >= 0.5) {
+        parts.push(`${bestW.icon}${bestW.name}天心情稍好（${bestW.avgScore}分），${worstW.icon}${worstW.name}天稍低（${worstW.avgScore}分），但整体受天气影响不大`);
+      } else {
+        parts.push(`不同天气下你的心情都很稳定（${worstW.avgScore}~${bestW.avgScore}分），是个「恒温型」心情人格`);
+      }
+    } else if (filled.length === 1) {
+      parts.push(`目前数据以${filled[0].icon}${filled[0].name}天为主，均分${filled[0].avgScore}分，记录更多不同天气的心情后可以看到更完整的画像`);
+    }
+
+    // Overall pattern
+    const allScores = records.map(r => byName(r.mood).score);
+    const avg = allScores.reduce((a, b) => a + b, 0) / allScores.length;
+    const std = Math.sqrt(allScores.reduce((s, n) => s + (n - avg) ** 2, 0) / allScores.length);
+
+    if (avg >= 4 && std < 0.8) {
+      parts.push('整体来看，你的心情基调积极且稳定，继续保持这份好状态');
+    } else if (avg >= 3.5) {
+      parts.push('整体来看，你的心情处于良好水平，偶尔的波动都是正常的');
+    } else if (std > 1.2) {
+      parts.push('整体来看，你的情绪有些起伏，记得多关注自己的感受，给自己一些缓冲时间');
+    } else {
+      parts.push('整体来看，坚持记录会帮助你更好地觉察和调节情绪');
+    }
+
+    this.setData({ tempMoodConclusion: parts.join('。') + '。' });
   },
 
   goRecord() {

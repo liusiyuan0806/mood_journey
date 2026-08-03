@@ -1,0 +1,442 @@
+/* ===== 天气心情人格 · 温暖色调 ===== */
+.page {
+  min-height: 100vh;
+  background: #FFF8F2;
+  padding-bottom: 180rpx;
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160rpx 60rpx;
+  text-align: center;
+}
+
+.empty-emoji {
+  font-size: 96rpx;
+  margin-bottom: 32rpx;
+}
+
+.empty-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  margin-bottom: 16rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #B5A69C;
+  line-height: 1.8;
+  white-space: pre-line;
+  margin-bottom: 48rpx;
+}
+
+.empty-btn {
+  padding: 24rpx 64rpx;
+  background: linear-gradient(135deg, #E8856A, #D87060);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 48rpx;
+  box-shadow: 0 8rpx 24rpx rgba(232, 133, 106, 0.25);
+}
+
+.empty-btn:active {
+  opacity: 0.85;
+}
+
+/* ===== 标题区 ===== */
+.header {
+  text-align: center;
+  padding: 40rpx 32rpx 24rpx;
+}
+
+.header-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #4A3A32;
+  letter-spacing: 1rpx;
+}
+
+.header-sub {
+  display: block;
+  font-size: 24rpx;
+  color: #B5A69C;
+  margin-top: 10rpx;
+}
+
+/* ===== Swiper ===== */
+.card-swiper {
+  width: 100%;
+  height: 720rpx;
+}
+
+/* ===== Slide 1: 人格卡 ===== */
+.personality-card {
+  height: 100%;
+  margin: 0 32rpx;
+  border-radius: 28rpx;
+  padding: 48rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 12rpx 36rpx rgba(200, 130, 90, 0.1);
+  box-sizing: border-box;
+}
+
+.pc-emoji-circle {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  border: 4rpx solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28rpx;
+}
+
+.pc-emoji {
+  font-size: 72rpx;
+  line-height: 1;
+}
+
+.pc-tag {
+  font-size: 52rpx;
+  font-weight: 800;
+  letter-spacing: 2rpx;
+  margin-bottom: 12rpx;
+}
+
+.pc-nickname {
+  font-size: 26rpx;
+  color: #8B776B;
+  margin-bottom: 24rpx;
+}
+
+.pc-divider {
+  width: 120rpx;
+  height: 4rpx;
+  border-radius: 2rpx;
+  margin-bottom: 28rpx;
+}
+
+.pc-desc {
+  font-size: 27rpx;
+  color: #5D4A40;
+  line-height: 1.9;
+  padding: 0 12rpx;
+}
+
+.pc-hint {
+  margin-top: auto;
+  padding-top: 24rpx;
+}
+
+.pc-hint text {
+  font-size: 22rpx;
+  color: #C5B6AC;
+}
+
+/* ===== Slide 2: 指标卡 ===== */
+.metrics-card {
+  height: 100%;
+  margin: 0 32rpx;
+  border-radius: 28rpx;
+  padding: 44rpx 36rpx;
+  background: #FFFFFF;
+  box-shadow: 0 12rpx 36rpx rgba(200, 130, 90, 0.08);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.mc-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #4A3A32;
+  text-align: center;
+}
+
+.mc-subtitle {
+  font-size: 24rpx;
+  color: #B5A69C;
+  text-align: center;
+  margin-top: 8rpx;
+  margin-bottom: 36rpx;
+}
+
+.metric-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #F5EBE3;
+}
+
+.metric-item:last-of-type {
+  border-bottom: none;
+}
+
+.mi-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  flex-shrink: 0;
+}
+
+.mi-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.mi-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3A32;
+}
+
+.mi-desc {
+  font-size: 22rpx;
+  color: #B5A69C;
+}
+
+.mi-value {
+  font-size: 48rpx;
+  font-weight: 800;
+  letter-spacing: -1rpx;
+}
+
+.mc-legend {
+  margin-top: auto;
+  padding-top: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  text-align: center;
+}
+
+.mc-legend text {
+  font-size: 21rpx;
+  color: #C5B6AC;
+}
+
+/* ===== Slide 3: 天气洞察卡 ===== */
+.insight-card {
+  height: 100%;
+  margin: 0 32rpx;
+  border-radius: 28rpx;
+  padding: 44rpx 36rpx;
+  background: #FFFFFF;
+  box-shadow: 0 12rpx 36rpx rgba(200, 130, 90, 0.08);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.ic-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #4A3A32;
+  text-align: center;
+}
+
+.ic-subtitle {
+  font-size: 24rpx;
+  color: #B5A69C;
+  text-align: center;
+  margin-top: 8rpx;
+  margin-bottom: 32rpx;
+}
+
+.ic-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #F5EBE3;
+}
+
+.ic-row:last-of-type {
+  border-bottom: none;
+}
+
+.ic-row-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: #FFF1E6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+
+.ic-row-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.ic-row-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A3A32;
+}
+
+.ic-row-desc {
+  font-size: 22rpx;
+  color: #B5A69C;
+}
+
+.ic-row-value {
+  font-size: 36rpx;
+  font-weight: 800;
+}
+
+.ic-counts {
+  margin-top: auto;
+  padding-top: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.ic-count-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.ic-count-num {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #E8856A;
+}
+
+.ic-count-label {
+  font-size: 22rpx;
+  color: #B5A69C;
+}
+
+.ic-count-divider {
+  width: 1rpx;
+  height: 60rpx;
+  background: #F5EBE3;
+}
+
+/* ===== 分享按钮 ===== */
+.share-btn-wrap {
+  padding: 24rpx 32rpx;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  height: 96rpx;
+  background: linear-gradient(135deg, #E8856A, #D87060);
+  border-radius: 48rpx;
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  box-shadow: 0 8rpx 24rpx rgba(232, 133, 106, 0.3);
+}
+
+.share-btn:active {
+  opacity: 0.88;
+}
+
+.share-btn-emoji {
+  font-size: 34rpx;
+}
+
+/* ===== 分享弹窗 ===== */
+.share-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+.share-modal-content {
+  width: 100%;
+  max-width: 600rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.share-modal-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #4A3A32;
+  margin-bottom: 24rpx;
+}
+
+.share-modal-img {
+  width: 100%;
+  height: 800rpx;
+  border-radius: 12rpx;
+  background: #F5EBE3;
+  margin-bottom: 32rpx;
+}
+
+.share-modal-actions {
+  width: 100%;
+  display: flex;
+  gap: 20rpx;
+}
+
+.share-modal-btn {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 44rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.share-modal-cancel {
+  background: #F5EBE3;
+  color: #8B776B;
+}
+
+.share-modal-save {
+  background: linear-gradient(135deg, #E8856A, #D87060);
+  color: #FFFFFF;
+  box-shadow: 0 4rpx 12rpx rgba(232, 133, 106, 0.3);
+}
+
+.share-modal-save:active {
+  opacity: 0.9;
+}
